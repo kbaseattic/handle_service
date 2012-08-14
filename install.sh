@@ -10,7 +10,7 @@ fi
 mkdir -p ${GOPATH}/src/github.com/MG-RAST
 cp -r Shock ${GOPATH}/src/github.com/MG-RAST/
 
-go install github.com/MG-RAST/Shock/...
+go get github.com/MG-RAST/Shock/...
 mkdir -p ${SERVICE_DIR} ${SERVICE_DIR}/bin ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs ${SERVICE_DIR}/data ${SERVICE_DIR}/data/temp
 cd ${SERVICE_DIR}/data
 ln -s . raw

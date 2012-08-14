@@ -9,3 +9,4 @@ pid=$(cat $pid_file)
 kill $pid
 rm $pid_file
 echo done.
+  
