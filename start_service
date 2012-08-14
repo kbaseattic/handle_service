@@ -1,0 +1,6 @@
+#!/bin/sh
+echo starting aux_store services.
+./bin/shock-server -conf conf/shock.cfg &
+echo $! > aux_store.pid
+echo aux_store site is listening on port 8080.
+echo aux_store service is listening on port 8000.

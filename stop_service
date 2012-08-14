@@ -1,0 +1,9 @@
+#!/bin/sh
+echo trying to stop aux_store services.
+pid_file=aux_store.pid
+if [ ! -f $pid_file ] ; then 
+	echo "No pid file: $pid_file found for service aux_store."
+	exit 1
+fi
+pid=$(cat $pid_file)
+kill $pid
