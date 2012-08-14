@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 
 SERVICE_DIR=$1
 export GOPATH=/usr/local/gopath
