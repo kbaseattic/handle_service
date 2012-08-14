@@ -20,3 +20,4 @@ cp -r Shock/site ${SERVICE_DIR}
 rm ${SERVICE_DIR}/site/assets/misc/README.md
 cp Shock/README.md ${SERVICE_DIR}/site/assets/misc/README.md
 cp shock.cfg ${SERVICE_DIR}/conf/shock.cfg
+cp start_service stop_service ${SERVICE_DIR}
