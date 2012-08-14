@@ -1,5 +1,5 @@
 TARGET ?= /kb/deployment
-SERVICE = shock
+SERVICE = aux_store
 SERVICE_DIR = $(TARGET)/services/$(SERVICE)
 
 all: deploy
@@ -7,5 +7,6 @@ all: deploy
 deploy: deploy-services
 
 deploy-services:
-    git submodule init
+	git submodule init
+	git submodule update
 	sh install.sh $(SERVICE_DIR)

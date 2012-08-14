@@ -16,7 +16,7 @@ cd ${SERVICE_DIR}/data
 ln -s . raw
 cd -
 cp ${GOPATH}/bin/shock-server ${SERVICE_DIR}/bin/
-cp -r site ${SERVICE_DIR}
+cp -r Shock/site ${SERVICE_DIR}
 rm ${SERVICE_DIR}/site/assets/misc/README.md
 cp Shock/README.md ${SERVICE_DIR}/site/assets/misc/README.md
 cp shock.cfg ${SERVICE_DIR}/conf/shock.cfg
