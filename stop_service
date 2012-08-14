@@ -7,3 +7,4 @@ if [ ! -f $pid_file ] ; then
 fi
 pid=$(cat $pid_file)
 kill $pid
+rm $pid_file
