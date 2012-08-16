@@ -1,0 +1,25 @@
+do{ my $x = {
+       'build_requires' => {},
+       'conflicts' => {},
+       'requires' => {
+                       'Email::Valid' => '0.19',
+                       'URI::Escape' => '1.6',
+                       'Storable' => '2.22',
+                       'Object::Tiny::RW' => '1.07',
+                       'Digest::SHA' => '2.13',
+                       'Digest::MD5' => '2.39',
+                       'HTTP::Daemon' => '6',
+                       'Test::Deep' => '0.109',
+                       'Net::OAuth' => '0.28',
+                       'Data::Dumper' => '2.1',
+                       'REST::Client' => 245,
+                       'Carp' => '1.17',
+                       'Test::More' => '0.94',
+                       'LWP::UserAgent' => '6.02',
+                       'MIME::Base64' => '3.08',
+                       'JSON' => '2.53',
+                       'HTTP::Request' => '6'
+                     },
+       'recommends' => {}
+     };
+$x; }
