@@ -27,13 +27,22 @@ cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
 
 # install uploader
 echo "installing uploader"
+
+# service nginx stop
+# apt-get update
+# apt-get install apache2-mpm-itk
+# echo "AddHandler cgi-script .cgi" >> /etc/apache2/mods-enabled/mime.conf 
+# rm /etc/apache2/sites-enabled/000-default
+
 cp -r uploader ${SERVICE_DIR}
 ./setup.pl -input conf/uploader.cfg -output ${SERVICE_DIR}/uploader/UploaderConfig.pm
 cp conf/uploader.apache.conf /etc/apache2/sites
 
-/kb/runtime/bin/perl Bio-KBase-Auth/Build.PL 
-/kb/runtime/bin/perl Bio-KBase-Auth/Build installdeps --install_path arch=${PERL_LIB}
-/kb/runtime/bin/perl Bio-KBase-Auth/Build install --install_path arch=${PERL_LIB}
+cd Bio-KBase-Auth
+/kb/runtime/bin/perl Build.PL 
+/kb/runtime/bin/perl Build installdeps --install_path arch=${PERL_LIB}
+/kb/runtime/bin/perl Build install --install_path arch=${PERL_LIB}
+cd -
 
 # services
 cp services/* ${SERVICE_DIR}
