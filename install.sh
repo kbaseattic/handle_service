@@ -3,6 +3,7 @@
 SERVICE_DIR=$1
 
 # build shock
+echo "installing shock"
 export GOPATH=/usr/local/gopath
 
 if [ ! -e ${GOPATH} ]; then
@@ -13,7 +14,7 @@ mkdir -p ${GOPATH}/src/github.com/MG-RAST
 cp -r Shock ${GOPATH}/src/github.com/MG-RAST/
 
 go get github.com/MG-RAST/Shock/...
-mkdir -p ${SERVICE_DIR} ${SERVICE_DIR}/bin ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs ${SERVICE_DIR}/data ${SERVICE_DIR}/data/temp
+mkdir -p ${SERVICE_DIR} ${SERVICE_DIR}/bin ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs/shock ${SERVICE_DIR}/data ${SERVICE_DIR}/data/temp
 cd ${SERVICE_DIR}/data
 ln -s . raw
 cd -
@@ -24,8 +25,10 @@ cp Shock/README.md ${SERVICE_DIR}/site/assets/misc/README.md
 cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
 
 # install uploader
-./setup.pl -input conf/uploader.cg -output uploader/UploaderConfig.pm
-
+echo "installing uploader"
+cp -r uploader ${SERVICE_DIR}
+./setup.pl -input conf/uploader.cfg -output ${SERVICE_DIR}/uploader/UploaderConfig.pm
+cp conf/uploader.apache.conf /etc/apache2/sites
 
 # services
 cp services/* ${SERVICE_DIR}
