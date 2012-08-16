@@ -1,0 +1,19 @@
+<div class="control-group">
+  <label class="control-label" for="samtools_organism">Organism</label>
+  <div class="controls">
+    <input type="text" class="input-xlarge" data-provide="typeahead"
+	   name="organism"  id="samtools_organism">
+    <p class="help-block">please select the reference organism for the pipeline to use</p>
+  </div>
+</div>
+<img src="/icons/loading.gif" id="loading_image" onload="jQuery.ajax({
+    url: 'uploader/samtools_organisms.cgi',
+    dataType: 'json',
+    success: function(data) {
+        $('#samtools_organism').typeahead( { source: data } );
+        document.getElementById('loading_image').style.display = 'none';
+    },
+    error: function (event, request, settings) {
+        console.warn('AJAX error! ', event, request, settings);
+    }
+});">

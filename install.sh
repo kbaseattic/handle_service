@@ -1,6 +1,8 @@
 #!/bin/sh 
 
 SERVICE_DIR=$1
+
+# build shock
 export GOPATH=/usr/local/gopath
 
 if [ ! -e ${GOPATH} ]; then
@@ -19,5 +21,11 @@ cp ${GOPATH}/bin/shock-server ${SERVICE_DIR}/bin/
 cp -r Shock/site ${SERVICE_DIR}
 rm ${SERVICE_DIR}/site/assets/misc/README.md
 cp Shock/README.md ${SERVICE_DIR}/site/assets/misc/README.md
-cp shock.cfg ${SERVICE_DIR}/conf/shock.cfg
-cp start_service stop_service ${SERVICE_DIR}
+cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
+
+# install uploader
+./setup.pl -input conf/uploader.cg -output uploader/UploaderConfig.pm
+
+
+# services
+cp services/* ${SERVICE_DIR}

@@ -1,0 +1,5 @@
+To install, place all files in the according webserver directories. Create a space for the user inboxes. All paths must be configured in UploaderConfig.pm.
+
+To install a new pipeline, place a $pipeline.html and $pipeline.exec file in the pipelines directory. The HTML file must provide the options to be shown when the pipeline is selected. The exec file must be the command line that executes the pipeline. Within the exec file, you can use all uppercase words that are the same as html parameters in the options provided in the HTML file. These words will be replaced by the values the user selected on the web page.
+
+The filename of the input file will replace the word INPUT_FILE in the exec file.
