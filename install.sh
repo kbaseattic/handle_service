@@ -36,7 +36,7 @@ echo "installing uploader"
 
 cp -r uploader ${SERVICE_DIR}
 ./setup.pl -input conf/uploader.cfg -output ${SERVICE_DIR}/uploader/UploaderConfig.pm
-cp conf/uploader.apache.conf /etc/apache2/sites
+cp conf/uploader.apache.conf /etc/apache2/sites-enabled
 
 cd Bio-KBase-Auth
 /kb/runtime/bin/perl Build.PL 
