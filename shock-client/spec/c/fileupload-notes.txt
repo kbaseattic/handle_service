@@ -1,0 +1,26 @@
+The problem is when you want to upload a file.
+
+SOLUTION 1
+
+A solution is use a client call to register the file with the server.
+
+The server then does a http based pull.
+
+The limitations of this strategy is that parallel transfers of chunks is not really possible without a specialized client.
+
+SOLUTION 2
+
+A solution is to do a mulit-part post from the client.
+
+The limitations of this strategy is that a specialized client will be required. A potential solution is a general client lib distributed as part of every client bundle that handles this. There is a special token in the type spec that directs the compiler to insert a file upload. Perhaps this can be a special type "UploadableFile".
+
+
+funcdef uploadFile(FileName localfile, FileName remotefile) returns (Filesize bytes) isa FileUploader;
+
+
+SOLUTION 3
+
+A solution is to get an id from the client, and then just do a PUT using curl or whatever you want. This seems to be the solution that our REST advocates would prefer.
+
+SOLUTION 4
+
