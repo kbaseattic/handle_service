@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+use lib "$ENV{HOME}/local/dev/shock/shock-client/lib";
+use Bio::KBase::AuthToken;;
+use Getopt::Long;
+GetOptions (
+			'u=s'      => \$user,
+			'p=s'      => \$password,
+			'url=s'    => \$base_url,
+			'id=s'     => \$id,
+			'attr=s'   => \$attr_file,
+			'data=s'   => \$data_file,
+
+			
+);
+
+usage("url or id not specified")           unless $base_url && $id;
+
+
+$cmd  = " curl -s -X PUT ";
+
+my $auth_token = Bio::KBase::AuthToken->new(user_id => $user,
+					    password => $password);
+unless ($auth_token->token() ) {
+  print STDERR "could not get kbase auth token, reverting to basic auth\n";
+  print STDERR $auth_token->error_message();
+  print STDERR "will try without authorization\n";
+}
+else {
+  $cmd .= " --header Authorization: OAuth " . $auth_token->token();
+}
+
+$cmd .= " -F \"attributes=\@$attr_file\" " if ($attr_file);
+$cmd .= " -F \"file=\@$data_file\" "       if ($data_file);
+$cmd .= " http://$base_url/node/$id?";
+$cmd =~ s/[\&\?]$//;
+
+print STDERR "command: $cmd\n";
+system ($cmd);
+
+sub usage {
+print @_, "\n" if @_;
+
+print<<END;
+GetOptions (
+	'u=s'      => \$user,
+	'p=s'      => \$password,
+	'url=s'    => \$base_url,
+	'id=s'     => \$id,
+	'attr=s' => \$attr_file,
+	'data=s' => \$data_file,
+);
+
+
+Modify:
+
+    - Once the file or attributes of a node are set they are immutiable.
+    - Accepts multipart/form-data encoded
+    - To set attributes include file field named "attributes" containing a json
+      file of attributes 
+    - To set file include file field named "file" containing
+      any file
+
+
+END
+exit;
+}

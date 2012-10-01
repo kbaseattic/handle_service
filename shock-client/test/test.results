@@ -1,0 +1,23 @@
+Tom,
+
+Here is what I observed:
+
+1.    shock-client/bin/resources.curl has different syntax than the remaining scripts.  It takes a URL as input and not -url=URL.  Also, it does not tell you the syntax of what it is wanting.
+2.    shock-client/bin/create_index.curl is not working for two reasons.  First, it is missing the URL in the curl command.  Second, creating an index is a PUT and not a GET in the curl command. Feature not tested.
+3.    shock-client/bin/view_user.curl has the comment that ID may not be needed. The ID is needed.  Without the ID, admin users can get the entire list but non-admin users get nothing.  FYI - The ID in this case is the uuid that was returned when the user was created.  To keep it from being confused with the ID for nodes or the user ID, it probably should be called uuid.
+4.    shock-client/bin/list_users.curl only works for admin users and therefore did not work for me. Has the comment "not sure id is required".  It isn't.  If an ID is included, it is the same as view_user.curl above. 
+5.    There is something amiss with the query feature.  The following:
+
+        /home/ml3/dev/KBase/shock/shock/shock-client/bin/list_nodes.curl -u=landml -p=mypass -url=localhost:8000 -query=file_name=h_sapiens_asm.tar.gz
+
+Does not return the same as its corresponding curl command:
+
+         curl -s -X GET --user landml:mypass http://localhost:8000/node/\?query\&file_name=h_sapiens_asm.tar.gz
+
+If I try to do -query and -limit in the same command, I get the error message: "sh: query: command not found".  These two may be halves of the same issue but they act differently.
+
+6.    There is something amiss with the -index=size and -chunksize.  I don't believe that shock is actually returning chunks.
+N.    All of these have a "feature" that I've seen in other interfaces.  The return is part text "command:....." and part JSON.  It would be easier to parse if it was all one or the other.
+
+Miriam
+

@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($user $password $base_url $id $download $index @parts $inbytes);
+use lib "$ENV{HOME}/local/dev/shock/shock-client/lib";
+use Bio::KBase::AuthToken;
+use Getopt::Long qw(:config auto_help);
+GetOptions (
+			'u=s'      => \$user,		# required
+			'p=s'      => \$password,	# required
+			'url=s'    => \$base_url,     	# required
+			'id=s'     => \$id,		# required
+			'download' => \$download,	# optional
+			'index=s'  => \$index,		# optional
+			'parts=s'  => \@parts,		# optional
+			'chunksize=i' => \$inbytes,	# optional
+			
+);
+
+usage("url or id not specified")      unless $base_url && $id;
+usage("index specified but no parts") if ($index and (!@parts));
+usage("parts specified but no index") if (@parts and (!$index));
+
+@parts=split(/\s*,\s*/,join(',',@parts));
+
+my $cmd  = " curl -s -X GET ";
+
+my $auth_token = Bio::KBase::AuthToken->new(user_id => $user,
+					    password => $password);
+unless ($auth_token->token() ) {
+  print STDERR "could not get kbase auth token, reverting to basic auth\n";
+  print STDERR $auth_token->error_message();
+  print STDERR "will try without authorization\n";
+}
+else {
+  $cmd .= " --header Authorization: OAuth " . $auth_token->token();
+}
+
+
+
+$cmd .= " http://$base_url/node/$id?";
+$cmd .= "download&"                   if ($download);
+if($index and @parts) {
+  $cmd .= "index=$index&";
+  $cmd .= "part=$_&" foreach @parts;
+}
+$cmd .= "chunksize=$inbytes&"         if ($inbytes);
+$cmd =~ s/[\&\?]$//;
+
+
+print STDERR "command: $cmd\n";
+system ($cmd);
+
+sub usage {
+print @_, "\n" if @_;
+
+print<<END;
+                        'u=s'      => \$user,           # required
+                        'p=s'      => \$password,       # required
+                        'url=s'    => \$base_url,       # required
+                        'id=s'     => \$id,             # required
+                        'download' => \$download,       # optional
+                        'index=s'  => \$index,          # optional
+                        'parts=s'  => \@parts,          # optional
+                        'chunksize=i' => \$inbytes,     # optional
+
+
+);
+
+query must be in the form key=value where key is the name of a field in the
+attributes and value is the value you are searching for.
+
+
+only available index is 'size'
+
+parts is required when index=size
+parts can be a comma seperated list no whitespace please ie: 1,2,3 (but if
+you must, don't forget to surround the string with quotes "1, 2, 3"
+
+index=size&part=1[&part=2&part=3...]
+
+
+END
+exit;
+}
