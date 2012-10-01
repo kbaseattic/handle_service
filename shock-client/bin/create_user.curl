@@ -27,7 +27,7 @@ unless ($auth_token->token() ) {
   print STDERR "will try without authorization\n";
 }
 else {
-  $cmd .= " --header Authorization: OAuth " . $auth_token->token();
+  $cmd .= " --header \"Authorization: OAuth " . $auth_token->token() . '"';
 }
 $cmd .= " http://$base_url/user?";
 $cmd =~ s/[\&\?]$//;

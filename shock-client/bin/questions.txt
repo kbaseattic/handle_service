@@ -1,3 +1,7 @@
-what becomes of create_user.curl. Is that still used? If so, what is a standard workflow that uses it?
+Q:	what becomes of create_user.curl. Is that still used? If so, what is a standard workflow that uses it?
+A:	SHOCK commands dealing with users are only applicable when SHOCK is a stand-alone tool.  When 
+	used with external authentication (e.g. Globus Online), then creating and listing users
+	isn't authorized. This is includes both creating, viewing, and listing users.
+
 
 
