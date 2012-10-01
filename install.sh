@@ -9,6 +9,8 @@ export GOPATH=/usr/local/gopath
 
 if [ ! -e ${GOPATH} ]; then
     mkdir ${GOPATH}
+else
+    rm -rf ${GOPATH}/*
 fi
 
 mkdir -p ${GOPATH}/src/github.com/MG-RAST
@@ -26,7 +28,7 @@ cp Shock/README.md ${SERVICE_DIR}/site/assets/misc/README.md
 cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
 
 # install uploader
-echo "installing uploader"
+#echo "installing uploader"
 
 # service nginx stop
 # apt-get update
@@ -34,15 +36,15 @@ echo "installing uploader"
 # echo "AddHandler cgi-script .cgi" >> /etc/apache2/mods-enabled/mime.conf 
 # rm /etc/apache2/sites-enabled/000-default
 
-cp -r uploader ${SERVICE_DIR}
-./setup.pl -input conf/uploader.cfg -output ${SERVICE_DIR}/uploader/UploaderConfig.pm
-cp conf/uploader.apache.conf /etc/apache2/sites-enabled
+#cp -r uploader ${SERVICE_DIR}
+#./setup.pl -input conf/uploader.cfg -output ${SERVICE_DIR}/uploader/UploaderConfig.pm
+#cp conf/uploader.apache.conf /etc/apache2/sites-enabled
 
-cd Bio-KBase-Auth
-/kb/runtime/bin/perl Build.PL 
-/kb/runtime/bin/perl Build installdeps --install_path arch=${PERL_LIB}
-/kb/runtime/bin/perl Build install --install_path arch=${PERL_LIB}
-cd -
+#cd Bio-KBase-Auth
+#/kb/runtime/bin/perl Build.PL 
+#/kb/runtime/bin/perl Build installdeps --install_path arch=${PERL_LIB}
+#/kb/runtime/bin/perl Build install --install_path arch=${PERL_LIB}
+#cd -
 
 # services
 cp services/* ${SERVICE_DIR}
