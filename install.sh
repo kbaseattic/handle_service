@@ -1,6 +1,7 @@
 #!/bin/sh 
 
 SERVICE_DIR=$1
+BIN_DIR=$2
 PERL_LIB="/kb/runtime/lib/perl5/site_perl/5.16.0"
 
 # build shock
@@ -17,11 +18,11 @@ mkdir -p ${GOPATH}/src/github.com/MG-RAST
 cp -r Shock ${GOPATH}/src/github.com/MG-RAST/
 
 go get github.com/MG-RAST/Shock/...
-mkdir -p ${SERVICE_DIR} ${SERVICE_DIR}/bin ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs/shock ${SERVICE_DIR}/data ${SERVICE_DIR}/data/temp
+mkdir -p ${BIN_DIR} ${SERVICE_DIR} ${SERVICE_DIR} ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs/shock ${SERVICE_DIR}/data ${SERVICE_DIR}/data/temp
 cd ${SERVICE_DIR}/data
 ln -s . raw
 cd -
-cp ${GOPATH}/bin/shock-server ${SERVICE_DIR}/bin/
+cp ${GOPATH}/bin/shock-server ${BIN_DIR}
 cp -r Shock/site ${SERVICE_DIR}
 rm ${SERVICE_DIR}/site/assets/misc/README.md
 cp Shock/README.md ${SERVICE_DIR}/site/assets/misc/README.md

@@ -1,6 +1,9 @@
 #!/bin/sh
-echo stopping aux_store services.
-pid_file=aux_store.pid
+DEPLOY=/kb/deployment
+SERVICE=$DEPLOY/services/aux_store
+
+echo stopping aux_store services
+pid_file=$SERVICE/aux_store.pid
 if [ ! -f $pid_file ] ; then 
 	echo "No pid file: $pid_file found for service aux_store."
 	exit 1
@@ -8,5 +11,5 @@ fi
 pid=$(cat $pid_file)
 kill $pid
 rm $pid_file
-echo done.
+echo done
   

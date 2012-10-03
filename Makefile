@@ -9,4 +9,4 @@ deploy: deploy-services
 deploy-services:
 	git submodule init
 	git submodule update
-	sh install.sh $(SERVICE_DIR)
+	sh install.sh $(SERVICE_DIR) $(TARGET)/bin
