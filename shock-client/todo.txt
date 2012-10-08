@@ -1,3 +1,0 @@
-1. creating an admin user does not seem to work
-2. you should be able to get your id by querying user with your username and password
-
