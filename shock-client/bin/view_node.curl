@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+
 use strict;
 use vars qw($user $password $base_url $id $download $index @parts $inbytes);
 #use lib "$ENV{HOME}/local/dev/shock/shock-client/lib";

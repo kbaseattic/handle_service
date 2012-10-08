@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+
 use lib "$ENV{HOME}/local/dev/shock/shock-client/lib";
 use Bio::KBase::AuthToken;
 use Getopt::Long;

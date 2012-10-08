@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+
 use strict;
 use vars qw($user $password $base_url $id $index);
 use Getopt::Long;
