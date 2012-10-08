@@ -1,3 +1,0 @@
-# auth.kbase.us aliases auth1.chicago.kbase.us which aliases 140.221.43.8
-# current ip address is hard coded into Bio::KBase::Auth.pm
-`
