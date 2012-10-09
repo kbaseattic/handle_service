@@ -11,15 +11,16 @@ SRC_PERL = $(wildcard client/bin/*.pl)
 
 all: deploy
 
-#deploy: deploy-services deploy-scripts
-deploy: deploy-scripts
+deploy: deploy-client
 
-deploy-services:
+deploy-all: deploy-service deploy-client
+
+deploy-service:
 	git submodule init
 	git submodule update
 	sh install.sh $(SERVICE_DIR) $(TARGET)/bin
 
-deploy-scripts:
+deploy-client:
 	export KB_TOP=$(TARGET); \
 	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
 	export KB_PERL_PATH=$(TARGET)/lib:$(TARGET)/lib/perl5 bash ; \
