@@ -19,7 +19,7 @@ fi
 mkdir -p ${GOPATH}/src/github.com/MG-RAST
 cp -r Shock ${GOPATH}/src/github.com/MG-RAST/
 
-go get github.com/MG-RAST/Shock/...
+go get -v github.com/MG-RAST/Shock/...
 mkdir -p ${BIN_DIR} ${SERVICE_DIR} ${SERVICE_DIR} ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs/shock ${SERVICE_DIR}/data/temp
 cp ${GOPATH}/bin/shock-server ${BIN_DIR}
 rm -r ${SHOCK_SITE}
