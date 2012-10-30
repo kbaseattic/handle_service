@@ -1,9 +1,20 @@
 #!/bin/sh
-DEPLOY=/kb/deployment
-SERVICE=$DEPLOY/services/aux_store
+SERVICE=aux_store
+DEPLOY_DIR=/kb/deployment
+SERVICE_DIR=$DEPLOY_DIR/services/$SERVICE
+
+echo stopping uploader
+if [ ! -f $SERVICE_DIR/uploader.pid ]; then
+   echo "No pid file $SERVICE_DIR/uploader.pid found for service uploader" 1>&2
+   exit 1
+fi
+
+PID=`cat $SERVICE_DIR/uploader.pid`
+kill $PID
+rm $SERVICE_DIR/uploader.pid
 
 echo stopping aux_store services
-pid_file=$SERVICE/aux_store.pid
+pid_file=$SERVICE_DIR/aux_store.pid
 if [ ! -f $pid_file ] ; then 
 	echo "No pid file: $pid_file found for service aux_store."
 	exit 1
