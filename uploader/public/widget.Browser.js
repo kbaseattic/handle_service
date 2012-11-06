@@ -17,7 +17,7 @@
     widget.display = function (div, args) {
 	var loaded_displays = {};
 	
-	div.innerHTML = "";
+	div.innerHTML = "<legend>Your Data in the Auxiliary Store</legend>";
 	var table_disp = document.createElement('div');
 	var detail_disp = document.createElement('div');
 	div.appendChild(table_disp);
@@ -54,13 +54,16 @@
 <a data-toggle="tab" href="#overview">overview</a>\
 </li>';
 	for (i in data.attributes) {
-	    if (typeof(data.attributes[i]) == "object") {
-		object_attributes.push(i);
-		var oname = i.replace(/ /g,"_"); 
-		html += '\
+	    if (data.attributes.hasOwnProperty(i)) {
+		if ((typeof(data.attributes[i]) == "object") && (typeof(data.attributes[i].join) == "undefined")) {
+		    object_attributes.push(i);
+		    var oname = i.replace(/ /g,"_"); 
+		    var otitle = i.replace(/_/g," ");
+		    html += '\
 <li>\
-<a data-toggle="tab" href="#' + oname + '">' + i + '</a>\
+<a data-toggle="tab" href="#' + oname + '">' + otitle + '</a>\
 </li>';
+		}
 	    }
 	}
 	html += '\
@@ -80,30 +83,39 @@
     <h4 style="margin-bottom: 5px;">'+type+' overview</h4>\
     <table class="table table-condensed">';
 	for (i in data.attributes) {
-	    if (typeof(data.attributes[i]) != "object") {
-		html += '<tr><th class="span3">'+i+'</th><td>'+data.attributes[i]+'</td></tr>';
+	    if (data.attributes.hasOwnProperty(i)) {
+		var otitle = i.replace(/_/g," ");
+		if (typeof(data.attributes[i].join) != "undefined") {
+		    html += '<tr><th class="span3">'+otitle+'</th><td>'+data.attributes[i].join(', ')+'</pre></td></tr>';
+		} else if (typeof(data.attributes[i]) != "object") {
+		    html += '<tr><th class="span3">'+otitle+'</th><td>'+data.attributes[i]+'</td></tr>';
+		}
 	    }
 	}
 	html += '</table>\
   </div>\
 ';
 	for (i=0; i<object_attributes.length; i++) {
-	    var oname = object_attributes[i].replace(/ /g,"_"); 
+	    var oname = object_attributes[i].replace(/ /g,"_");
+	    var suptitle = object_attributes[i].replace(/_/g," ");
 	    html += '\
   <div id="'+oname+'" class="tab-pane">\
-  <h4 style="margin-bottom: 5px;">'+object_attributes[i]+'</h4>\
-  <table class="table table-condensed">';
+    <h4 style="margin-bottom: 5px;">'+suptitle+'</h4>\
+    <table class="table table-condensed">';
 	    for (h in data.attributes[object_attributes[i]]) {
-		if (typeof(data.attributes[object_attributes[i]][h]) == "object") {
-		    html += '<tr><th class="span3">'+h+'</th><td><pre>'+JSON.stringify(data.attributes[object_attributes[i]][h])+'</pre></td></tr>';
-		} else {
-		    html += '<tr><th class="span3">'+h+'</th><td>'+data.attributes[object_attributes[i]][h]+'</td></tr>';
+		if (data.attributes[object_attributes[i]].hasOwnProperty(h)) {
+		    var otitle = h.replace(/_/g," ");
+		    if (typeof(data.attributes[object_attributes[i]][h]) == "object") {
+			html += '<tr><th class="span3">'+otitle+'</th><td><pre>'+JSON.stringify(data.attributes[object_attributes[i]][h])+'</pre></td></tr>';
+		    } else {
+			html += '<tr><th class="span3">'+otitle+'</th><td>'+data.attributes[object_attributes[i]][h]+'</td></tr>';
+		    }
 		}
 	    }
+	    html += '</table>\
+  </div>';
 	}
-	html += '</table>\
-  </div>\
-</div>\
+	html += '</div>\
 ';
 	
 	Retina.Widget.Browser.detailSpace.innerHTML = html;
@@ -116,12 +128,14 @@
 	var table_data = [];
 	for (i=0; i<types.length; i++) {
 	    for (h in stm.DataStore[types[i]]) {
-		if (stm.DataStore[types[i]][h].file.size > 0) {
-		    var row = [ types[i], stm.DataStore[types[i]][h].file.name, pretty_size(stm.DataStore[types[i]][h].file.size), stm.DataStore[types[i]][h].file.checksum.md5, h ];
-		    table_data.push(row);
-		} else {
-		    var row = [ types[i], "-", "-", "-", h ];
-		    table_data.push(row);
+		if (stm.DataStore[types[i]].hasOwnProperty(h)) {
+		    if (stm.DataStore[types[i]][h].file.size > 0) {
+			var row = [ types[i], stm.DataStore[types[i]][h].file.name, pretty_size(stm.DataStore[types[i]][h].file.size), stm.DataStore[types[i]][h].file.checksum.md5, h ];
+			table_data.push(row);
+		    } else {
+			var row = [ types[i], "-", "-", "-", h ];
+			table_data.push(row);
+		    }
 		}
 	    }
 	}
