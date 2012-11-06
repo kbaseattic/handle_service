@@ -91,7 +91,7 @@ any '/upload' => sub {
   }
 };
 
-# the data viewer is activated
+# data viewer page
 any '/view' => sub {
   
   check_login();
@@ -115,12 +115,94 @@ any '/view' => sub {
   return $html;
 };
 
+# pipeline submission page
 any '/pipelines' => sub {
 
   check_login();
+
+  # if there is no user, abort the request
+  unless ($user) {
+    return "unauthorized request";
+  }
   
+  # check if the user directory exists
+  &initialize_user_dir();
+
   my $html = start_template();
-  $html .= message("info", "Pipeline Submission Screen<br><br>This still needs to be implemented.");
+
+  # check the pipeline directory
+  my $pdir = PIPELINE_DIR;
+  if (opendir(my $dh, $pdir)) {
+    
+    # get all .pipeline files
+    my @pfiles = grep { $_ =~ /^.*\.pipeline$/ } readdir($dh);
+    closedir $dh;
+
+    # load all pipeline files
+    my $pipelines = [];
+    foreach my $pfile (@pfiles) {
+      if (open(FH, "<$pdir/$pfile")) {
+	my $data = "";
+	while (<FH>) {
+	  $data .= $_;
+	}
+	close FH;
+	my $pipeline;
+	eval {
+	  $pipeline = $json->decode($data);
+	};
+	if ($@) {
+	  $html .= message("error", "pipeline $pfile has invalid structure: $@");
+	} else {
+	  push(@$pipelines, $pipeline);
+	}
+      } else {
+	$html .= message("error", "could not open pipeline file $pfile");	
+      }      
+    }
+
+    # put the pipelines onto the page
+    $html .= "<h4>select a pipeline</h4><select onchange='switchToPipeline(this.options[this.selectedIndex].value);'>";
+    map { $html .= "<option>".$_->{name}."</option>" } @$pipelines;
+    $html .= "</select>";
+    $html .= "<div id='pipeline_container'>";
+    my $first = 1;
+    foreach my $pipeline (@$pipelines) {
+      $html .= pipeline_parameters($pipeline, $first);
+      $first = 0;
+    }
+    $html .= "</div>";
+
+  } else {
+    $html .= message("error", "could not open pipeline directory");
+  }
+  
+  $html .= end_template();
+
+  return $html;
+};
+
+# execute a pipeline submission and show the status of current submissions
+any '/pipeline_status' => sub {
+
+  check_login();
+
+  # if there is no user, abort the request
+  unless ($user) {
+    return "unauthorized request";
+  }
+  
+  # check if the user directory exists
+  &initialize_user_dir();
+
+  my $html = start_template();
+
+  # check if we have a submission
+  if (param('pipeline_name')) {
+    $html .= submit_to_pipeline();
+  }
+
+  $html .= pipeline_status();
   $html .= end_template();
 
   return $html;
@@ -175,13 +257,13 @@ sub start_template {
 
     </head>
 
-    <body>    
+    <body style="padding-bottom: 100px;">    
     <div class="container">
-      <img src="~ . IMAGE_DIR . qq~KbaseLogo.jpg">
+      <img src="~ . IMAGE_DIR . qq~KbaseLogoTransparent.gif">
       <div class="navbar">
 	<div class="navbar-inner">
 	  <div class="container">
-            <a style="color: white; cursor: default;" href="#" class="brand">KBASE Uploader</a>
+            <a style="color: white; cursor: default;" href="#" class="brand">KBase Uploader</a>
 	    <ul class="nav">
 	      <li>
 		<a href="/">upload</a>
@@ -191,6 +273,9 @@ sub start_template {
 	      </li>
 	      <li>
 		<a href="/pipelines">pipelines</a>
+	      </li>
+	      <li>
+		<a href="/pipeline_status">status</a>
 	      </li>
             </ul>
             ~.&user_display().qq~
@@ -232,7 +317,7 @@ sub login_screen {
 
   return qq~
 <div class="well">
-  <h4>Please log in with your kbase credentials</h4>$message
+  <h4>Please log in with your KBase credentials</h4>$message
   <br>
   <form class="form-inline" method="post" action="http://localhost:7052">
     <input class="input-small" type="text" placeholder="Login" name="login">
@@ -251,7 +336,7 @@ sub error {
 sub message {
   my ($type, $message) = @_;
   
-  return qq~<br><div class="alert alert-$type">
+  return qq~<div class="alert alert-$type">
 <button class="close" data-dismiss="alert" type="button">x</button>
 <strong>$type</strong><br>
 $message
@@ -264,8 +349,7 @@ sub progress {
 
 sub upload_screen {
   return qq~
-<div class="well">
-  <h4 style="margin-bottom: 5px;">select files to upload</h4>
+  <legend>select files to upload</legend>
   <p>Select one or more files to upload to your private inbox folder.</p>
   <form class="form-horizontal">
     <input class="input-file" type="file" multiple size=40 id="file_upload">
@@ -298,18 +382,86 @@ sub upload_screen {
     </div>
   </div>
 
-  <h4 style="margin-bottom: 5px;">private inbox</h4>
+  <legend>private inbox</legend>
   <p>Please note that this is a temporary space. Files in here must be submitted to the auxiliary store within one week or they will be automatically deleted. Once a file is submitted to the auxiliary store, it will be removed from your inbox. Use the <b>view</b> button in the menu to view your personal files in the auxiliary store.</p>
-  <p><input type="button" class="btn" value="delete selected" onclick="check_delete_files();"><input type="button" class="btn" value="uncompress selected" onclick="uncompress_files();"><input type="button" class="btn" value="change file directory" onclick="change_file_dir();"></p>
+  <p><input type="button" class="btn" value="delete selected" onclick="check_delete_files();"><input type="button" class="btn" value="uncompress selected" onclick="uncompress_files();"><input type="button" class="btn" value="change file directory" onclick="change_file_dir();"><input type="button" class="btn" value="create attributes file" onclick="create_attributes_file();"></p>
   <div id="inbox" style='margin-top: 10px;'><br><br><img src="~.IMAGE_DIR.qq~loading.gif"> loading...</div>
   <p><input type="button" class="btn" value="select for submission" onclick="select_files();" style="margin-top: -10px;"></p>
 
-  <h4 style="margin-bottom: 5px;">submit to auxiliary store</h4>
+  <legend>submit to auxiliary store</legend>
   <p>Files uploaded to the auxiliary store need to be accompanied by a metadata file. The data must be in a <span style="cursor: pointer; color: #0088CC;" id="json_object">JSON style object</span> which has at least the attribute 'type' at the top level. The metadata file must have the exact same filename as the data file, appending the extension <b>.attributes</b>. Note that extensive metadata is essential in any further analyses or queries.</p>
   <table><tr><td><form id="submission_form" action="/submit" method="post"><select id="submission_box" name="submission_files" multiple style="width: 420px; height: 200px;"></select></form></td><td id="submission_info"></td></tr></table>
   <p><input type="button" class="btn" value="remove selected" onclick="remove_submit_files();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="btn" value="submit to aux store" onclick="if(document.getElementById('submission_box').options.length){selectAll(document.getElementById('submission_box'));document.getElementById('submission_form').submit();}else{alert('You did not select any files');}"></p>
-</div>
 ~;
+}
+
+sub pipeline_parameters {
+  my ($pipeline, $active) = @_;
+  
+  my $display = " style='display: none;'";
+  if ($active) {
+    $display = "";
+  }
+  my $script = "<script type='text/javascript'>jQuery(function () { getUserData().then(function () {";
+  my $html = qq~
+<div id='pipeline-~.$pipeline->{name}.qq~' $display>
+  <form action='/pipeline_status' class="form-horizontal" method='post'>
+    <input type='hidden' name='pipeline_name' value='~.$pipeline->{file_name}.qq~'>
+    <fieldset>
+      <legend>~.$pipeline->{name}.qq~</legend>
+      <p>~.$pipeline->{description}.qq~</p>
+~;
+  foreach my $param (@{$pipeline->{parameters}}) {
+    $html .= qq~
+      <div class="control-group">
+        <label class="control-label" for="~.$param->{name}.qq~"><b>~.$param->{title}.qq~</b></label>
+        <div class="controls">~;
+    if ($param->{type} eq 'checkbox') {
+      $html .= qq~          <input type="checkbox" ~.$param->{default}.qq~ name="~.$param->{name}.qq~">~;
+    } elsif (($param->{type} eq 'select') || ($param->{type} eq 'multi-select')) {
+      my $multiple = "";
+      if ($param->{type} eq 'multi-select') {
+	$multiple = " multiple";
+      }
+      $html .= qq~          <select name="~.$param->{name}.qq~"$multiple>~;
+      my $i = 0;
+      foreach my $option (@{$param->{options}}) {
+	my $selected = "";
+	if ($i == $param->{default}) {
+	  $selected = "selected ";
+	}
+	$html .= qq~          <option value="~.$option->{value}.qq~"$selected>~.$option->{title}.qq~</option>~;
+	$i++;
+      }
+      $html .= qq~          </select>~;
+    } elsif (($param->{type} eq "aux-store-file") || ($param->{type} eq "multi-aux-store-file")) {
+      my $multiple = "";
+      if ($param->{type} eq 'multi-select') {
+	$multiple = " multiple";
+      }
+      $html .= qq~          <select id="select_~.$pipeline->{name}."_".$param->{name}.qq~" name="~.$param->{name}.qq~"$multiple>~;
+      unless ($param->{type} eq 'multi-select') {
+	$html .= qq~            <option value='-' style='font-style: italic;'>- please select -</option>~;
+      }
+      $html .= qq~          </select>~;
+      $script .= qq~fillSelect('select_~.$pipeline->{name}."_".$param->{name}.qq~', '~.$param->{file_type}.qq~');~;
+    } else {
+      $html .= qq~          <input type="text" class="input-xlarge" name="~.$param->{name}.qq~">~;
+    }
+$html .= qq~          <p class="help-block">~.$param->{description}.qq~</p>
+        </div>
+      </div>
+~;
+  }
+  $script .= "})});</script>";
+  $html .= qq~
+      <button type="submit" class="btn">Submit</button>
+    </fieldset>
+  </form>
+$script
+</div>~;
+
+  return $html;
 }
 
 ############################
@@ -391,7 +543,13 @@ sub initialize_user_dir {
     unless (mkdir "$udir/.tmp") {
       return "could not create directory '$udir/.tmp'";
     }
-    chmod 0777, "$udir/.temp";
+    chmod 0777, "$udir/.tmp";
+  }
+  unless ( -d "$udir/.pipelines") {
+    unless (mkdir "$udir/.pipelines") {
+      return "could not create directory '$udir/.pipelines'";
+    }
+    chmod 0777, "$udir/.pipelines";
   }
   my $user_file = "$udir/USER";
   if ( ! -e $user_file ) {	
@@ -522,6 +680,22 @@ sub read_inbox {
 	}
       }
     }
+
+    # create an attributes file for a file in the inbox
+    if ($action eq 'create_attributes') {
+      my $file = shift @$files;
+      my $type = param('type') || "file";
+      if (-f "$udir/$file.attributes") {
+	push(@{$data->{messages}}, "The file $file already has an attributes file. If you would like to create a new one, please delete the old one first.");
+      } else {
+	if (open(FH, ">$udir/$file.attributes")) {
+	  print FH '{ "type": "'.$type.'", "owner": "'.$user.'" }';
+	  close FH;
+	} else {
+	  push(@{$data->{messages}}, "The attributes file for file $file could not be created: $@");
+	}
+      }
+    }
   }
   
   # read the contents of the inbox
@@ -611,6 +785,25 @@ sub read_inbox {
 	$data->{fileinfo}->{"$attfile.attributes"}->{'error'} = "The file is not valid JSON: $error";
 	$data->{fileinfo}->{"$attfile"}->{'not submittable'} = "The associated attributes file does not contain valid JSON: $error";
       } else {
+	# check if we have the mandatory fields
+	my $modified = 0;
+	unless ($attstruct->{"type"}) {
+	  $attstruct->{"type"} = "file";
+	  $modified = 1;
+	}
+	if (! exists($attstruct->{"owner"}) || ($attstruct->{"owner"} && $attstruct->{"owner"} ne $user)) {
+	  $attstruct->{"owner"} = $user;
+	  $modified = 1;
+	}
+	if ($modified) {
+	  if (open(FH, ">$udir/$attfile.attributes")) {
+	    print FH $json->encode($attstruct);
+	    close FH;
+	  } else {
+	    $data->{fileinfo}->{"$attfile.attributes"}->{'error'} = "The file could not be modified: $@";
+	    $data->{fileinfo}->{"$attfile"}->{'not submittable'} = "The associated attributes file could not be modified: $@";
+	  }
+	}
 	$data->{fileinfo}->{"$attfile.attributes"}->{'valid'} = "This file contains valid JSON";
 	$data->{fileinfo}->{"$attfile"}->{'submittable'} = "This file has a valid attributes file";
       }
@@ -638,7 +831,7 @@ sub read_inbox {
 
   # send an info message about attributes files if at least one file is missing one
   if ($file_wo_attributes) {
-    push(@{$data->{messages}}, "In order to submit a file to the auxiliary store, you must supply an accompanying attributes file containing metadata. The attributes file must have the exact same name as the file to submit, appending the ending <b>.attributes</b>. The metadata must be in JSON format, i.e.<br><br><pre>{ \"type\": \"metagenome\", \"name\": \"Sample123\", \"biome\": \"human gut\", ... }</pre>");
+    push(@{$data->{messages}}, "In order to submit a file to the auxiliary store, you must supply an accompanying attributes file containing metadata. The attributes file must have the exact same name as the file to submit, appending the ending <b>.attributes</b>. The metadata must be in JSON format, i.e.<br><br><pre>{ \"type\": \"metagenome\", \"name\": \"Sample123\", \"biome\": \"human gut\", ... }</pre><b>Note: </b>If you want minimal metadata only, you can select a file below and click <i>'create attributes file'</i>.");
   }
 
   # sort the returned files lexigraphically
@@ -647,6 +840,248 @@ sub read_inbox {
   content_type 'application/json';
 
   return $json->encode($data);
+}
+
+# perform the pipeline submission
+sub submit_to_pipeline {
+  # get the pipeline name
+  my $pipeline = param('pipeline_name');
+
+  # check if we really have one
+  unless ($pipeline) {
+    return message("error", "no pipeline name given for submission");
+  }
+
+  # get the pipeline definition
+  my $pdefdir = PIPELINE_DIR;
+  if (open(FH, "<$pdefdir/$pipeline")) {
+    $pipeline = "";
+    while (<FH>) {
+      $pipeline .= $_;
+    }
+    close FH;
+    eval {
+      $pipeline = $json->decode($pipeline);
+    };
+    if ($@) {
+      return message("error", "pipeline definition invalid");
+    }
+  } else {
+    return message("error", "could not open pipeline definition file: $@");
+  }
+
+  # if we get here, we have a valid pipeline structure in $data
+  # initialize the status structure
+  my $status = { "pipeline_name" => $pipeline->{"name"},
+		 "pipeline_file" => $pipeline->{"pipeline_file"},
+		 "url" => "",
+		 "result" => $pipeline->{"result_url"} || "",
+		 "start_date" => pretty_date(time),
+		 "name" => "-",
+		 "id" => "",
+		 "status" => "not submitted",
+		 "message" => "not submitted" };
+
+  # create the submission exec
+  my $exec = "curl -s -X GET";
+
+  # check for authentication
+  if ($token) {
+    $exec .= ' -H "Authorization: Globus-Goauthtoken '.$token.'"';
+  }
+
+  # create parameter string
+  my $params = [];
+  foreach my $param (@{$pipeline->{parameters}}) {
+    my $p = param($param->{name});
+    unless (ref($p) eq 'ARRAY') {
+      $p = [ $p ];
+    }
+    if ($param->{type} eq 'aux-store-file') {
+      @$p = map { SHOCK_URL."/".$_."?download" } @$p;
+    }
+    push(@$params, join(";", map { $param->{name}."=".$_ } @$p));
+
+    # check if this parameter is part of the submission url
+    my $n = $param->{name};
+    $p = $p->[0];
+    if ($pipeline->{submission_url} =~ /\$$n\$/) {
+      $pipeline->{submission_url} =~ s/^(.*)\$$n\$(.*)$/$1$p$2/;
+    }
+  }
+  $params = join(";", @$params);
+
+  # attach the parameters and url
+  $exec .= ' -F "'.$params.'" "'.$pipeline->{submission_url}.'"';
+
+  # perform the upload
+  my $return = `$exec`;
+  my $result = "";
+
+  # check the result
+  eval {
+    $result = $json->decode($return);
+  };
+  if ($@) {
+    $status->{message} = "invalid pipeline return: '".$return."'";
+    $status->{status} = "error";
+    save_pipeline_status($status);
+    return message("error", "pipeline ".$pipeline->{pipeline_name}." did not return a validly formatted result: '$return'");
+  } else {
+    $status->{id} = $result->{id};
+    if ($result->{name}) {
+      $status->{name} = $result->{name};
+    }
+    $status->{message} = $result->{error} || $result->{message} || "-";
+    if ($result->{url}) {
+      $status->{url} = $result->{url};
+    } else {
+      my $id = $status->{id};
+      $status->{url} = $pipeline->{status_url};
+      $status->{url} =~ s/^(.*)\$ID\$(.*)$/$1$id$2/;
+    }
+    save_pipeline_status($status);
+  }
+
+  return message("success", "Your job was successfully submitted to the pipeline. You can see the current status below. Reload the page to update the status table.");
+}
+
+sub save_pipeline_status {
+  my ($status, $fn) = @_;
+
+  # create the status file for this submission
+  my $pdir = "$udir/.pipelines";
+  unless ($fn) {
+    $fn = randstring();
+    while (-f "$pdir/$fn") {
+      $fn = randstring();
+    }
+  }
+  if (open(FH, ">$pdir/$fn")) {
+    print FH $json->encode($status);
+    close FH;
+  } else {
+    die "error creating pipeline file: $@";
+  }
+}
+
+# check submission status
+sub pipeline_status {
+  my $html = "<legend>Status of your current submissions</legend><p>The table below shows the results returned from the pipelines you submitted jobs to. Reloading this page will update the status. If a pipeline does not respond to a status request, the results of the last successful status request will be displayed. Jobs that are completed or in error state will not be updated. You can delete them via the delete button in the according row.</p><br>";
+  
+  # check if there is a pipeline directory in the user dir
+  my $pdir = "$udir/.pipelines";
+  if (-d $pdir) {
+    if (opendir(my $dh, $pdir)) {
+      my @pfiles = grep { -f "$pdir/$_" && $_ =~ /^[^\.]/ } readdir($dh);
+      closedir $dh;
+
+      # collect errors
+      my $errors = [];
+
+      # read all status files
+      my $status_info = [];
+      foreach my $file (@pfiles) {
+	if (open(FH, "<$pdir/$file")) {
+	  my $data = "";
+	  while (<FH>) {
+	    $data .= $_;
+	  }
+	  close FH;
+	  eval {
+	    $data = $json->decode($data);
+	  };
+	  if ($@) {
+	    push(@$errors, "pipeline file has invalid data");
+	  } else {
+	    push(@$status_info, [ $data, $file ]);
+	  }
+	} else {
+	  push(@$errors, "could not open pipeline status file: $@");
+	}
+      }
+
+      # query each resource for current status
+      foreach my $stat_inf (@$status_info) {
+
+	my $status = $stat_inf->[0];
+	my $file = $stat_inf->[1];
+
+	# do not query if the compute has already completed
+	next if ($status->{status} && (($status->{status} eq 'complete') || ($status->{status} eq 'error')));
+
+	my $url = $status->{url};
+	if ($url =~ /\$ID\$/) {
+	  my $id = $status->{id};
+	  $url =~ s/^(.*)\$ID\$(.*)$/$1$id$2/;
+	}
+
+	my $exec = "curl -s -X GET";
+
+	# check for authentication
+	if ($token) {
+	  $exec .= ' -H "Authorization: Globus-Goauthtoken '.$token.'"';
+	}
+	my $res = $exec;
+	$exec .= ' "'.$url.'"';
+	
+	# perform the upload
+	my $return = `$exec`;
+	my $result = "";
+
+	# check the result
+	eval {
+	  $result = $json->decode($return);
+	};
+	if ($@) {
+	  push(@$errors, "pipeline ".$status->{pipeline_name}." returned an invalid status for query '$url': $return");
+	} else {
+	  $status->{status} = $result->{status};
+	  $status->{message} = $result->{error} || $result->{message} || "-";
+	  if (($status->{status} eq 'complete') && $status->{result}) {
+	    my $id = $status->{id};
+	    $status->{result} =~ s/^(.*)\$ID(.*)\$$/$1$id$2/;
+	    $status->{message} = "<a href='#' onclick='getResult(\"".$status->{result}."\");'>view results</a>";
+	    $res .= ' "'.$status->{result}.'"';
+	    `$res`;
+	  }
+	  save_pipeline_status($status, $file);
+	}
+      }
+
+      # print out errors if there were any
+      if (scalar(@$errors)) {
+	$html .= message("error", "There were errors during the status queries of your submissions:<br><ul><li>".join("</li><li>", @$errors)."</ul><br>The table will show the last valid entry received.");
+      }
+      
+      # create the status table
+      $html .= "<table class='table table-hover'><tr><th>pipeline</th><th>submission time</th><th>name</th><th>ID</th><th>status</th><th>message</th></tr>";
+      foreach my $stat_inf (@$status_info) {
+	my $status = $stat_inf->[0];
+	$html .= "<tr><td>".$status->{pipeline_name}."</td><td>".$status->{start_date}."</td><td>".$status->{name}."</td><td>".$status->{id}."</td><td>";
+	if ($status->{status} eq 'running') {
+	  $html .= '<span class="label label-warning">in progress</span>';
+	} elsif ($status->{status} eq 'error') {
+	  $html .= '<span class="label label-important">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+	} elsif ($status->{status} eq 'complete') {
+	  $html .= '<span class="label label-success">&nbsp;&nbsp;complete&nbsp;&nbsp;</span>';
+	} else {
+	  $html .= '<span class="label label-info">'.$status->{status}.'</span>';
+	  
+	  # a pipeline sent an invalid status, post to the error log
+	  print STDERR "invalid status from ".$status->{pipeline_name}.": '".$status->{status}."'\n";
+	} 
+	$html .= "</td><td>".$status->{message}."</td></tr>";
+      }
+      $html .= "</table>";
+    } else {
+      return message("error", "could not open pipeline directory: $@");
+    }
+  } else {
+    return message("error", "could not find pipeline directory");
+  }
+
+  return $html;
 }
 
 ##################
@@ -701,6 +1136,19 @@ sub addCommas {
 	$x1 =~ s/(\d+)(\d{3})/$1,$2/;
     }
     return $x1 . $x2;
+}
+
+sub randstring {
+  my ($len) = @_;
+  unless ($len) {
+    $len = 25;
+  }
+  my $generated = "";
+  my $possible = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
+  while (length($generated) < $len) {
+    $generated .= substr($possible, (int(rand(length($possible)))), 1);
+  }
+  return $generated;
 }
 
 start;
