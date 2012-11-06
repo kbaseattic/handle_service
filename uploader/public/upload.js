@@ -15,6 +15,7 @@ var last_directory = "";
 var upload_url = "/upload";
 var inbox_url = "/inbox";
 var in_submission = [];
+var pending = [];
 
 // initialization
 function init () {
@@ -32,6 +33,7 @@ function init () {
     jQuery('#json_object').popover({ 'title': "example attribute structure", 'content': '{ "type": "metagenome", "name": "Sample123", "biome": "human gut", ... }' });
 }
 
+// initialize the browser widget
 function init_browser () {
     stm.init('http://api.metagenomics.anl.gov/api2.cgi').then(function() {
 	Retina.init( { library_resource: "./" } ).then( function () {
@@ -75,13 +77,13 @@ function update_inbox (data, files, action) {
 		var fn = stm.DataStore.fileinfo[dlist[i]][h];
 		var status = "'";
 		if (stm.DataStore.fileinfo[fn]["error"]) {
-		    status = " color: red;' disabled"
+		    status = " color: red;' "
 		}
 		if (stm.DataStore.fileinfo[fn]["submittable"]) {
-		    status = " color: green;'";
+		    status = " color: green;' ";
 		}
 		if (stm.DataStore.fileinfo[fn]["not submittable"]) {
-		    status = " color: red;' disabled";
+		    status = " color: red;' ";
 		}
 		html += "<option style='display: none; padding-left: 35px;"+status+" value='"+dlist[i]+"/"+fn+"' onclick='show_file_info(\""+dlist[i]+"/"+fn+"\");'>"+fn+"</option>";
 	    }
@@ -90,16 +92,16 @@ function update_inbox (data, files, action) {
 	for (var i=0; i<flist.length; i++) {
 	    var status = "";
 	    if (stm.DataStore.fileinfo[flist[i]]["error"]) {
-		status = "style='color: red;' disabled "
+		status = "style='color: red;' "
 	    }
 	    if (stm.DataStore.fileinfo[flist[i]]["submittable"]) {
 		status = "style='color: green;' ";
 	    }
 	    if (stm.DataStore.fileinfo[flist[i]]["not submittable"]) {
-		status = "style='color: red;' disabled ";
+		status = "style='color: red;' ";
 	    }
 	    if (stm.DataStore.fileinfo[flist[i]]["valid"]) {
-		status = "style='color: green;' disabled ";
+		status = "style='color: green;' ";
 	    }
 	    html += "<option value='"+flist[i]+"' "+status+"onclick='show_file_info(\""+flist[i]+"\");'>"+flist[i]+"</option>";
 	}
@@ -193,8 +195,77 @@ function remove_submit_files () {
     }
 }
 
+function resolvePending () {
+    for (i=0; i<pending.length; i++) {
+	pending[i].resolve();
+    }
+}
+
+function getResult (url) {
+    var uid_element = document.getElementById('uid');
+    var sid = uid_element.attributes.sid.value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("progress", stm.updateProgress, false);
+    if ("withCredentials" in xhr) {
+	xhr.open('GET', url, true);
+	xhr.setRequestHeader('Authorization', 'Globus-Goauthtoken '+sid);
+    } else if (typeof XDomainRequest != "undefined") {
+	xhr = new XDomainRequest();
+	xhr.open('GET', url);
+	xhr.setRequestHeader('Authorization', 'Globus-Goauthtoken '+sid);
+    } else {
+	alert("your browser does not support CORS requests");
+	console.log("your browser does not support CORS requests");
+	return;
+    }
+    xhr.onload = function() {
+	var progressIndicator = document.getElementById('progressIndicator');
+	if (progressIndicator) {
+	    progressIndicator.style.display = "none";
+	}
+	var data = xhr.responseText;
+	var w = window.open("", "Result Data");
+	var d = w.document;
+	d.open();
+	d.write(data);
+	d.close();
+	
+	return;
+    };
+    
+    xhr.onerror = function() {
+	alert('The data retrieval failed.');
+	console.log("data retrieval failed");
+	return;
+    };
+    
+    xhr.onabort = function() {
+	console.log("data retrieval was aborted");
+	return;
+    };
+    
+    var progressIndicator = document.getElementById('progressIndicator');
+    if (progressIndicator) {
+	progressIndicator.style.display = "";
+	document.getElementById('progressBar').innerHTML = "requesting data...";
+    }
+    
+    xhr.send();
+
+    return 0;
+}
+
 function getUserData () {
     var promise = jQuery.Deferred();
+    pending.push(promise);
+    if (pending.length > 1) {
+	return promise;
+    }
+    if (stm.DataStore['user_types']) {
+	resolvePending();
+	return promise;
+    }
     var uid_element = document.getElementById('uid');
     var uid = uid_element.innerHTML;
     var aid = uid_element.attributes.aid.value + "?query&owner="+uid;
@@ -230,19 +301,20 @@ function getUserData () {
 		stm.DataStore[data.D[i].attributes.type][data.D[i].id] = data.D[i];
 	    }
 	}
-	promise.resolve();
+	resolvePending();
+	return;
     };
     
     xhr.onerror = function() {
 	alert('The data retrieval failed.');
 	console.log("data retrieval failed");
-	promise.resolve();
+	resolvePending();
 	return;
     };
     
     xhr.onabort = function() {
 	console.log("data retrieval was aborted");
-	promise.resolve();
+	resolvePending();
 	return;
     };
     
@@ -269,6 +341,13 @@ function check_delete_files () {
     }
     update_inbox(null, files, "del");
   }
+}
+
+function create_attributes_file () {
+    var type = prompt("Please enter a type for your file");
+    var filebox = document.getElementById('inbox_select');
+    var file = filebox.options[filebox.selectedIndex].value;
+    update_inbox(null, [ file ], "create_attributes&type="+type);
 }
 
 function uncompress_files () {
@@ -446,6 +525,32 @@ function uploadFailed (evt) {
 
 function uploadCanceled (evt) {
   document.querySelector("#upload_status").innerHTML = "the upload was canceled";
+}
+
+/* pipeline functionality */
+function switchToPipeline (pipeline) {
+    var container = document.getElementById('pipeline_container');
+    for (i=0; i<container.childNodes.length; i++) {
+	if (container.childNodes[i].nodeName == "DIV") {
+	    if (container.childNodes[i].id == "pipeline-"+pipeline) {
+		container.childNodes[i].style.display = "";
+	    } else {
+		container.childNodes[i].style.display = "none";
+	    }
+	}
+    }
+}
+
+function fillSelect (select, type) {
+    var typedata = stm.DataStore[type];
+    var sel = document.getElementById(select);
+    if (stm.DataStore[type]) {
+	for (var h in typedata) {
+	    if (typedata.hasOwnProperty(h)) {
+		sel.add(new Option(typedata[h].file.name, typedata[h].id), null);
+	    }
+	}
+    }
 }
 
 /* Helper Functions */
