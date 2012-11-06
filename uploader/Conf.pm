@@ -16,8 +16,9 @@ use constant IMAGE_DIR => '';
 use constant JS_DIR => '';
 use constant CSS_DIR => '';
 use constant USER_DIR => '/kb/deployment/services/aux_store/uploader/incoming';
+use constant PIPELINE_DIR => '/kb/deployment/services/aux_store/uploader/pipelines';
 
 @ISA = qw(Exporter);
-@EXPORT = qw(SHOCK_URL AUTH_SERVER_URL SESSION_COOKIE_NAME SESSION_TIMEOUT BASE_URL IMAGE_DIR JS_DIR CSS_DIR USER_DIR);
+@EXPORT = qw(SHOCK_URL AUTH_SERVER_URL SESSION_COOKIE_NAME SESSION_TIMEOUT BASE_URL IMAGE_DIR JS_DIR CSS_DIR USER_DIR PIPELINE_DIR);
 
 1;
