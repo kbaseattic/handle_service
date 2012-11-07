@@ -319,7 +319,7 @@ sub login_screen {
 <div class="well">
   <h4>Please log in with your KBase credentials</h4>$message
   <br>
-  <form class="form-inline" method="post" action="http://localhost:7052">
+  <form class="form-inline" method="post" action="~.BASE_URL.qq~">
     <input class="input-small" type="text" placeholder="Login" name="login">
     <input class="input-small" type="password" placeholder="Password" name="pass">
     <button class="btn" type="submit">Sign in</button>
