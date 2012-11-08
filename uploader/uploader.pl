@@ -470,6 +470,10 @@ $script
 
 # check if a login or logout is being performed
 sub check_login {
+  $user = undef;
+  $token = undef;
+  $udir = undef;
+
   my $cn = SESSION_COOKIE_NAME;
   
   # get the cookie
