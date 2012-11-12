@@ -9,7 +9,7 @@ export PATH=$KB_BIN:$DEPLOY_DIR/bin:$LIB_DIR:$PATH
 
 $SERVICE_DIR/stop_service
 echo starting uploader service
-nohup perl -I $LIB_DIR $DEPLOY_DIR/uploader/uploader.pl &
+nohup perl -I $LIB_DIR $SERVICE_DIR/uploader/uploader.pl &
 echo $! > $SERVICE_DIR/uploader.pid
 
 echo starting aux_store services
