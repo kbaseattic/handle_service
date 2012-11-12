@@ -46,7 +46,6 @@ any '/inbox' => sub {
   }
   
   # check if the user directory exists
-  &initialize_user_dir();
 
   read_inbox();
 };
@@ -60,9 +59,6 @@ any '/upload' => sub {
   unless ($user) {
     return "unauthorized request";
   }
-  
-  # check if the user directory exists
-  &initialize_user_dir();
   
   # If we get here, this is an actual upload
   unless (param('upload_file') ) {
@@ -124,9 +120,6 @@ any '/pipelines' => sub {
   unless ($user) {
     return "unauthorized request";
   }
-  
-  # check if the user directory exists
-  &initialize_user_dir();
 
   my $html = start_template();
 
@@ -191,9 +184,6 @@ any '/pipeline_status' => sub {
   unless ($user) {
     return "unauthorized request";
   }
-  
-  # check if the user directory exists
-  &initialize_user_dir();
 
   my $html = start_template();
 
@@ -514,6 +504,10 @@ sub check_login {
 	$login_failed = 1;
       }
     }
+
+    # check if the user directory exists
+    &initialize_user_dir();
+
     return;
   }
   
@@ -523,6 +517,10 @@ sub check_login {
     my $expires;
     ($user, $expires) = $cookie =~ /un=(\w+)\|.*\|expiry=(\d+)\|/;
     cookie $cn => $cookie, expires => $expires ? '+'.($expires - time).'s' : SESSION_TIMEOUT;
+
+    # check if the user directory exists
+    &initialize_user_dir();
+
     return;
   }
 }
