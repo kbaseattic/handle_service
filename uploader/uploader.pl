@@ -214,8 +214,10 @@ any '/submit' => sub {
     my $retval = submit_to_shock("$udir/$file", "$udir/$file.attributes");
     if ($retval->[0] eq 'success') {
       $html .= message($retval->[0], "The file <b>".$retval->[1]->{file}->{name}."</b> was successfully submitted with id <b>".$retval->[1]->{id}."</b>");
+      $html .= qq~<script>window.opener.postMessage("you just uploaded ~.$retval->[1]->{file}->{name}.qq~ to the aux store with id ~.$retval->[1]->{id}.qq~","*");</script>~;
     } else {
       $html .= message($retval->[0], "The file <b>".$file."</b> failed to submit: ".$retval->[1]);
+      $html .= qq~<script>window.opener.postMessage("the upload of ~.$file.qq~ to the aux store failed: ~.$retval->[1].qq~","*");</script>~;
     }
   }
   my $init = qq~<script>jQuery(function(){init();});</script>~;
@@ -482,7 +484,7 @@ sub check_login {
 
   # check if a login is being performed
   if (param('login') && param('pass')) {
-    my $exec = 'curl -s -u '.param('login').':'. param('pass') .' -X POST "'.AUTH_SERVER_URL.'"';
+    my $exec = 'curl -s -u "'.param('login').'":"'. param('pass') .'" -X POST "'.AUTH_SERVER_URL.'"';
     my $result = `$exec`;
     my $ustruct = "";
     eval {
