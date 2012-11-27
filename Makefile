@@ -9,7 +9,6 @@ WRAP_PERL_TOOL = wrap_perl
 WRAP_PERL_SCRIPT = bash $(TOOLS_DIR)/$(WRAP_PERL_TOOL).sh
 SRC_PERL = $(wildcard client/bin/*.pl)
 
-DEPLOY_RUNTIME=/kb/runtime
 
 all: deploy
 
@@ -36,4 +35,10 @@ deploy-client:
 
 deploy-docs:
 	-mkdir -p $(SERVICE_DIR)/webroot
-	$(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/adm.html
+	$(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/adm.htmlq
+
+
+
+
+
+
