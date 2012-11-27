@@ -54,3 +54,10 @@ a:hover    {
 #content {
     margin-top: 40px;
 }
+
+.type-widget {
+    display: inline-block;
+    width: auto;
+    margin: 0 10px;
+    text-align: center;
+}

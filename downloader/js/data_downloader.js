@@ -2,18 +2,35 @@
 
 $(document).ready(function() {
     // grab the available types
-    $.ajax({
+    var typesAjax = $.ajax({
         type: 'GET',
         url:  'types.json'
-    }).done(addTypes)
-      .fail(ajaxError);
+    })
+
+    var countAjax = $.ajax({
+        type: 'GET',
+        url:  'type_counts.json',
+    })
+
+    $.when(typesAjax, countAjax).done(function(types, counts){
+        addTypes(types[0], counts[0]);
+    }).fail(ajaxError);
+
 });
 
-function addTypes(types) {
+function addTypes(types, counts) {
     for (var i in types) {
         var type = types[i];
-        $('type-header').append('<div class="type-widget">'+type+'</div>')
+        $('#type-header').append('<div class="type-widget"> \
+                                    <div class="well well-small">'+type+' \
+                                    <span class="badge badge-inverse">'+counts[i]+'<br> \
+                                    </div> \
+                                  </div>');
+
     }
+
+//<span class="badge badge-inverse">
+
 }
 
 function getNodesForType(type) {
