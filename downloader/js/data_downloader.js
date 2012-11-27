@@ -37,20 +37,18 @@
     
     }
 
+
     function addTypes(types, counts) {
         for (var i in types) {
             var type = types[i];
-            $('#type-header').append('<div class="type-widget"> \
+            $('#type-header').append('<a href="'+type+'" ><div class="type-widget"> \
                                         <div class="well well-small">'+type+' \
-                                          <span class="badge badge-inverse">'+counts[i]+'<br> \
+                                        <span class="badge badge-inverse">'+counts[i]+'<br> \
                                         </div> \
-                                      </div>');
-
+                                      </div></a>');
         }
-
-//<span class="badge badge-inverse">
-
     }
+
 
     function getNodesForType(type) {
         if (type_cache[type]) {
