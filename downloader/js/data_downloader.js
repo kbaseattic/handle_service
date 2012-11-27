@@ -10,7 +10,10 @@ $(document).ready(function() {
 });
 
 function addTypes(types) {
-
+    for (var i in types) {
+        var type = types[i];
+        $('type-header').append('<div class="type-widget">'+type+'</div>')
+    }
 }
 
 function getNodesForType(type) {
