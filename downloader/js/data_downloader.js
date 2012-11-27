@@ -53,6 +53,9 @@
             return;
         }
 
+        setActiveType(type);
+
+        // check if data has already been loaded
         if (typeCache[type]) {
             console.log('loading type data from cache: ' + type);
             loadDataTable(typeCache[type]);
@@ -68,16 +71,32 @@
                     alert('error loading data');
                     console.log(data.E, data.S);
                 } else {
-                    typeCache[type] = data.D;
-                    loadDataTable(data.D);
+                    var aaData = processData(data.D);
+                    typeCache[type] = aaData;
+                    loadDataTable(aaData);
                 }
             }).fail(ajaxError);
         }
     }
 
-    function loadDataTable(data) {
-        $('#type-table').empty().append('data');
-        console.log(data);
+    function processData(data) {
+        // process the data objects
+        // should we include nodes without a file? (file.size = 0)
+        var aaData = [];
+        for (var i in data) {
+            var node = data[i];
+            if (node.file.size !== 0) {
+                var nodeData = [
+                    node.file.name,
+                    node.attributes.name,
+                    node.attributes.created,
+                    node.file.size
+                ];
+                aaData.push(nodeData);
+            }
+        }
+
+        return aaData;
     }
 
     function ajaxError(jqXHR, textStatus, errorThrown) {
