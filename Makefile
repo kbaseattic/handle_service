@@ -21,7 +21,7 @@ deploy-service:
 	git submodule update
 	sh install.sh $(SERVICE_DIR) $(TARGET)/bin
 
-deploy-client:
+deploy-client: deploy-docs
 	export KB_TOP=$(TARGET); \
 	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
 	export KB_PERL_PATH=$(TARGET)/lib:$(TARGET)/lib/perl5 bash ; \
@@ -35,10 +35,4 @@ deploy-client:
 
 deploy-docs:
 	-mkdir -p $(SERVICE_DIR)/webroot
-	$(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/adm.htmlq
-
-
-
-
-
-
+	$(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/aux_store.html
