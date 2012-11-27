@@ -1,52 +1,55 @@
-  /* this is from the kbase.us body */
-  body {
+/* this is from the kbase.us body */
+body {
     font-family: Arial, Helvetica, sans-serif;
     color: #333333;
     font-size: 13px;
-  }
+}
 
-  .container {
+.container {
     width: 960px;
     margin-left: auto;
     margin-right: auto;
-  }
-  p {
+}
+p {
     font-size: 1em;
     margin: 0px;
     line-height: 1.3em;
     margin-bottom: 12px;
-  }
+}
 
-  /* these are the defualt kbase.us link styling */
-  a {
+/* these are the defualt kbase.us link styling */
+a {
     color: #08C;  
     text-decoration: none;
-  }
-  a:visited  {
+}
+a:visited  {
     color: #08C;
-  }
-  a:hover    {
+}
+a:hover    {
     text-decoration: underline;
     color: #005580;
-  }
+}
 
-  .footer-area {
+.footer-area {
     border-top: 4px solid #333;
     padding: 20px;
-  }
-  .copyright {
+}
+.copyright {
     text-align: center;
     font-size: 12px;
-  }
-  .social:hover {
+}
+.social:hover {
     opacity: 0.8;
     text-decoration: none; /* override default */
-  }
-  .doe-logo:hover {
+}
+.doe-logo:hover {
     text-decoration: none;
-  }
-  .sponsor {
+}
+.sponsor {
     font-size: 14px;
     width: 380px;
     margin: 10px auto;
-  }
+}
+.content {
+    margin-top: 40px;
+}
