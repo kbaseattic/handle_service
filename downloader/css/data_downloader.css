@@ -1,8 +1,7 @@
 /* this is from the kbase.us body */
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    color: #333333;
-    font-size: 13px;
+    /*font-family: Arial, Helvetica, sans-serif;*/
+
 }
 
 .container {
@@ -10,6 +9,7 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
 p {
     font-size: 1em;
     margin: 0px;
@@ -18,6 +18,7 @@ p {
 }
 
 /* these are the defualt kbase.us link styling */
+
 a {
     color: #08C;  
     text-decoration: none;
@@ -50,6 +51,6 @@ a:hover    {
     width: 380px;
     margin: 10px auto;
 }
-.content {
+#content {
     margin-top: 40px;
 }
