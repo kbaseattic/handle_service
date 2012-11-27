@@ -1,42 +1,36 @@
 (function($) {
-    var type_cache = {};
+    var typeCache = {};
+    var allTypes;
 
     // define the routes
     var app = $.sammy(function() {
-
-        this.get('#/', function() {
-            $('#main').text('');
+        this.get('#:type', function() {
+            var type = this.params['type'];
+            getNodesForType(type);
         });
-        
-        this.get('#/test', function() {
-            $('#main').text('Hello World');
-        });
-        
     });
 
     $(document).ready(function() {
         // grab the available types
-            var typesAjax = $.ajax({
-                type: 'GET',
-                url:  'types.json'
-            });
+        var typesAjax = $.ajax({
+            type: 'GET',
+            url: 'types.json',
+            dataType: 'json'
+        });
 
         var countAjax = $.ajax({
             type: 'GET',
-            url:  'type_counts.json'
+            url: 'type_counts.json',
+            dataType: 'json'
         });
 
         $.when(typesAjax, countAjax).done(function(types, counts){
-            addTypeRoutes(types[0]);
+            allTypes = types[0];
             addTypes(types[0], counts[0]);
+            app.run();
         }).fail(ajaxError);
 
     });
-
-    function addTypeRoutes(types) {
-    
-    }
-
 
     function addTypes(types, counts) {
         for (var i in types) {
@@ -51,9 +45,15 @@
 
 
     function getNodesForType(type) {
-        if (type_cache[type]) {
+        // make sure type is a valid type
+        if ($.inArray(type, allTypes) === -1) {
+            alert("'" + type + "' is not a valid type");
+            return;
+        }
+
+        if (typeCache[type]) {
             console.log('loading type data from cache: ' + type);
-            loadDataTable(type_cache[type]);
+            loadDataTable(typeCache[type]);
         } else {
             $('#type-table').empty().append('loading...');
             console.log('loading type data from AJAX call: ' + type);
@@ -66,7 +66,7 @@
                     alert('error loading data');
                     console.log(data.E, data.S);
                 } else {
-                    type_cache[type] = data.D;
+                    typeCache[type] = data.D;
                     loadDataTable(data.D);
                 }
             }).fail(ajaxError);
