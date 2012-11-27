@@ -55,9 +55,16 @@ a:hover    {
     margin-top: 40px;
 }
 
+#type-header {
+    margin: 20px 0 0 20px;
+}
+
+
 .type-widget {
     display: inline-block;
     width: auto;
     margin: 0 10px;
     text-align: center;
 }
+
+
