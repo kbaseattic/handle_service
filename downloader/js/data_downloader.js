@@ -30,8 +30,6 @@
             app.run();
         }).fail(ajaxError);
 
-        addTestTable()
-
     });
 
     function addTypes(types, counts) {
@@ -45,6 +43,10 @@
         }
     }
 
+    function setActiveType(type) {
+
+
+    }
 
     function getNodesForType(type) {
         // make sure type is a valid type
@@ -102,6 +104,19 @@
     function ajaxError(jqXHR, textStatus, errorThrown) {
         alert('error with ajax call');
         console.log(jqXHR, textStatus, errorThrown);
+    }
+
+    function loadDataTable(aaData) {
+        console.log(aaData)
+        var dataDict = {'aaData':aaData,
+                        'aoColumns': [{'sTitle': "File Name"},
+                                    {'sTitle': "Name"},
+                                    {'sTitle': "Date Created"},
+                                    {'sTitle': "Size"}]
+                        };
+
+        $('#type-table').append('<table id="table"></table>');
+        $('#table').dataTable(dataDict);
     }
 
     function addTestTable() {
