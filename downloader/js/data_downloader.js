@@ -1,12 +1,14 @@
 (function($) {
-    var typeCache = {};
-    var allTypes;
+    var apiUrl = 'http://kbase.us/services/shock-api';
+
+    var typesLoaded = {};  // hash from type to int (0 - not loaded, 1 - loading, 2 - loaded);
+    var selectedType = null;
 
     // define the routes
     var app = $.sammy(function() {
         this.get('#:type', function() {
             var type = this.params['type'];
-            getNodesForType(type);
+            selectType(type);
         });
     });
 
@@ -25,7 +27,10 @@
         });
 
         $.when(typesAjax, countAjax).done(function(types, counts){
-            allTypes = types[0];
+            for (var i in types[0]) {
+                var type = types[0][i];
+                typesLoaded[type] = 0;
+            }
             addTypes(types[0], counts[0]);
             app.run();
         }).fail(ajaxError);
@@ -36,63 +41,83 @@
         for (var i in types) {
             var type = types[i];
             $('#type-header').append('<div class="type-widget"><a href="#'+type+'" > \
-                                        <div class="well well-small">'+type+' \
-                                        <span class="badge badge-inverse">'+counts[i]+'<br> \
-                                        </div></a> \
-                                      </div>');
+<div class="well well-small">'+type+' \
+<span class="badge badge-inverse">'+counts[i]+'<br> \
+</div></a> \
+</div>');
         }
     }
 
-    function setActiveType(type) {
-
-
-    }
-
-    function getNodesForType(type) {
+    function selectType(type) {
         // make sure type is a valid type
-        if ($.inArray(type, allTypes) === -1) {
+        if (typesLoaded[type] === undefined) {
             alert("'" + type + "' is not a valid type");
+            return;
+        } else if (selectedType === type) {
+            // type is already selected, do nothing
             return;
         }
 
-        setActiveType(type);
+        // Neal: unselect the old, and select the new type
+
+        // hide the current type table
+        if (selectedType !== null) {
+            $('#' + selectedType + '_div').hide();
+        }
+        selectedType = type;
 
         // check if data has already been loaded
-        if (typeCache[type]) {
-            console.log('loading type data from cache: ' + type);
-            loadDataTable(typeCache[type]);
-        } else {
-            $('#type-table').empty().append('loading...');
+        if (typesLoaded[type] === 0) {
+            // not loaded
             console.log('loading type data from AJAX call: ' + type);
-            $.ajax({
-                type: 'GET',
-                url:  'http://kbase.us/services/shock-api/node?query&type=' + type
-            }).done(function(data) {
-                // check for error
-                if (data.E !== null) {
-                    alert('error loading data');
-                    console.log(data.E, data.S);
-                } else {
-                    var aaData = processData(data.D);
-                    typeCache[type] = aaData;
-                    loadDataTable(aaData);
-                }
-            }).fail(ajaxError);
+            $('#type-table').append('<div id="' + type + '_div"></div>');
+            typesLoaded[type] = 1;
+            getNodesForType(type);
+        } else if (typesLoaded[type] === 1) {
+            // in the process of loading
+            console.log('already loading type data for type: ' + type);
+        } else if (typesLoaded[type] === 2) {
+            // already loaded
+            console.log('loading type data from cache: ' + type);
+            $('#' + type + '_div').show();
         }
+    }
+
+    function getNodesForType(type) {
+        // add the loading image and text to type_div
+        $('#' + type + '_div').append('<div style="text-align:center"><img src="img/loading.gif" /><br />Loading...</div>');
+
+        $.ajax({
+            type: 'GET',
+            url:  apiUrl + '/node?query&type=' + type
+        }).done(function(data) {
+            // check for error
+            if (data.E !== null) {
+                alert('error loading data');
+                console.log(data.E, data.S);
+                // should we set typesLoaded to 0? or set it to 2?
+            } else {
+                var aaData = processData(data.D);
+                loadDataTable(type, aaData);
+                typesLoaded[type] = 2;
+            }
+        }).fail(ajaxError);
     }
 
     function processData(data) {
         // process the data objects
-        // should we include nodes without a file? (file.size = 0)
         var aaData = [];
         for (var i in data) {
             var node = data[i];
             if (node.file.size !== 0) {
+                var downloadLink = apiUrl + '/node/' + node.id + '?download';
+                var filename = '<a href="' + downloadLink + '">' + node.file.name + '</a>';
+
                 var nodeData = [
-                    node.file.name,
+                    filename,
                     node.attributes.name,
                     node.attributes.created,
-                    node.file.size
+                    prettySize(parseInt(node.file.size))
                 ];
                 aaData.push(nodeData);
             }
@@ -101,13 +126,17 @@
         return aaData;
     }
 
-    function ajaxError(jqXHR, textStatus, errorThrown) {
-        alert('error with ajax call');
-        console.log(jqXHR, textStatus, errorThrown);
+    function prettySize(size) {
+        var units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
+        var count = 0;
+        while (size > 1024) {
+            count++;
+            size = size/1024;
+        }
+        return Math.round(size*100)/100 + ' ' + units[count];
     }
 
-    function loadDataTable(aaData) {
-        console.log(aaData)
+    function loadDataTable(type, aaData) {
         var dataDict = {'aaData':aaData,
                         'aoColumns': [{'sTitle': "File Name"},
                                     {'sTitle': "Name"},
@@ -115,14 +144,12 @@
                                     {'sTitle': "Size"}]
                         };
 
-        $('#type-table').append('<table id="table"></table>');
-        $('#table').dataTable(dataDict);
+        $('#' + type + '_div').empty().append('<table id="' + type + '_table"></table>');
+        $('#' + type + '_table').dataTable(dataDict);
     }
 
-    function addTestTable() {
-        $('#type-table').append('<table id="table"><thead><tr><th>Column 1</th><th>Column 2</th><th>etc</th>' +
-		         '</tr></thead><tbody><tr><td>Row 1 Data 1</td><td>Row 1 Data 2</td><td>etc</td></tr><tr>' +
-		         '<td>Row 2 Data 1</td><td>Row 2 Data 2</td><td>etc</td></tr></tbody></table>');
-        $('#table').dataTable();
+    function ajaxError(jqXHR, textStatus, errorThrown) {
+        alert('error with ajax call');
+        console.log(jqXHR, textStatus, errorThrown);
     }
 })(jQuery);
