@@ -1,4 +1,5 @@
 TARGET ?= /kb/deployment
+DEPLOY_RUNTIME = /kb/runtime
 SERVICE = aux_store
 SERVICE_DIR = $(TARGET)/services/$(SERVICE)
 
