@@ -85,11 +85,30 @@
 
     function getNodesForType(type) {
         // add the loading image and text to type_div
-        $('#' + type + '_div').append('<div style="text-align:center"><img src="img/loading.gif" /><br />Loading...</div>');
+        $('#' + type + '_div').append('<div style="text-align:center"><img src="img/loading.gif" /><br />Loading...<br /><span id="progress"></span></div>');
 
+        var xhr, myTrigger;
         $.ajax({
             type: 'GET',
-            url:  apiUrl + '/node?query&type=' + type
+            url:  apiUrl + '/node?query&type=' + type,
+            xhr: function() {
+                xhr = jQuery.ajaxSettings.xhr();
+                myTrigger = setInterval (function () {
+                    if (xhr.readyState > 2) {
+                        var totalBytes = xhr.getResponseHeader ('Content-length');
+                        var dlBytes = xhr.responseText.length;
+                        if (dlBytes > -1) {
+                            (totalBytes > 0) ?
+                                $('#progress').html(Math.round ((dlBytes / totalBytes) * 100) + "%"):
+                                $('#progress').html(prettySize(dlBytes));
+                        }
+                    }
+                }, 200);
+                return xhr;
+            },
+            complete: function () {
+                clearInterval (myTrigger);
+            }
         }).done(function(data) {
             // check for error
             if (data.E !== null) {
