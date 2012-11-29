@@ -91,7 +91,11 @@ sub create_node {
         # authentication...
     );
 
-    my $result = _process_response($res);
+    if (!$res->is_success) {
+        die $res->status_line, ($res->content ? ": " . $res->content : "");
+    }
+
+    my $result = _process_content($res->content);
     if ($result->{error}) {
         die "Error with request: " . $result->{message};
     }
@@ -102,7 +106,26 @@ sub create_node {
 sub query_nodes {
     my ($self, $opts) = @_;
 
-    
+    # parse options
+    if (defined($opts->{attributes})) {
+        
+    }
+
+    my $res = $self->{ua}->get(
+        $self->{url} . "/node" # plus query info
+        # authentication...
+    );
+
+    if (!$res->is_success) {
+        die $res->status_line, ($res->content ? ": " . $res->content : "");
+    }
+
+    my $result = _process_content($res->content);
+    if ($result->{error}) {
+        die "Error with request: " . $result->{message};
+    }
+
+    return $result->{data};
 }
 
 sub view_node {
@@ -117,7 +140,15 @@ sub view_node {
         # authentication...
     );
 
-    my $result = _process_response($res);
+    if (!$res->is_success) {
+        if ($res->status_line == 404) {
+            die "Node not found: " . $opts->{node_id};
+        } else {
+            die $res->status_line, ($res->content ? ": " . $res->content : "");
+        }
+    }
+
+    my $result = _process_content($res->content);
     if ($result->{error}) {
         die "Error with request: " . $result->{message};
     }
@@ -132,30 +163,32 @@ sub download_node {
         die "Must pass in a node id (node_id) to " . $package . "->view_node";
     }
 
+    my $filename = $opts->{node_id};
+    if ($opts->{filename}) {
+        $filename = $opts->{filename};
+    }
+
     my $res = $self->{ua}->get(
         $self->{url} . "/node/" . $opts->{node_id} . "?download",
+        ':content_file' => $filename
         # authentication...
     );
 
-    my $result = _process_response($res);
-    if ($result->{error}) {
-        die "Error with request: " . $result->{message};
+    if (!$res->is_success) {
+        if ($res->status_line == 404) {
+            die "Node not found: " . $opts->{node_id};
+        } else {
+            die $res->status_line, ($res->content ? ": " . $res->content : "");
+        }
     }
 
-    return $result->{data};
+    return $filename;
 }
 
-sub _process_response {
+sub _process_content {
     my ($res) = @_;
 
-    if (!$res->is_success) {
-        return {
-            error => 1,
-            message => $res->status_line, ($res->content ? ": " . $res->content : ""), "\n"
-        };
-    }
-
-    my $content = decode_json($res->content);
+    my $content = decode_json($res);
     if ($content->{E}) {
         return {
             error => 1,
@@ -193,42 +226,6 @@ sub _process_opts {
         $self->{url} = $default_url;
     }
 }
-
-=head
-
-{
-  user => s,
-  pass => s,
-  attr_file => f or %,
-  data_file => f,
-  types => @,
-  format => s,
-  url => s
-}
-
-
-    if ($opts->{attr_file}) {
-        if (ref($opts->{attr_file}) eq 'HASH') {
-            $self->{attributes} = $opts->{attr_file};
-        } else {
-            # try to open it as a file
-            if (-f $self->{attr_file}) {
-                open ATTR, "<" . $self->{attr_file}
-                  or die "Couldn't open attr_file '" . $self->{attr_file} . "': " . $!;
-                my $attrs = decode_json(<ATTR>);
-                close ATTR;
-                $self->{attributes} = $attrs;
-            } else {
-                die usage();
-            }
-        }
-    } else {
-        die usage();
-    }
-
-
-
-=cut
 
 sub usage {
     my ($message) = @_;
