@@ -158,7 +158,7 @@ module adm {
 	   Ths is the response wrapper for a user. The Userdata described
 	   above along with an error string and a http return code are
 	   wrapped in the User response wrapper.
-	/*
+	*/
 	typedef structure {
 		Userdata D;
 		Error E;
