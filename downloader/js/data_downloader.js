@@ -34,17 +34,16 @@
             addTypes(types[0], counts[0]);
             app.run();
         }).fail(ajaxError);
-
     });
 
     function addTypes(types, counts) {
         for (var i in types) {
             var type = types[i];
             $('#type-header').append('<div class="type-widget"><a href="#'+type+'" > \
-<div class="well well-small">'+type+' \
-<span class="badge badge-inverse">'+counts[i]+'<br> \
-</div></a> \
-</div>');
+                                        <div id="'+type+'-selector" class="well well-small">'+type+' \
+                                        <span class="badge badge-inverse">'+counts[i]+'<br> \
+                                        </div></a> \
+                                    </div>');
         }
     }
 
@@ -58,7 +57,8 @@
             return;
         }
 
-        // Neal: unselect the old, and select the new type
+        $('.well').removeClass('alert-success')
+        $('#'+type+'-selector').addClass('alert-success')
 
         // hide the current type table
         if (selectedType !== null) {
