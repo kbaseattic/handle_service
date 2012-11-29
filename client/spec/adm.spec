@@ -1,3 +1,4 @@
+/* Top-level description of service goes here */
 module adm {
 
 	/* GENERIC DATA TYPES */
@@ -12,7 +13,7 @@ module adm {
 	typedef string Filename;
 
 	/* The size of a file in bytes */
-	typedef Filesize int
+	typedef int Filesize;
 
 	/* Any error message returned */
 	typedef string Error;
@@ -104,7 +105,7 @@ module adm {
 		FileVersion file_ver;
 	} VersionParts;
 
-	# OK, we've defined the basic parts of the node data.
+	/* OK, we've defined the basic parts of the node data. */
 
 	/*
 	   Node data has seven parts that are defined above.They are id,
@@ -157,7 +158,7 @@ module adm {
 	   Ths is the response wrapper for a user. The Userdata described
 	   above along with an error string and a http return code are
 	   wrapped in the User response wrapper.
-	/*
+	*/
 	typedef structure {
 		Userdata D;
 		Error E;
@@ -210,7 +211,7 @@ module adm {
 	funcdef createNode(Username n, Password p, Nodeparams np) returns (NodeResponseWrapper n);
 
 	/* Modify a node. */
-	funcdef modifyNode(Username n, Password p, Nodeparams np) returns (NodeResposeWrapper n);
+	funcdef modifyNode(Username n, Password p, Nodeparams np) returns (NodeResponseWrapper n);
 
 
 	/*

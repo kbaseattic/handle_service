@@ -35,9 +35,13 @@ deploy-client: deploy-docs
 		$(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(TARGET)/bin/$$base ; \
 	done
 
-deploy-docs:
+deploy-docs: build-docs
 	-mkdir -p $(SERVICE_DIR)/webroot
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/aux_store.html
+
+build-docs:
+	mkdir -p client/spec/c
+	compile_typespec client/spec/adm.spec client/spec/c
 
 # Test Section
 TESTS = $(wildcard test/*.t)
