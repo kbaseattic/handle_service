@@ -40,9 +40,8 @@ deploy-docs: build-docs
 	$(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/aux_store.html
 
 build-docs:
-#	mkdir -p client/spec/c
-	# Can't yet call this--compile_typespec won't compile adm.spec. Issue reported to Bob O. --NH
-#	compile_typespec client/spec/adm.spec client/spec/c
+	mkdir -p client/spec/c
+	compile_typespec client/spec/adm.spec client/spec/c
 
 # Test Section
 TESTS = $(wildcard test/*.t)
