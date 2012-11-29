@@ -3,13 +3,26 @@
 
     var typesLoaded = {};  // hash from type to int (0 - not loaded, 1 - loading, 2 - loaded);
     var selectedType = null;
+    var modalOpen = false;
+    var numIncorrectType = 0;
+
+    // setup modal dialog
+    initializeModal();
+
+    // setup toastr.js
+    toastr.options.positionClass = 'toast-bottom-right';
 
     // define the routes
     var app = $.sammy(function() {
         this.get('#:type', function() {
+            console.log('get: ' + this.params['type']);
             var type = this.params['type'];
             selectType(type);
         });
+
+        this.notFound = function() {
+            // do nothing for now
+        };
     });
 
     $(document).ready(function() {
@@ -50,12 +63,30 @@
 
     function selectType(type) {
         // make sure type is a valid type
-        if (typesLoaded[type] === undefined) {
-            alert("'" + type + "' is not a valid type");
-            return;
-        } else if (selectedType === type) {
+        if (selectedType === type) { // move this before typeloaded=undefined?
             // type is already selected, do nothing
             return;
+        } else if (typesLoaded[type] === undefined) {
+            numIncorrectType++;
+
+            // make modal asking user to go back
+            $('#type-modal-body').html("'" + type + "' is not a valid type");
+
+            if (!modalOpen) {
+                modalOpen = 1;
+                $('#type-modal').modal('show');
+            }
+
+            selectedType = type;
+
+            return;
+        }
+
+        // hide the modal if shown
+        if (modalOpen) {
+            modalOpen = false;
+            $('#type-modal').modal('hide');
+            numIncorrectType = 0;
         }
 
         // Neal: unselect the old, and select the new type
@@ -112,7 +143,7 @@
         }).done(function(data) {
             // check for error
             if (data.E !== null) {
-                alert('error loading data');
+                // alert('error loading data');
                 console.log(data.E, data.S);
                 // should we set typesLoaded to 0? or set it to 2?
             } else {
@@ -134,8 +165,8 @@
 
                 var nodeData = [
                     filename,
-                    node.attributes.name,
-                    node.attributes.created,
+                    node.attributes.name !== undefined ? node.attributes.name : 'none',
+                    node.attributes.created !== undefined ? node.attributes.created : 'none',
                     prettySize(parseInt(node.file.size))
                 ];
                 aaData.push(nodeData);
@@ -143,16 +174,6 @@
         }
 
         return aaData;
-    }
-
-    function prettySize(size) {
-        var units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-        var count = 0;
-        while (size > 1024) {
-            count++;
-            size = size/1024;
-        }
-        return Math.round(size*100)/100 + ' ' + units[count];
     }
 
     function loadDataTable(type, aaData) {
@@ -167,8 +188,33 @@
         $('#' + type + '_table').dataTable(dataDict);
     }
 
+    function initializeModal() {
+        $('#type-modal').modal({
+            backdrop : 'static',
+            keyboard : false,
+            show : false
+        });
+
+        $('#modal-close').click(function() {
+            modalOpen = false;
+            $('#type-modal').modal('hide');
+            history.go(0 - numIncorrectType);
+            numIncorrectType = 0;
+        });
+    }
+
+    function prettySize(size) {
+        var units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
+        var count = 0;
+        while (size > 1024) {
+            count++;
+            size = size/1024;
+        }
+        return Math.round(size*100)/100 + ' ' + units[count];
+    }
+
     function ajaxError(jqXHR, textStatus, errorThrown) {
-        alert('error with ajax call');
+        // alert('error with ajax call');
         console.log(jqXHR, textStatus, errorThrown);
     }
 })(jQuery);

@@ -5,7 +5,7 @@
     <title>Shock Data Download</title>
     <link href="css/bootstrap.css" rel="stylesheet" media="screen" />
     <link href="css/jquery.dataTables.css" rel="stylesheet" />
-    <link href="css/DT_bootstrap.css" rel="stylesheet" />
+    <link href="css/toastr.css" rel="stylesheet" />    
     <link href="css/data_downloader.css" rel="stylesheet" />
   </head>
 
@@ -56,11 +56,25 @@
       </div>
     </div>
 
+    <!-- modal for incorrect types -->
+    <div id="type-modal" class="modal" tabindex="-1" role="dialog" style="display:none;" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <h3 id="myModalLabel">Warning: Incorrect Type</h3>
+      </div>
+      <div id="type-modal-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button id="modal-close" class="btn" aria-hidden="true">Go Back</button>
+      </div>
+    </div>
+
+    <!-- remove -->
+    <a href="#blah">blah</a>
+
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="js/sammy.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/jquery.dataTables.js"></script>
-    <script src="js/DT_bootstrap.js"></script>
+    <script src="js/toastr.js"></script>
     <script src="js/data_downloader.js"></script>
 
   </body>
