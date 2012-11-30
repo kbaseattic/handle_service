@@ -121,6 +121,7 @@
         var xhr, myTrigger;
         $.ajax({
             type: 'GET',
+            dataType: 'json',
             url:  apiUrl + '/node?query&type=' + type,
             xhr: function() {
                 xhr = jQuery.ajaxSettings.xhr();
