@@ -1,4 +1,4 @@
-package ShockAPI;
+package AuxStoreAPI;
 
 use JSON;
 use LWP;
@@ -7,7 +7,7 @@ use Bio::KBase::AuthToken;
 use Data::Dumper;
 
 my $default_url = "http://kbase.us/services/shock-api";
-my $package = "ShockAPI";
+my $package = "AuxStoreAPI";
 
 sub new {
     my ($class, $opts) = @_;
@@ -73,6 +73,7 @@ sub create_node {
     # should have everything we need to create a data node
     # note: this loads the entire data file into memory before transmitting...
     # can try '$HTTP::Request::Common::DYNAMIC_FILE_UPLOAD = 1' but probably not supported
+    $HTTP::Request::Common::DYNAMIC_FILE_UPLOAD = 1;
     my $res = $self->{ua}->post(
         $self->{url} . "/node",
         [
