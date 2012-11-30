@@ -13,7 +13,7 @@ use MIME::Base64;
 use Data::Dumper;
 my $json = new JSON;
 
-my $HOST = "10.0.8.10";
+my $HOST = "10.0.8.221";
    $HOST = "140.221.92.230";
 my $PORT = "7044";
 my $BASE_URL = "http://$HOST:$PORT";

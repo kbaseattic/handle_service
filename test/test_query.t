@@ -25,7 +25,7 @@ use Data::Dumper;
 
 my $json = new JSON;
 
-my $HOST = "140.221.92.230";
+my $HOST = "10.0.8.221";
 my $PORT = "7044";
 my $BASE_URL = "http://$HOST:$PORT";
 my $URI = "$BASE_URL/node";
