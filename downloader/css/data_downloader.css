@@ -1,7 +1,6 @@
 /* this is from the kbase.us body */
 body {
     /*font-family: Arial, Helvetica, sans-serif;*/
-
 }
 
 .container {
@@ -10,26 +9,17 @@ body {
     margin-right: auto;
 }
 
-p {
-    font-size: 1em;
-    margin: 0px;
-    line-height: 1.3em;
-    margin-bottom: 12px;
+.type-widget {
+    display: inline-block;
+    width: auto;
+    margin: 0 10px;
+    text-align: center;
 }
 
-/* these are the defualt kbase.us link styling */
+#type-table {
+    margin: 50px 0 50px 0;
+}
 
-a {
-    color: #08C;  
-    text-decoration: none;
-}
-a:visited  {
-    color: #08C;
-}
-a:hover    {
-    text-decoration: underline;
-    color: #005580;
-}
 
 .footer-area {
     border-top: 4px solid #333;
@@ -56,15 +46,8 @@ a:hover    {
 }
 
 #type-header {
-    margin: 20px 0 0 20px;
+    margin: 20px 0 0 0px;
 }
 
-
-.type-widget {
-    display: inline-block;
-    width: auto;
-    margin: 0 10px;
-    text-align: center;
-}
 
 

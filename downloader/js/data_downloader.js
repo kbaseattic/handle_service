@@ -164,9 +164,11 @@
                 var downloadLink = apiUrl + '/node/' + node.id + '?download';
                 var filename = '<a href="' + downloadLink + '">' + node.file.name + '</a>';
 
+
+
                 var nodeData = [
                     filename,
-                    node.attributes.name !== undefined ? node.attributes.name : 'none',
+                    node.attributes.name !== undefined ? node.attributes.name.slice(0,20) :'none',
                     node.attributes.created !== undefined ? node.attributes.created : 'none',
                     prettySize(parseInt(node.file.size))
                 ];
@@ -178,14 +180,16 @@
     }
 
     function loadDataTable(type, aaData) {
-        var dataDict = {'aaData':aaData,
-                        'aoColumns': [{'sTitle': "File Name"},
-                                    {'sTitle': "Name"},
-                                    {'sTitle': "Date Created"},
-                                    {'sTitle': "Size"}]
+        var dataDict = {'sPaginationType': 'full_numbers',
+                        'aaData':aaData,
+                        'aoColumns': [{'sTitle': 'File Name', 'sWidth': '20px'},
+                                    {'sTitle': 'Name'},
+                                    {'sTitle': 'Date Created'},
+                                    {'sTitle': 'Size'}]
                         };
 
-        $('#' + type + '_div').empty().append('<table id="' + type + '_table"></table>');
+        $('#' + type + '_div').empty().append('<table id="' + type + '_table" \
+                                    class="table table-striped table-boarded"></table>');
         $('#' + type + '_table').dataTable(dataDict);
     }
 
