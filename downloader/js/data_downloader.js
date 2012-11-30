@@ -188,8 +188,10 @@
                                     {'sTitle': 'Size'}]
                         };
 
-        $('#' + type + '_div').empty().append('<table id="' + type + '_table" \
-                                    class="table table-striped table-boarded"></table>');
+        $('#' + type + '_div').empty().append('<h4 class="table-header">Available Data</h4><br> \
+                                                <table id="' + type + '_table" \
+                                                class="table table-striped table-boarded"> \
+                                                </table>');
         $('#' + type + '_table').dataTable(dataDict);
     }
 
