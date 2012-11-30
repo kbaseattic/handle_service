@@ -1,3 +1,4 @@
+/* Note: this spec was reverse-engineered and is NOT currently used to build the client libraries. It's here for reference only. */
 /* Top-level description of service goes here */
 module adm {
 
