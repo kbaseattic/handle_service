@@ -9,13 +9,17 @@ use HTTP::Response;
 use HTTP::Request::Common qw(POST);
 use HTML::Parser;
 use JSON;
+use MIME::Base64;
+use Data::Dumper;
 my $json = new JSON;
 
 my $HOST = "10.0.8.10";
-   $HOST = "140.221.92.148";
-my $PORT = "8000";
+   $HOST = "140.221.92.230";
+my $PORT = "7044";
 my $BASE_URL = "http://$HOST:$PORT";
-my $uri = "$BASE_URL/register";
+my $uri = "$BASE_URL/node";
+my $username = 'kbasetest';
+my $password = '@Suite525';
 my $response;
 my $response_hash;
 
@@ -71,10 +75,10 @@ sub check_response
 	my $attrib   = shift;
 	my $id       = shift;
 	my $filename = shift;
-	is ($response->{'checksum'},$attrib->{'md5'}, 'Is the GET checksum right?');
-	is ($response->{'size'},$attrib->{'size'}, 'Is the GET size right?');
-	is ($response->{'id'},$id, 'Is the ID right?');
-	is ($response->{'file_name'},$filename, 'Is the GET file name right?');
+	is ($response->{'D'}->{'file'}->{'checksum'}->{'md5'},$attrib->{'md5'}, 'Is the GET checksum right?');
+	is ($response->{'D'}->{'file'}->{'size'},$attrib->{'size'}, 'Is the GET size right?');
+	is ($response->{'D'}->{'id'},$id, 'Is the ID right?');
+	is ($response->{'D'}->{'file'}->{'name'},$filename, 'Is the GET file name right?');
 
 	if (ref($response->{'attributes'}) =~ /HASH/)
 	{
@@ -129,6 +133,8 @@ $file_contents = join('',@lines);
 #
 
 my $browser = LWP::UserAgent->new;
+
+$browser->default_header( "Authorization" => "Basic ".  encode_base64($username . ':' . $password));
 # set the http command (POST, GET, DELETE, or CHANGE)
 my $req = HTTP::Request->new( 'POST', $uri );
 
@@ -138,11 +144,12 @@ my $req = HTTP::Request->new( 'POST', $uri );
 $response = $browser->post(
             "$uri",
             Content_Type => 'multipart/form-data',
-            Content => [ file => [undef, $filename, Content=>$file_contents ], attributes => [$attfile] ]
+            Content => [ upload => [undef, $filename, Content=>$file_contents ], attributes => [$attfile] ]
      );
-ok( $response->is_redirect, "Did a POST job get redirected successfully?" );
+$response_hash = $json->decode( $response->content ); 
+is( $response_hash->{"S"}, 200, "Did a POST job get redirected successfully?" );
 
-my ($id) = &html_parse($response->content );
+my $id = $response_hash->{"D"}->{"id"};
 
 #
 #  Test the ID just extracted with GET
@@ -152,13 +159,12 @@ my ($id) = &html_parse($response->content );
 $uri = "$BASE_URL/node/$id/";
 $req = HTTP::Request->new( 'GET', $uri );
 $response = $browser->request($req);
-
-ok( $response->is_success, "Did a GET job get submitted successfully?" );
-#print "DEBUG: RESPONSE=".$response->content."\n\n";
-
 $response_hash = $json->decode( $response->content ); 
 
+is( $response_hash->{"S"}, 200, "Did a GET job get submitted successfully?" );
 &check_response($response_hash,\%attrib,$id,$filename);
+
+
 
 #
 #  Request a download of the contents of the file
@@ -173,7 +179,6 @@ ok( $response->is_success, "Did a GET download job get submitted successfully?" 
 #print "RESPONSE=".$response->content."\n FILE_CONTENTS=$file_contents \n";
 
 is ($response->content, $file_contents, 'Is the response back the same as the input file');
-
 #--------------------------------------------------------------------------------------
 #
 #	REPEAT the process with a binary file
@@ -198,8 +203,8 @@ $attrib{'size'} = -s $filename;
 #	Set up the new request
 #
 
-$uri = "$BASE_URL/register";
-$browser = LWP::UserAgent->new;
+$uri = "$BASE_URL/node";
+#$browser = LWP::UserAgent->new;
 # set the http command (POST, GET, DELETE, or CHANGE)
 $req = HTTP::Request->new( 'POST', $uri );
 
@@ -209,14 +214,12 @@ $req = HTTP::Request->new( 'POST', $uri );
 $response = $browser->post(
             "$uri",
             Content_Type => 'multipart/form-data',
-            Content => [ file => [undef, $filename, Content=>$file_contents ], attributes => [$attfile] ]
+            Content => [ upload => [undef, $filename, Content=>$file_contents ], attributes => [$attfile] ]
      );
-ok( $response->is_redirect, "Did a POST job get redirected successfully?" );
+$response_hash = $json->decode( $response->content ); 
+is( $response_hash->{"S"}, 200, "Did a POST job get redirected successfully?" );
 
-#
-#  Parse the HTML response and find the node ID number
-#
-($id) = &html_parse($response->content);
+my $id = $response_hash->{"D"}->{"id"};
 
 #
 #  Test the ID just extracted with GET
@@ -227,14 +230,9 @@ $uri = "$BASE_URL/node/$id/";
 $req = HTTP::Request->new( 'GET', $uri );
 $response = $browser->request($req);
 
-ok( $response->is_success, "Did a GET job get submitted successfully?" );
-#print "DEBUG: RESPONSE=".$response->content."\n\n";
-
 $response_hash = $json->decode( $response->content ); 
 
-#
-#	Check the attributes found in the response
-#
+is( $response_hash->{"S"}, 200, "Did a GET job get submitted successfully?" );
 &check_response($response_hash,\%attrib,$id,$filename);
 
 #
@@ -253,7 +251,6 @@ is ($response->content, $file_contents, 'Is the response back the same as the in
 
 
 
-
 #-----------------------------------------------------------------------------
 #	Tests that should fail due to bad inputs
 #
@@ -262,7 +259,7 @@ $uri = "$BASE_URL/in_valid";
 $response = $browser->post(
             "$uri",
             Content_Type => 'multipart/form-data',
-            Content => [ file => [undef, $filename, Content=>$file_contents ], attributes => [$attfile] ]
+            Content => [ upload => [undef, $filename, Content=>$file_contents ], attributes => [$attfile] ]
      );
 ok( $response->is_error, "Give POST an invalid request and it should generate an error" );
 
@@ -278,7 +275,6 @@ $req = HTTP::Request->new( 'GET', $uri );
 $response = $browser->request($req);
 
 ok( $response->is_error, "Give GET an invalid request and it should generate an error" );
-
 TODO: {
 	my $TODO = "This code is returning data for the node instead of returning an Error status";
 #	print "DEBUG: RESPONSE=".$response->content."\n\n";
@@ -289,7 +285,7 @@ TODO: {
 $response = $browser->post(
             "$uri",
             Content_Type => 'multipart/form-data',
-            Content => [ file => [undef, $attfile, Content=>$file_contents ], attributes => [$filename] ]
+            Content => [ upload => [undef, $attfile, Content=>$file_contents ], attributes => [$filename] ]
      );
 ok( $response->is_error, "POST with bad attribute should fail with HTTP error code?" );
 
@@ -310,27 +306,13 @@ $uri = "$BASE_URL/node/999999999/";
 $req = HTTP::Request->new( 'GET', $uri );
 $response = $browser->request($req);
 
-ok( $response->is_success, "Unknown ID - Did a GET job submit and return successfully?" );
-#print "DEBUG: RESPONSE=".$response->content."\n\n";
-$response_hash = $json->decode( $response->content );
-is($response_hash->{status},'Error', "Return - has Error 'Status' in content");
+ok( $response->is_error, "Unknown ID - Did a GET job submit and return successfully?" );
 
 $uri = "$BASE_URL/node/NAN/";
 $req = HTTP::Request->new( 'GET', $uri );
 $response = $browser->request($req);
 
-ok( $response->is_success, "String ID - Did a GET job get submitted successfully?" );
-#print "DEBUG: RESPONSE=".$response->content."\n\n";
-$response_hash = $json->decode( $response->content );
-is($response_hash->{status},'Error', "Return - has Error 'Status' in content");
-
-$uri = "$BASE_URL/register/";
-$req = HTTP::Request->new( 'GET', $uri );
-$response = $browser->request($req);
-
-ok( $response->is_success, "Use 'register' in URI - Did a GET job get submitted successfully?" );
-#print "DEBUG: RESPONSE=".$response->content."\n\n";
-like($response->content, qr/DOCTYPE/, "Return - generates html as its return");
+ok( $response->is_error, "String ID - Did a GET job get submitted successfully?" );
 
 $uri = "$BASE_URL/in_valid/";
 $req = HTTP::Request->new( 'GET', $uri );

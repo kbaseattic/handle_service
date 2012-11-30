@@ -25,13 +25,12 @@ use Data::Dumper;
 
 my $json = new JSON;
 
-my $HOST = "140.221.92.148";
-my $PORT = "8000";
+my $HOST = "140.221.92.230";
+my $PORT = "7044";
 my $BASE_URL = "http://$HOST:$PORT";
 my $URI = "$BASE_URL/node";
-my $USER = "test";
-my $PW = "test";
-my $UID = "f34dc877005b84b939cfa69eda2ca90c";
+my $USER = 'kbasetest';
+my $PW = '@Suite525';
 
 my $response;
 my $response_hash;
@@ -81,6 +80,39 @@ sub check_node_response_format {
 #          "file_ver" : "version_string",
 #   }
 # }
+#
+#{
+#   "S" : 200,
+#   "D" : [
+#      {
+#         "version" : "1c6f9c4b03bb0fc4a74c47623d79340d",
+#         "file" : {
+#            "checksum" : {
+#               "sha1" : "5905b9a3a343daf06c6b47d3151315b229d45df8",
+#               "md5" : "8c10d21f26ecb37dbb4024d1e64ae7af"
+#            },
+#            "format" : "",
+#            "name" : "protein.faa",
+#            "virtual_parts" : [],
+#            "virtual" : false,
+#            "size" : 1168026
+#         },
+#         "id" : "d34a605c-f406-4cd2-8c81-0aaf7e0a48c1",
+#         "attributes" : {
+#            "source" : "ftp://no_such_url.anl.gov/no_such_file",
+#            "file_list" : "test1.rev.1.txt",
+#            "fake_id" : 75,
+#            "file_name" : "No_name_known",
+#            "description" : "File created for testing"
+#         },
+#         "indexes" : {}
+#      }
+#   ],
+#   "E" : null
+#}
+#
+#
+#
 # Note that if no file is loaded (i.e. just a POST /node with no other info)
 # then the file:checksum hash will be empty.
 #
@@ -97,14 +129,6 @@ sub check_node_format {
 	ok( exists( $node->{'attributes'} ), "Does the node have an 'attributes' field?" );
 	ok( !defined($node->{'attributes'}) || ref($node->('attributes')) eq 'HASH', "Is the 'attributes' field either a hash or undef?");
 	
-	ok( exists($node->{'acl'}), "Does the node have an 'acl' field?" );
-	ok( ref($node->{'acl'}) eq 'HASH', "Is the 'acl' field a hash?" );
-	ok( exists($node->{'acl'}->{'read'}), "Does the 'acl' field have a 'read' field?" );
-	ok( ref($node->{'acl'}->{'read'}) eq 'ARRAY', "Is the 'read' field an array?" );
-	ok( exists($node->{'acl'}->{'write'}), "Does the 'acl' field have a 'write' field?" );
-	ok( ref($node->{'acl'}->{'write'}) eq 'ARRAY', "Is the 'write' field an array?" );
-	ok( exists($node->{'acl'}->{'delete'}), "Does the 'acl' field have a 'delete' field?" );
-	ok( ref($node->{'acl'}->{'delete'}) eq 'ARRAY', "Is the 'delete' field an array?" );
 	
 	ok( exists($node->{'file'}), "Is there a 'file' field?" );
 	ok( ref($node->{'file'}) eq 'HASH', "Is the 'file' field a hash?" );
@@ -128,15 +152,6 @@ sub check_node_format {
 	
 	ok( exists($node->{'indexes'}), "Does the node have an 'indexes' field?" );
 	ok( ref($node->{'indexes'}) eq 'HASH', "Is the 'indexes' field a hash?" );
-	
-	ok( exists($node->{'version_parts'}), "Does the node have a 'verison_parts' field?" );
-	ok( ref($node->{'version_parts'}) eq 'HASH', "Is the 'version_parts' field a hash?" );
-	ok( exists($node->{'version_parts'}->{'acl_ver'}), "Does the 'version_parts' have an 'acl_ver' field?" );
-	ok( length($node->{'version_parts'}->{'acl_ver'}) > 0, "Is the 'acl_ver' a non-empty string?" );
-	ok( exists($node->{'version_parts'}->{'attributes_ver'}), "Does the 'version_parts' have an 'attributes_ver' field?" );
-	ok( length($node->{'version_parts'}->{'attributes_ver'}) > 0, "Is the 'attribtes_ver' a non-empty string?" );
-	ok( exists($node->{'version_parts'}->{'file_ver'}), "Does the 'version_parts' have a 'file_ver' field?" );
-	ok( length($node->{'version_parts'}->{'file_ver'}) > 0, "Is the 'file_ver' a non-empty string?" );
 print "Done!\n";
 }
 
@@ -151,7 +166,7 @@ use String::Random;
 my $strrd = new String::Random;
 my $NUM_TAG = 30;
 my $NUM_VAL = 50;
-my $NUM_ATR = 10;
+my $NUM_ATR = 1;
 my %tags = ();
 my %vals = ();
 
@@ -190,7 +205,7 @@ while( $ait < $NUM_ATR) {
   my $json_text = to_json(\%hs, {utf8 => 1, pretty => 1});
   $json_text =~ s/\n//g;
   `echo  '$json_text' > att-$$.json;`;
-  my $res = `curl -s -X POST -F \"attributes=\@att-$$.json\" $URI`;
+  my $res = `curl --user '$USER:$PW' -s -X POST -F \"attributes=\@att-$$.json\" $URI`;
   my $rh =  from_json($res);
   ok(! defined $rh->{E}, "Creating a document with the attributes (err_msg)");
   is($rh->{S}, 200, "Creating a document with the attributes (status)");
@@ -206,7 +221,7 @@ foreach my $tagval (keys %tagval2ait) {
   my @tv = split/:/,$tagval;
 
   # Correct query test
-  my $res = `curl -s -X GET '$URI/?query&$tv[0]=$tv[1]'`;
+  my $res = `curl --user '$USER:$PW' -s -X GET '$URI/?query&$tv[0]=$tv[1]'`;
   my $rh =  from_json($res);
 
 
@@ -227,7 +242,7 @@ foreach my $tagval (keys %tagval2ait) {
 
 
   # Wrong query tag test
-  $res = `curl -s -X GET '$URI/?query&ttt$tv[0]=$tv[1]'`;
+  $res = `curl --user '$USER:$PW' -s -X GET '$URI/?query&ttt$tv[0]=$tv[1]'`;
   $rh =  from_json($res);
   # check return status
 
@@ -237,7 +252,7 @@ foreach my $tagval (keys %tagval2ait) {
 
 
   # Wrong query value  test
-  $res = `curl -s -X GET '$URI/?query&$tv[0]=tttttttttttttttttt$tv[1]'`;
+  $res = `curl --user '$USER:$PW' -s -X GET '$URI/?query&$tv[0]=tttttttttttttttttt$tv[1]'`;
   $rh =  from_json($res);
   # check return status
 
@@ -246,7 +261,7 @@ foreach my $tagval (keys %tagval2ait) {
 
 
   # With username & password 
-  $res = `curl -s -X GET --user $USER:$PW '$URI/?query&$tv[0]=$tv[1]'`;
+  $res = `curl -s -X GET --user '$USER:$PW' '$URI/?query&$tv[0]=$tv[1]'`;
   $rh =  from_json($res);
   foreach my $hr (@{$rh->{D}}) {
     is($nidhs{$hr->{id}}, 1, "Query result correctness test with username");
@@ -260,8 +275,8 @@ foreach my $tagval (keys %tagval2ait) {
 # Test with user and valid JSON file
 
 #reset previous datastructures
-my %tags = ();
-my %vals = ();
+%tags = ();
+%vals = ();
 
 while (scalar keys %tags < $NUM_TAG) {
   $tags{(time()).'-'.$strrd->randregex("[a-zA-Z]{5,500}")} = ();
@@ -297,7 +312,7 @@ while( $ait < $NUM_ATR) {
   my $json_text = to_json(\%hs, {utf8 => 1, pretty => 1});
   $json_text =~ s/\n//g;
   `echo  '$json_text' > att-$$.json;`;
-  my $res = `curl -s -X POST --user $USER:$PW -F \"attributes=\@att-$$.json\" $URI`;
+  my $res = `curl -s -X POST --user '$USER:$PW' -F \"attributes=\@att-$$.json\" $URI`;
   my $rh =  from_json($res);
   ok(! defined $rh->{E}, "Creating a document with the attributes (err_msg, username & passwd)");
   is($rh->{S}, 200, "Creating a document with the attributes (status, username & passwd)");
@@ -313,7 +328,7 @@ foreach my $tagval (keys %tagval2ait) {
   my @tv = split/:/,$tagval;
 
   # Correct query test
-  my $res = `curl -s -X GET --user $USER:$PW '$URI/?query&$tv[0]=$tv[1]'`;
+  my $res = `curl -s -X GET --user '$USER:$PW' '$URI/?query&$tv[0]=$tv[1]'`;
   my $rh =  from_json($res);
 
 
@@ -334,7 +349,7 @@ foreach my $tagval (keys %tagval2ait) {
 
 
   # Wrong query tag test
-  $res = `curl -s -X GET --user $USER:$PW '$URI/?query&ttt$tv[0]=$tv[1]'`;
+  $res = `curl -s -X GET --user '$USER:$PW' '$URI/?query&ttt$tv[0]=$tv[1]'`;
   $rh =  from_json($res);
   # check return status
 
@@ -344,7 +359,7 @@ foreach my $tagval (keys %tagval2ait) {
 
 
   # Wrong query value  test
-  $res = `curl -s -X GET --user $USER:$PW '$URI/?query&$tv[0]=tttttttttttttttttt$tv[1]'`;
+  $res = `curl -s -X GET --user '$USER:$PW' '$URI/?query&$tv[0]=tttttttttttttttttt$tv[1]'`;
   $rh =  from_json($res);
   # check return status
 
@@ -362,7 +377,7 @@ foreach my $tagval (keys %tagval2ait) {
 
 
   # with wrong password
-  $res = `curl -s -X GET --user $USER:kkkkkkkkk$PW '$URI/?query&$tv[0]=$tv[1]'`;
+  $res = `curl -s -X GET --user '$USER:kkkkkkkkk$PW' '$URI/?query&$tv[0]=$tv[1]'`;
   $rh =  from_json($res);
   # check return status
   is($rh->{E}[0], "Invalid username or password", "Wrong password <- unauthorized error");
