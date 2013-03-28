@@ -36,7 +36,6 @@ $(window).load(function(){
 						       old = attrs[attr];
 						       attrs[attr] = old.split("\n");
 						   });
-			     console.log(attrs);
 			     var datafile = $("#datafile")[0];
 			     upload(datafile,attrs,localStorage['auth_token']);
 			     // reset form
@@ -44,8 +43,16 @@ $(window).load(function(){
 				 .val('')
 				 .removeAttr('checked')
 				 .removeAttr('selected');
+			     $('#related_kbid').val('');
 			 });
     $('#related_kbid').val("");
+    $("#fid").keypress(function(event) {
+		if (event.which == 13) {
+			event.preventDefault();
+			$('#add_genome_btn').triggerHandler("click");
+		}
+    });
+
     $("#add_genome_btn").click( function(event) {
 				    var newfid = $("#fid").val();
 				    var related_kbids = $('#related_kbid').val();
