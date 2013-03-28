@@ -11,7 +11,7 @@ use constant SESSION_COOKIE_NAME => "kbase_session";
 use constant SESSION_TIMEOUT => "+2d";
 
 # directories
-use constant BASE_URL => 'localhost';
+use constant BASE_URL => '';
 use constant IMAGE_DIR => '';
 use constant JS_DIR => '';
 use constant CSS_DIR => '';

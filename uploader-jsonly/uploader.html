@@ -1,0 +1,136 @@
+<html>
+    <head>
+      <title>KBase Uploader</title>
+      <link type="text/css" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
+      <link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/smoothness/jquery-ui.css" rel="stylesheet"/>    
+      <link type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet"/>      
+      <link type="text/css" href="uploader.css" rel="stylesheet"/>      
+      <link type="text/css" href="kbase-common.css" rel="stylesheet"/>      
+    </head>
+
+    <body style="padding-bottom: 100px;">    
+      <div class="container">
+	<div class="navbar">
+	  <div class="navbar-inner">
+	    <img src="http://www.kbase.us/themes/kbase/images/Kbase_Logo.png"/>
+	    <div class="container">
+              <a style="color: black; cursor: default;" href="#" class="brand"><h1>KBase Data Uploader</h1></a>
+	      <ul class="nav">
+             </ul>
+	     <div class="pull-right">
+	       <span id="login_status" class="navbar-text">Not logged in</span>
+	       <button id="logout" class="btn btn-block" onclick="logout()">Log out</button>
+	     </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- login content -->
+	<div id="new_login" class="row hidden">
+	  <div class="row">
+	    <div class="offset4 span4">
+	      <form class="form-signin" name="kbase_login_form">
+		<h2 class="form-signin-heading">Log in to KBase</h2>
+		<div id="login_error"></div>
+		<input id="kbase_username" type="text" class="input-block-level" placeholder="KBase username"></input>
+		<input id="kbase_password" type="password" class="input-block-level" placeholder="Password"></input>
+		<div class="span2 nomargin pull-left">
+		  <a target="_blank" class="span2 nomargin" href="http://gologin.kbase.us/Signup">Register here</a>
+		  <a target="_blank" class="span2 nomargin" href="http://gologin.kbase.us/ResetPassword">Forgot password?</a>
+		</div>
+		<button class="pull-right btn btn-large btn-primary" type="button" onclick="login($('#kbase_username').val(),$('#kbase_password').val());">Log in</button>
+	      </form>                
+	    </div>
+	  </div>        
+	</div>
+	<div class="alert alert-info" id="inbox_feedback_msg" style="display: none;"></div>
+	<div id="main_app" class="hidden">
+	  <div class="row">
+	    <form id="upload" class="form-horizontal">  
+	      <div class="span6">
+		<fieldset>
+		  <div class="control-group">  
+		    <label class="control-label" for="datafile">Datafile for upload</label>  
+		    <div class="controls">  
+		      <input class="input-file" id="datafile" type="file"/>
+		    </div>  
+		  </div>    
+		  <div class="control-group">  
+		    <label class="control-label" for="type">Type of file</label>  
+		    <div class="controls">  
+		      <select id="type" class="input-small">  
+			<option>image</option>  
+			<option>text</option>  
+			<option>binary</option>  
+			<option>json</option>  
+		      </select> 
+		    </div>
+		  </div>  
+		  <div class="control-group">  
+		    <label class="control-label" for="Description">Description of file contents</label>  
+		    <div class="controls">  
+		      <textarea class="input-xlarge" id="Description" rows="3"></textarea>  
+		    </div>  
+		  </div>  
+		  <button type="submit" class="btn">Submit</button>  
+		</fieldset>
+	      </div>
+	      <div class="span6">
+		<fieldset>
+		  <div class="control-group">  
+		    <label class="control-label" for="owner">Owner of file</label>  
+		    <div class="controls">  
+		      <input type="text" class="input-medium" id="owner" readonly>  
+		    </div>  
+		  </div>  
+		  <input type="hidden" id="upload_date" >  
+		  <div class="control-group">  
+		    <label class="control-label" for="related_kbids">Related KBase IDs</label>  
+		    <div class="controls">  
+		      <textarea class="input-xlarge" id="related_kbids" rows="3"></textarea>  
+		    </div>  
+		  </div>  
+		</fieldset>
+	      </div>
+	    </form>  
+	  </div>
+	  <div id="upload_progress">
+	    <h4>Upload Progress</h4>
+	    <div id="uploaded_files" style="display: none;" class="alert alert-info"></div>
+	    <div id="progress_display" class="progress_table">
+	      <table class="table" id="uploads">
+		<tbody>
+		</tbody>
+	      </table>
+	    </div>
+	  </div>
+	</div>
+	<div id="loading_spinner" class="row hidden">
+	  <div id="loading_spinner_text" style="text-align:center; font-size:24px; font-weight:bold; margin-top:20px">Loading, please wait...</div>
+	  <div style="text-align:center; margin-top:20px"><img src="assets/img/loading.gif" align="center" /></div>
+	</div>
+      </div>
+      
+      <div class="hidden">
+        <div id="loading_message">
+	  <div id="loading_message_text">Loading, please wait...</div>
+	  <div id="loading_message_icon">
+	    <img src="assets/img/kbase_animated_logo.gif"/>
+	  </div>
+	</div>
+      </div>
+      
+      <div id="error" class="row hidden">
+	Sorry, an error occurred. Please try again.
+	<hr/>
+	<div id="error_text"></div>
+      </div>
+      
+    </div>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="uploader.js"></script>
+    <script type="text/javascript" src="http://malsup.github.com/jquery.blockUI.js"></script>
+</body>
+</html>
