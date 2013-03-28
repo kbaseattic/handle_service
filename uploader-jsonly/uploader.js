@@ -24,12 +24,19 @@ $(window).load(function(){
 			     var d = new Date();
 			     $("#upload_date").val(d.toJSON());
 			     var attrs = Object();
-			     $("#upload").find(':input').each(function(i){
+			     $("#upload").find(':input').not(':button, :submit').each(function(i){
 								  attrs[$(this).attr('id')] = $(this).val()
 							      });
-			     // Strip out unwanted fields from attrs
+			     // Strip out unwanted form fields from attrs that go into Shock
 			     delete attrs[undefined];
 			     delete attrs['datafile'];
+			     delete attrs['fid'];
+			     // Convert these fields from \n delimited string into a list
+			     ['related_kbid'].map( function(attr) {
+						       old = attrs[attr];
+						       attrs[attr] = old.split("\n");
+						   });
+			     console.log(attrs);
 			     var datafile = $("#datafile")[0];
 			     upload(datafile,attrs,localStorage['auth_token']);
 			     // reset form
@@ -38,8 +45,21 @@ $(window).load(function(){
 				 .removeAttr('checked')
 				 .removeAttr('selected');
 			 });
+    $('#related_kbid').val("");
+    $("#add_genome_btn").click( function(event) {
+				    var newfid = $("#fid").val();
+				    var related_kbids = $('#related_kbid').val();
+				    if (related_kbids == "") {
+					$('#related_kbid').val( newfid);
+				    } else {
+					$('#related_kbid').val( related_kbids + "\n" + newfid);
+				    }
+				    $("#fid").val("");
+				});
+
     checkLogin();
 });
+
 
 // fileInputElement is the form field where the user selected the file
 // attributes is a hash containing the metadata attributes

@@ -58,10 +58,16 @@
 		    <label class="control-label" for="type">Type of file</label>  
 		    <div class="controls">  
 		      <select id="type" class="input-small">  
+			<option>metagenome</option>
 			<option>image</option>  
 			<option>text</option>  
 			<option>binary</option>  
 			<option>json</option>  
+			<option>drisee</option>
+			<option>histogram</option>
+			<option>stylesheet</option>
+			<option>biom</option>
+			<option>kmer</option>
 		      </select> 
 		    </div>
 		  </div>  
@@ -84,9 +90,10 @@
 		  </div>  
 		  <input type="hidden" id="upload_date" >  
 		  <div class="control-group">  
-		    <label class="control-label" for="related_kbids">Related KBase IDs</label>  
+		    <label class="control-label" for="related_kbid">Related Genome IDs</label>  
 		    <div class="controls">  
-		      <textarea class="input-xlarge" id="related_kbids" rows="3"></textarea>  
+		      <input type="text" class="input-large" id="fid" placeholder="KBase Genome ID"> <button type="button" class="btn btn-small" id="add_genome_btn">Add Genome ID</button>
+		      <textarea class="input-xlarge" name="related_kbid" id="related_kbid" placeholder="Type in a KBase genome ID above and click 'Add Genome ID' to insert it here"readonly></textarea>
 		    </div>  
 		  </div>  
 		</fieldset>
