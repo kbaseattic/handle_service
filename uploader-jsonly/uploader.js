@@ -1,9 +1,14 @@
 var login_url = "http://kbase.us/services/authorization/Sessions/Login/";
+var upload_url = "https://kbase.us/services/shock-api/node";
+var cdmi_url = "http://kbase.us/services/cdmi_api/";
+
+var cdmi_api = new CDMI_API(cdmi_url);
+var cdmi_entity_api = new CDMI_EntityAPI(cdmi_url);
+
 var defaultUserData = {
     auth_token: null,
     user_id: null
 };
-var upload_url = "https://kbase.us/services/shock-api/node";
 var filecount = 0;
 
 /* BEGIN UTILITY functions */
@@ -44,6 +49,7 @@ $(window).load(function(){
 				 .removeAttr('checked')
 				 .removeAttr('selected');
 			     $('#related_kbid').val('');
+			     $('#kbid_check').hide();
 			 });
     $('#related_kbid').val("");
     $("#fid").keypress(function(event) {
@@ -55,13 +61,23 @@ $(window).load(function(){
 
     $("#add_genome_btn").click( function(event) {
 				    var newfid = $("#fid").val();
-				    var related_kbids = $('#related_kbid').val();
-				    if (related_kbids == "") {
-					$('#related_kbid').val( newfid);
-				    } else {
-					$('#related_kbid').val( related_kbids + "\n" + newfid);
-				    }
-				    $("#fid").val("");
+				    $('#kbid_check').attr("class","label label-info").text("Checking " + newfid).show();
+				    isKBaseGenome( newfid,
+						   function() {
+						       var related_kbids = $('#related_kbid').val();
+						       if (related_kbids == "") {
+							   $('#related_kbid').val( newfid);
+						       } else {
+							   $('#related_kbid').val( related_kbids + "\n" + newfid);
+						       }
+						       $("#fid").val("");
+						       $('#kbid_check').attr("class","label label-success").text("Genome ID OK");
+						   },
+						   function(res) {
+						       console.log( newfid + " is note a legitimate KBase Genome ID");
+						       $('#kbid_check').attr("class","label label-important").text("Unrecognized Genome ID");
+
+						   })
 				});
 
     checkLogin();

@@ -92,7 +92,7 @@
 		  <div class="control-group">  
 		    <label class="control-label" for="related_kbid">Related Genome IDs</label>  
 		    <div class="controls">  
-		      <input type="text" class="input-large" id="fid" placeholder="KBase Genome ID"> <button type="button" class="btn btn-small" id="add_genome_btn">Add Genome ID</button>
+		      <input type="text" class="input-large" id="fid" placeholder="KBase Genome ID"> <button type="button" class="btn btn-small" id="add_genome_btn">Add Genome ID</button> <span class="label label-important" id="kbid_check" style='display:none;'>Unrecognized Genome ID</span>
 		      <textarea class="input-xlarge" rows=3 name="related_kbid" id="related_kbid" placeholder="Type in a KBase genome ID above and click 'Add Genome ID' to insert it here"readonly></textarea>
 		    </div>  
 		  </div>  
@@ -137,7 +137,8 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
     <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="uploader.js"></script>
+    <script type="text/javascript" src="kbase.js"></script>
     <script type="text/javascript" src="http://malsup.github.com/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="uploader.js"></script>
 </body>
 </html>
