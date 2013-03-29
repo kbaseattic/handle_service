@@ -49,6 +49,12 @@
 	      <div class="span6">
 		<fieldset>
 		  <div class="control-group">  
+		    <label class="control-label" for="owner">Owner of file</label>  
+		    <div class="controls">  
+		      <input type="text" class="input-medium" id="owner" readonly>  
+		    </div>  
+		  </div>  
+		  <div class="control-group">  
 		    <label class="control-label" for="datafile">Datafile for upload</label>  
 		    <div class="controls">  
 		      <input class="input-file" id="datafile" type="file"/>
@@ -58,11 +64,11 @@
 		    <label class="control-label" for="type">Type of file</label>  
 		    <div class="controls">  
 		      <select id="type" class="input-small">  
-			<option>metagenome</option>
 			<option>image</option>  
 			<option>text</option>  
 			<option>binary</option>  
 			<option>json</option>  
+			<option>metagenome</option>
 			<option>drisee</option>
 			<option>histogram</option>
 			<option>stylesheet</option>
@@ -77,30 +83,33 @@
 		      <textarea class="input-xlarge" id="Description" rows="3"></textarea>  
 		    </div>  
 		  </div>  
-		  <button type="submit" class="btn">Submit</button>  
 		</fieldset>
 	      </div>
 	      <div class="span6">
 		<fieldset>
-		  <div class="control-group">  
-		    <label class="control-label" for="owner">Owner of file</label>  
-		    <div class="controls">  
-		      <input type="text" class="input-medium" id="owner" readonly>  
-		    </div>  
-		  </div>  
 		  <input type="hidden" id="upload_date" >  
 		  <div class="control-group">  
 		    <label class="control-label" for="related_kbid">Related Genome IDs</label>  
+		    <div class="controls">
+		      <input type="text" class="input-large" id="fid" placeholder="KBase Genome ID"/>
+		      <span class="label label-important" id="kbid_check" style='visibility:"hidden";'></span>
+		      <textarea class="input-xlarge" rows=4 name="related_kbid" id="related_kbid" placeholder="Type in a KBase genome ID above and click 'Add Genome' to insert it here"readonly></textarea>
+		    </div>  
+		  </div>  
+		  <div class="control-group">  
+		    <label class="control-label" for="tags">Tags</label>  
 		    <div class="controls">  
-		      <input type="text" class="input-large" id="fid" placeholder="KBase Genome ID"> <button type="button" class="btn btn-small" id="add_genome_btn">Add Genome ID</button> <span class="label label-important" id="kbid_check" style='display:none;'>Unrecognized Genome ID</span>
-		      <textarea class="input-xlarge" rows=3 name="related_kbid" id="related_kbid" placeholder="Type in a KBase genome ID above and click 'Add Genome ID' to insert it here"readonly></textarea>
+		      <input type="text" class="input-large" id="tag" placeholder="Tags"/>
+		      <span class="label label-important" id="tag_check" style='visibility:"hidden";'></span>
+		      <textarea class="input-xlarge" rows=4 name="tags" id="tags" placeholder="Type in a tag consisting of alphanumeric characters and '_' or ':' above and click 'Add Tag' to insert it here" readonly></textarea>
 		    </div>  
 		  </div>  
 		</fieldset>
+		<button type="submit" class="btn btn-large btn-primary pull-right">Upload!</button>  
 	      </div>
 	    </form>  
 	  </div>
-	  <div id="upload_progress">
+	  <div id="upload_progress" style="display:none;">
 	    <h4>Upload Progress</h4>
 	    <div id="uploaded_files" style="display: none;" class="alert alert-info"></div>
 	    <div id="progress_display" class="progress_table">

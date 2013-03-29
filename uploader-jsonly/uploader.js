@@ -25,6 +25,7 @@ $(window).load(function(){
 		}
     });
     $("#upload").submit( function(event) {
+			     $("#upload_progress").show();
 			     event.preventDefault();
 			     var d = new Date();
 			     $("#upload_date").val(d.toJSON());
@@ -33,11 +34,15 @@ $(window).load(function(){
 								  attrs[$(this).attr('id')] = $(this).val()
 							      });
 			     // Strip out unwanted form fields from attrs that go into Shock
-			     delete attrs[undefined];
-			     delete attrs['datafile'];
-			     delete attrs['fid'];
+			     [undefined,'datafile','fid','tag'].map( function(attr) {
+									 delete attrs[ attr];
+								     });
+			     //delete attrs[undefined];
+			     //delete attrs['datafile'];
+			     //delete attrs['fid'];
+			     //delete attrs['tag'];
 			     // Convert these fields from \n delimited string into a list
-			     ['related_kbid'].map( function(attr) {
+			     ['related_kbid','tags'].map( function(attr) {
 						       old = attrs[attr];
 						       attrs[attr] = old.split("\n");
 						   });
@@ -49,36 +54,69 @@ $(window).load(function(){
 				 .removeAttr('checked')
 				 .removeAttr('selected');
 			     $('#related_kbid').val('');
-			     $('#kbid_check').hide();
+			     $('#tags').val('');
+			     $('#kbid_check').css('visibility','hidden');
+			     $('#tag_check').css('visibility','hidden');
 			 });
     $('#related_kbid').val("");
     $("#fid").keypress(function(event) {
-		if (event.which == 13) {
-			event.preventDefault();
-			$('#add_genome_btn').triggerHandler("click");
-		}
-    });
+			   if (event.which == 13) {
+			       event.preventDefault();
+			       var newfid = $("#fid").val();
+			       $('#kbid_check').attr("class","label label-info").text("Checking").show();
+			       isKBaseGenome( newfid,
+					      function() {
+						  var related_kbids = $('#related_kbid').val();
+						  if (related_kbids == "") {
+						      $('#related_kbid').val( newfid);
+						  } else {
+						      $('#related_kbid').val( related_kbids + "\n" + newfid);
+						  }
+						  $("#fid").val("");
+						  $('#kbid_check').attr("class","label label-success").text("ID OK").fadeOut(3000);
+					      },
+					      function(res) {
+						  console.log( newfid + " is note a legitimate KBase Genome ID");
+						  $('#kbid_check').attr("class","label label-important").text("Bad ID").fadeOut(3000);
+					      });
+			   }
+		       });
+    $("#tag").keypress(function(event) {
+			   if (event.which == 13) {
+			       event.preventDefault();
+			       var newtag = $("#tag").val();
+			       $('#tag_check').attr("class","label label-info").text("Checking").show();
+			       var tags = $('#tags').val();
+			       if ( 1 ) {
+				   if (tags == "") {
+				       $('#tags').val( newtag);
+				   } else {
+				       $('#tags').val( tags + "\n" + newtag);
+				   }
+				   $("#tag").val("");
+				   $('#tag_check').attr("class","label label-success").text("Tag OK").fadeOut(3000);
+			       } else {
+				   $('#tag_check').attr("class","label label-important").text("Bad Tag").fadeOut(3000);
+			       }
+			   }
+		       });
 
-    $("#add_genome_btn").click( function(event) {
-				    var newfid = $("#fid").val();
-				    $('#kbid_check').attr("class","label label-info").text("Checking " + newfid).show();
-				    isKBaseGenome( newfid,
-						   function() {
-						       var related_kbids = $('#related_kbid').val();
-						       if (related_kbids == "") {
-							   $('#related_kbid').val( newfid);
-						       } else {
-							   $('#related_kbid').val( related_kbids + "\n" + newfid);
-						       }
-						       $("#fid").val("");
-						       $('#kbid_check').attr("class","label label-success").text("Genome ID OK");
-						   },
-						   function(res) {
-						       console.log( newfid + " is note a legitimate KBase Genome ID");
-						       $('#kbid_check').attr("class","label label-important").text("Unrecognized Genome ID");
-
-						   })
-				});
+    $("#add_tag_btn").click( function(event) {
+			     var newtag = $("#tag").val();
+			     $('#tag_check').attr("class","label label-info").text("Checking " + newtag).css("visibility", "visible")
+			     var tags = $('#tags').val();
+			     if ( 1 ) {
+				 if (tags == "") {
+				     $('#tags').val( newtag);
+				 } else {
+				     $('#tags').val( tags + "\n" + newtag);
+				 }
+				 $("#tag").val("");
+				 $('#tag_check').attr("class","label label-success").text("Tag OK");
+			     } else {
+				 $('#tag_check').attr("class","label label-important").text("Bad Tag");
+			     }
+			     });
 
     checkLogin();
 });
@@ -109,7 +147,6 @@ function upload(fileInputElement,attributes,authToken) {
     $("#cancel"+filecount).on('click',function(e) {
 				  $("#cancel"+filecount).hide();
 				  xhr.abort();
-				  $("#upload_status"+filecount).text("Aborted!")
 			      });
 
     xhr.onload = function(e) {
@@ -127,8 +164,12 @@ function upload(fileInputElement,attributes,authToken) {
 	    $("#upload_status"+filecount).text(e.loaded+" of "+e.total+" bytes");
 	}
     };
-    xhr.addEventListener("error", uploadFailed, false);
-    xhr.addEventListener("abort", uploadCanceled, false);
+    xhr.addEventListener("error", function(evt) { 
+			     $('#upload_status'+filecount).text('Error during upload');
+			     }, false);
+    xhr.addEventListener("abort", function(evt) { 
+			     $('#upload_status'+filecount).text('Upload aborted');
+			     }, false);
     
     var fd = new FormData();
     fd.append("upload", fileInputElement.files[0]);
@@ -142,11 +183,6 @@ function upload(fileInputElement,attributes,authToken) {
 function uploadFailed (evt) {
   $("#upload_status").text("the upload has failed");
 }
-
-function uploadCanceled (evt) {
-  $("#upload_status").text("the upload was canceled");
-}
-
 
 // Found in StackOverflow:
 // http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
