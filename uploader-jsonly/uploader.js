@@ -43,9 +43,13 @@ $(window).load(function(){
 			     //delete attrs['tag'];
 			     // Convert these fields from \n delimited string into a list
 			     ['related_kbid','tags'].map( function(attr) {
-						       old = attrs[attr];
-						       attrs[attr] = old.split("\n");
+							      old = attrs[attr];
+							      attrs[attr] = old.split("\n");
+							      attrs[attr] = $.grep(attrs[attr], function(v, k){
+										       return $.inArray(v ,attrs[attr]) === k;
+										   });
 						   });
+			     
 			     var datafile = $("#datafile")[0];
 			     upload(datafile,attrs,localStorage['auth_token']);
 			     // reset form
@@ -87,7 +91,7 @@ $(window).load(function(){
 			       var newtag = $("#tag").val();
 			       $('#tag_check').attr("class","label label-info").text("Checking").show();
 			       var tags = $('#tags').val();
-			       if ( 1 ) {
+			       if ( newtag.match(/^\w[\w\:]*$/) ) {
 				   if (tags == "") {
 				       $('#tags').val( newtag);
 				   } else {
