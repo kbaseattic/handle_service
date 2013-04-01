@@ -59,16 +59,23 @@ $(window).load(function(){
 			       event.preventDefault();
 			       var newfid = $("#fid").val();
 			       $('#kbid_check').attr("class","label label-info").text("Checking").show();
-			       isKBaseGenome( newfid,
-					      function() {
-						  $('#kbidlist').append($('<li>').attr('class','status-info').text(newfid));
-						  $("#fid").val("");
-						  $('#kbid_check').attr("class","label label-success").text("ID OK").fadeOut(3000);
-					      },
-					      function(res) {
-						  console.log( newfid + " is not a legitimate KBase Genome ID");
-						  $('#kbid_check').attr("class","label label-important").text("Bad ID").fadeOut(3000);
-					      });
+			       // Is this a Genome or a Gene id?
+			       var validator;
+			       if (newfid.match(/^kb\|g\.\d+$/)) {
+				   validator = isKBaseGenome;
+			       } else {
+				   validator = isKBaseGene;
+			       }
+			       validator( newfid,
+					  function() {
+					      $('#kbidlist').append($('<li>').attr('class','status-info').text(newfid));
+					      $("#fid").val("");
+					      $('#kbid_check').attr("class","label label-success").text("ID OK").fadeOut(3000);
+					  },
+					  function(res) {
+					      console.log( newfid + " is not a legitimate KBase Genome ID");
+					      $('#kbid_check').attr("class","label label-important").text("Bad ID").fadeOut(3000);
+					  });
 			   }
 		       });
     $("#newtag").keypress(function(event) {
@@ -243,7 +250,7 @@ function isKBaseGenome(genome_id, success_function, error_function) {
 
 function isKBaseGene(gene_id, success_function, error_function) {
     try {
-	cdmi_entity_api.get_entity_Feature_async([gene_id],["id"],
+	cdmi_entity_api.get_entity_Feature_async([gene_id],["source_id"],
 						function (result) {
 						    try {
 							result = result[gene_id]["id"];
