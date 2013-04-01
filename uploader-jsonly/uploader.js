@@ -24,8 +24,8 @@ $(window).load(function(){
 			login($('#kbase_username').val(),$('#kbase_password').val());
 		}
     });
+    $('#clearform').on('click',clearForm);
     $("#upload").submit( function(event) {
-			     $("#upload_progress").show();
 			     event.preventDefault();
 			     var d = new Date();
 			     $("#upload_date").val(d.toJSON());
@@ -34,33 +34,24 @@ $(window).load(function(){
 								  attrs[$(this).attr('id')] = $(this).val()
 							      });
 			     // Strip out unwanted form fields from attrs that go into Shock
-			     [undefined,'datafile','fid','tag'].map( function(attr) {
+			     [undefined,'datafile','fid','newtag'].map( function(attr) {
 									 delete attrs[ attr];
 								     });
-			     //delete attrs[undefined];
-			     //delete attrs['datafile'];
-			     //delete attrs['fid'];
-			     //delete attrs['tag'];
-			     // Convert these fields from \n delimited string into a list
-			     ['related_kbid','tags'].map( function(attr) {
-							      old = attrs[attr];
-							      attrs[attr] = old.split("\n");
-							      attrs[attr] = $.grep(attrs[attr], function(v, k){
-										       return $.inArray(v ,attrs[attr]) === k;
-										   });
-						   });
-			     
+			     // Read in the fields being managed by pillbox widgets
+			     ['tags','related_kbid'].map( function(attr) {
+					       field = $('#'+attr);
+					       attrs[attr] = field.pillbox('items').map( function(item) { return(item.text) } )
+					   });
 			     var datafile = $("#datafile")[0];
-			     upload(datafile,attrs,localStorage['auth_token']);
-			     // reset form
-			     $(':input','#upload').not(':button, :submit, :hidden, :reset, [readonly]')
-				 .val('')
-				 .removeAttr('checked')
-				 .removeAttr('selected');
-			     $('#related_kbid').val('');
-			     $('#tags').val('');
-			     $('#kbid_check').css('visibility','hidden');
-			     $('#tag_check').css('visibility','hidden');
+			     
+			     if ($("#datafile")[0].files[0] == undefined) {
+				 alert("Please choose a file for upload")
+			     } else {
+				 $("#upload_progress").show();
+				 console.log( attrs);
+				 upload(datafile,attrs,localStorage['auth_token']);
+				 clearForm();
+			     }
 			 });
     $('#related_kbid').val("");
     $("#fid").keypress(function(event) {
@@ -70,60 +61,45 @@ $(window).load(function(){
 			       $('#kbid_check').attr("class","label label-info").text("Checking").show();
 			       isKBaseGenome( newfid,
 					      function() {
-						  var related_kbids = $('#related_kbid').val();
-						  if (related_kbids == "") {
-						      $('#related_kbid').val( newfid);
-						  } else {
-						      $('#related_kbid').val( related_kbids + "\n" + newfid);
-						  }
+						  $('#kbidlist').append($('<li>').attr('class','status-info').text(newfid));
 						  $("#fid").val("");
 						  $('#kbid_check').attr("class","label label-success").text("ID OK").fadeOut(3000);
 					      },
 					      function(res) {
-						  console.log( newfid + " is note a legitimate KBase Genome ID");
+						  console.log( newfid + " is not a legitimate KBase Genome ID");
 						  $('#kbid_check').attr("class","label label-important").text("Bad ID").fadeOut(3000);
 					      });
 			   }
 		       });
-    $("#tag").keypress(function(event) {
+    $("#newtag").keypress(function(event) {
 			   if (event.which == 13) {
 			       event.preventDefault();
-			       var newtag = $("#tag").val();
-			       $('#tag_check').attr("class","label label-info").text("Checking").show();
-			       var tags = $('#tags').val();
-			       if ( newtag.match(/^\w[\w\:]*$/) ) {
-				   if (tags == "") {
-				       $('#tags').val( newtag);
-				   } else {
-				       $('#tags').val( tags + "\n" + newtag);
-				   }
-				   $("#tag").val("");
-				   $('#tag_check').attr("class","label label-success").text("Tag OK").fadeOut(3000);
+			       var newtag = $("#newtag").val();
+			       $('#newtag_check').attr("class","label label-info").text("Checking").show();
+			       if ( newtag.match(/^\w[\w\-\:]*$/) ) {
+				   $("#taglist").append($('<li>').attr('class','status-info').text(newtag));
+				   $("#newtag").val("");
+				   $('#newtag_check').attr("class","label label-success").text("Tag OK").fadeOut(3000);
 			       } else {
-				   $('#tag_check').attr("class","label label-important").text("Bad Tag").fadeOut(3000);
+				   $('#newtag_check').attr("class","label label-important").text("Bad Tag").fadeOut(3000);
 			       }
 			   }
 		       });
 
-    $("#add_tag_btn").click( function(event) {
-			     var newtag = $("#tag").val();
-			     $('#tag_check').attr("class","label label-info").text("Checking " + newtag).css("visibility", "visible")
-			     var tags = $('#tags').val();
-			     if ( 1 ) {
-				 if (tags == "") {
-				     $('#tags').val( newtag);
-				 } else {
-				     $('#tags').val( tags + "\n" + newtag);
-				 }
-				 $("#tag").val("");
-				 $('#tag_check').attr("class","label label-success").text("Tag OK");
-			     } else {
-				 $('#tag_check').attr("class","label label-important").text("Bad Tag");
-			     }
-			     });
-
     checkLogin();
 });
+
+function clearForm() {
+    $(':input','#upload').not(':button, :submit, :hidden, :reset, [readonly]')
+	.val('')
+	.removeAttr('checked')
+	.removeAttr('selected');
+    $('#related_kbid').empty();
+    $('#taglist').empty();
+    $('#kbid_check').css('visibility','hidden');
+    $('#tag_check').css('visibility','hidden');
+    
+}
 
 
 // fileInputElement is the form field where the user selected the file
@@ -244,24 +220,47 @@ function sortByKBaseID(a, b) {
 
 function isKBaseGenome(genome_id, success_function, error_function) {
     try {
-		cdmi_entity_api.get_entity_Genome_async([genome_id],["id"],
-			function (result) {
-				try {
-					result = result[genome_id]["id"];
-					success_function();
-				}
-				catch (e) {
-					error_function(e);
-				}
-			},
-			function (error) {
-				throw Error(error);
-			}
-		);
+	cdmi_entity_api.get_entity_Genome_async([genome_id],["id"],
+						function (result) {
+						    try {
+							result = result[genome_id]["id"];
+							success_function();
+						    }
+						    catch (e) {
+							error_function(e);
+						    }
+						},
+						function (error) {
+						    throw Error(error);
+						}
+					       );
+    }
+    catch (e) {
+	console.log("There was an error attempting to call get_entity_Genome_async() from " + cdmi_url);
+	throw Error({error_object: e, message: "There was an error attempting to call get_entity_Genome_async() from " + cdmi_url});
 	}
-	catch (e) {
-	    console.log("There was an error attempting to call get_entity_Genome_async() from " + cdmi_url);
-	    throw Error({error_object: e, message: "There was an error attempting to call get_entity_Genome_async() from " + cdmi_url});
+}
+
+function isKBaseGene(gene_id, success_function, error_function) {
+    try {
+	cdmi_entity_api.get_entity_Feature_async([gene_id],["id"],
+						function (result) {
+						    try {
+							result = result[gene_id]["id"];
+							success_function();
+						    }
+						    catch (e) {
+							error_function(e);
+						    }
+						},
+						function (error) {
+						    throw Error(error);
+						}
+					       );
+    }
+    catch (e) {
+	console.log("There was an error attempting to call get_entity_Genome_async() from " + cdmi_url);
+	throw Error({error_object: e, message: "There was an error attempting to call get_entity_Genome_async() from " + cdmi_url});
 	}
 }
 

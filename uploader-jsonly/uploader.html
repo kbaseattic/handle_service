@@ -1,9 +1,10 @@
-<html>
+<html class="fuelux" lang="en">
     <head>
       <title>KBase Uploader</title>
       <link type="text/css" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
       <link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/smoothness/jquery-ui.css" rel="stylesheet"/>    
       <link type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet"/>      
+      <link type="text/css" href="fuelux.css" rel="stylesheet" /> 
       <link type="text/css" href="uploader.css" rel="stylesheet"/>      
       <link type="text/css" href="kbase-common.css" rel="stylesheet"/>      
     </head>
@@ -89,23 +90,32 @@
 		<fieldset>
 		  <input type="hidden" id="upload_date" >  
 		  <div class="control-group">  
-		    <label class="control-label" for="related_kbid">Related Genome IDs</label>  
+		    <label class="control-label" for="related_kbid">Related KBase Genome/Gene ID</label>  
 		    <div class="controls">
-		      <input type="text" class="input-large" id="fid" placeholder="KBase Genome ID"/>
+		      		      <input type="text" class="input" id="fid" placeholder="Example: kb|g.1"/>
 		      <span class="label label-important" id="kbid_check" style='visibility:"hidden";'></span>
-		      <textarea class="input-xlarge" rows=4 name="related_kbid" id="related_kbid" placeholder="Type in a KBase genome ID ( for example 'kb|g.3562') above and press return to insert it here"readonly></textarea>
+		      <div class="pillbox" id="related_kbid">
+			<ul id="kbidlist">
+			</ul>
+		      </div>
 		    </div>  
 		  </div>  
-		  <div class="control-group">  
-		    <label class="control-label" for="tags">Tags</label>  
-		    <div class="controls">  
-		      <input type="text" class="input-large" id="tag" placeholder="Tags"/>
-		      <span class="label label-important" id="tag_check" style='visibility:"hidden";'></span>
-		      <textarea class="input-xlarge" rows=4 name="tags" id="tags" placeholder="Type in a tag consisting of alphanumeric characters and '_' or ':' above and press return to insert it here" readonly></textarea>
-		    </div>  
-		  </div>  
+		  <div class="control-group">
+		    <label class="control-label" for="tags2">Tags</label>
+		    <div class="controls" id="tags2">
+		      <input type="text" class="input" id="newtag" placeholder="Example: photo_1:11-3-2013"/>
+		      <span class="label label-important" id="newtag_check" style='visibility:"hidden";'></span>
+		      <div class="pillbox" id="tags">
+			<ul id="taglist">
+			</ul>
+		      </div>
+		    </div>
+		  </div>
 		</fieldset>
-		<button type="submit" class="btn btn-large btn-primary pull-right">Upload!</button>  
+		<div class="form-actions">
+		  <button type="button" class="btn btn-large" id='clearform'>Reset</button>  
+		  <button type="submit" class="btn btn-large btn-primary">Upload!</button>  
+		</div>
 	      </div>
 	    </form>  
 	  </div>
@@ -148,6 +158,7 @@
     <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="kbase.js"></script>
     <script type="text/javascript" src="http://malsup.github.com/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="http://fuelux.exacttargetapps.com/fuelux/2.2.1/loader.min.js"></script>
     <script type="text/javascript" src="uploader.js"></script>
 </body>
 </html>
