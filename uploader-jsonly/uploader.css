@@ -189,7 +189,12 @@ div.blockMsg {
 
 .progress_table {
     height: 250px;
-    overflow: scroll;
+    overflow: auto;
+}
+
+.tagbox {
+    height: 90px;
+    overflow: auto;
 }
 
 /*End of file*/

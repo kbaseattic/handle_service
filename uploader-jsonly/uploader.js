@@ -68,7 +68,7 @@ $(window).load(function(){
 			       }
 			       validator( newfid,
 					  function() {
-					      $('#kbidlist').append($('<li>').attr('class','status-info').text(newfid));
+					      $('#kbidlist').append($('<li>').text(newfid));
 					      $("#fid").val("");
 					      $('#kbid_check').attr("class","label label-success").text("ID OK").fadeOut(3000);
 					  },
@@ -84,7 +84,7 @@ $(window).load(function(){
 			       var newtag = $("#newtag").val();
 			       $('#newtag_check').attr("class","label label-info").text("Checking").show();
 			       if ( newtag.match(/^\w[\w\-\:]*$/) ) {
-				   $("#taglist").append($('<li>').attr('class','status-info').text(newtag));
+				   $("#taglist").append($('<li>').text(newtag));
 				   $("#newtag").val("");
 				   $('#newtag_check').attr("class","label label-success").text("Tag OK").fadeOut(3000);
 			       } else {
