@@ -17,7 +17,7 @@ $(window).load(function(){
     //clear the default CSS associated with the blockUI loading element so we can insert ours
     $.blockUI.defaults.css = {};
     $(document).ajaxStop($.unblockUI);
-    
+    $('#tabs').tab();    
     $(".form-signin").keypress(function(event) {
 		if (event.which == 13) {
 			event.preventDefault();
