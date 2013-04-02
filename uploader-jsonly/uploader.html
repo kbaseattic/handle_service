@@ -9,20 +9,18 @@
       <link type="text/css" href="kbase-common.css" rel="stylesheet"/>      
     </head>
 
-    <body style="padding-bottom: 100px;">    
+    <body>    
       <div class="container">
-	<div class="navbar">
-	  <div class="navbar-inner">
+	<div class="row well well-small">
+	  <div class="span12">
 	    <img src="http://www.kbase.us/themes/kbase/images/Kbase_Logo.png"/>
-	    <div class="container">
-              <a style="color: black; cursor: default;" href="#" class="brand"><h1>KBase Data Uploader</h1></a>
-	      <ul class="nav">
-             </ul>
-	     <div class="pull-right">
-	       <span id="login_status" class="navbar-text">Not logged in</span>
-	       <button id="logout" class="btn btn-block" onclick="logout()">Log out</button>
-	     </div>
-	    </div>
+	  </div>
+	  <div class="span6">
+            <a href="#"><h2>KBase Data Uploader</h2></a>
+	  </div>
+	  <div class="span2 pull-right">
+	    <span id="login_status" class="navbar-text">Not logged in</span>
+	    <button id="logout" class="btn btn-block" onclick="logout()">Log out</button>
 	  </div>
 	</div>
 	<!-- login content -->
@@ -53,105 +51,107 @@
 		    <label class="control-label" for="owner">Owner of file</label>  
 		    <div class="controls">  
 		      <input type="text" class="input-medium" id="owner" readonly>  
+		      </div>  
 		    </div>  
-		  </div>  
-		  <div class="control-group">  
-		    <label class="control-label" for="datafile">Datafile for upload</label>  
-		    <div class="controls">  
-		      <input class="input-file" id="datafile" type="file"/>
-		    </div>  
-		  </div>    
-		  <div class="control-group">  
-		    <label class="control-label" for="type">Type of file</label>  
-		    <div class="controls">  
-		      <select id="type" class="input-small">  
-			<option>image</option>  
-			<option>text</option>  
-			<option>binary</option>  
-			<option>json</option>  
-			<option>metagenome</option>
-			<option>drisee</option>
-			<option>histogram</option>
-			<option>stylesheet</option>
-			<option>biom</option>
-			<option>kmer</option>
-		      </select> 
-		    </div>
-		  </div>  
-		  <div class="control-group">  
-		    <label class="control-label" for="Description">Description of file contents</label>  
-		    <div class="controls">  
-		      <textarea class="input-xlarge" id="Description" rows="3"></textarea>  
-		    </div>  
-		  </div>  
-		</fieldset>
-	      </div>
-	      <div class="span6">
-		<fieldset>
-		  <input type="hidden" id="upload_date" >  
-		  <div class="control-group">  
-		    <label class="control-label" for="related_kbid">Related KBase Genome/Gene ID</label>  
-		    <div class="controls">
-		      		      <input type="text" class="input" id="fid" placeholder="Example: kb|g.1"/>
-		      <span class="label label-important" id="kbid_check" style='visibility:"hidden";'></span>
-		      <div class="pillbox tagbox" id="related_kbid">
-			<ul id="kbidlist">
-			</ul>
+		    <div class="control-group">  
+		      <label class="control-label" for="datafile">Datafile for upload</label>  
+		      <div class="controls">  
+			<input class="input-file" id="datafile" type="file"/>
+		      </div>  
+		    </div>    
+		    <div class="control-group">  
+		      <label class="control-label" for="type">Type of file</label>  
+		      <div class="controls">  
+			<select id="type" class="input-small">  
+			  <option>image</option>  
+			  <option>text</option>  
+			  <option>binary</option>  
+			  <option>json</option>  
+			  <option>metagenome</option>
+			  <option>drisee</option>
+			  <option>histogram</option>
+			  <option>stylesheet</option>
+			  <option>biom</option>
+			  <option>kmer</option>
+			</select> 
 		      </div>
 		    </div>  
-		  </div>  
-		  <div class="control-group">
-		    <label class="control-label" for="tags2">Tags</label>
-		    <div class="controls" id="tags2">
-		      <input type="text" class="input" id="newtag" placeholder="Example: photo_1:11-3-2013"/>
-		      <span class="label label-important" id="newtag_check" style='visibility:"hidden";'></span>
-		      <div class="pillbox tagbox" id="tags">
-			<ul id="taglist">
-			</ul>
+		    <div class="control-group">  
+		      <label class="control-label" for="Description">Description of file contents</label>  
+		      <div class="controls">  
+			<textarea class="input-xlarge" id="Description" rows="3"></textarea>  
+		      </div>  
+		    </div>  
+		  </fieldset>
+		</div>
+		<div class="span6">
+		  <fieldset>
+		    <input type="hidden" id="upload_date"/>  
+		    <div class="control-group">  
+		      <label class="control-label" for="related_kbid">Related KBase Genome/Gene ID</label>  
+		      <div class="controls">
+			<input type="text" class="input" id="fid" placeholder="Example: kb|g.1"/>
+			<span class="label label-important" id="kbid_check" style='visibility:"hidden";'></span>
+			<div class="pillbox tagbox" id="related_kbid">
+			  <ul id="kbidlist">
+			  </ul>
+			</div>
+		      </div>  
+		    </div>  
+		    <div class="control-group">
+		      <label class="control-label" for="tags2">Tags</label>
+		      <div class="controls" id="tags2">
+			<input type="text" class="input" id="newtag" placeholder="Example: photo_1:11-3-2013"/>
+			<span class="label label-important" id="newtag_check" style='visibility:"hidden";'></span>
+			<div class="pillbox tagbox" id="tags">
+			  <ul id="taglist">
+			  </ul>
+			</div>
 		      </div>
 		    </div>
-		  </div>
-		</fieldset>
+		  </fieldset>
+		</div>
+		<div class="span6 offset6">
+		  <button type="submit" class="btn btn-large btn-primary pull-right">Upload!</button>  
+		  <button type="button" class="btn btn-large pull-right" id='clearform'>Reset</button>  
+		</div>
+	      </form>  
+	    </div>
+	    <div id="upload_progress" style="display:none;">
+	      <h4>Upload Progress</h4>
+	      <div id="uploaded_files" style="display: none;" class="alert alert-info"></div>
+	      <div id="progress_display" class="progress_table">
+		<table class="table" id="uploads">
+		  <tbody>
+		  </tbody>
+		</table>
 	      </div>
-	      <div class="span6 offset6">
-		<button type="submit" class="btn btn-large btn-primary pull-right">Upload!</button>  
-		<button type="button" class="btn btn-large pull-right" id='clearform'>Reset</button>  
-	      </div>
-	    </form>  
+	    </div>
 	  </div>
-	  <div id="upload_progress" style="display:none;">
-	    <h4>Upload Progress</h4>
-	    <div id="uploaded_files" style="display: none;" class="alert alert-info"></div>
-	    <div id="progress_display" class="progress_table">
-	      <table class="table" id="uploads">
-		<tbody>
-		</tbody>
-	      </table>
+	  <div id="loading_spinner" class="row hidden">
+	    <div id="loading_spinner_text" style="text-align:center; font-size:24px; font-weight:bold; margin-top:20px">Loading, please wait...</div>
+	    <div style="text-align:center; margin-top:20px"><img src="assets/img/loading.gif" align="center" /></div>
+	  </div>
+	</div>
+	
+	<div class="hidden">
+          <div id="loading_message">
+	    <div id="loading_message_text">Loading, please wait...</div>
+	    <div id="loading_message_icon">
+	      <img src="assets/img/kbase_animated_logo.gif"/>
 	    </div>
 	  </div>
 	</div>
-	<div id="loading_spinner" class="row hidden">
-	  <div id="loading_spinner_text" style="text-align:center; font-size:24px; font-weight:bold; margin-top:20px">Loading, please wait...</div>
-	  <div style="text-align:center; margin-top:20px"><img src="assets/img/loading.gif" align="center" /></div>
+	
+	<div id="error" class="row hidden">
+	  Sorry, an error occurred. Please try again.
+	  <hr/>
+	  <div id="error_text"></div>
 	</div>
+	
       </div>
-      
-      <div class="hidden">
-        <div id="loading_message">
-	  <div id="loading_message_text">Loading, please wait...</div>
-	  <div id="loading_message_icon">
-	    <img src="assets/img/kbase_animated_logo.gif"/>
-	  </div>
-	</div>
-      </div>
-      
-      <div id="error" class="row hidden">
-	Sorry, an error occurred. Please try again.
-	<hr/>
-	<div id="error_text"></div>
-      </div>
-      
     </div>
+
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
