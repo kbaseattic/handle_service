@@ -5,9 +5,9 @@
     <link type="text/css" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
     <link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/smoothness/jquery-ui.css" rel="stylesheet"/>    
     <link type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet"/>      
-    <link type="text/css" href="fuelux.css" rel="stylesheet" /> 
-    <link type="text/css" href="uploader.css" rel="stylesheet"/>      
-    <link type="text/css" href="kbase-common.css" rel="stylesheet"/>      
+    <link type="text/css" href="css/fuelux.css" rel="stylesheet" /> 
+    <link type="text/css" href="css/uploader.css" rel="stylesheet"/>      
+    <link type="text/css" href="css/kbase-common.css" rel="stylesheet"/>      
   </head>
   
   <body>    
@@ -148,9 +148,63 @@
 	      </div>
 	    </div>
 	    <div class="tab-pane" id="browse">
-	      <p>You might someday find a browse Shock function here!</p>
-	    </div>
-	  </div>
+	      <table id="ShockGrid" class="table table-bordered datagrid">
+		<thead>
+		  <tr>
+		    <th>
+		      <span class="datagrid-header-title">Prototype Shock Browser</span>
+		      <div class="datagrid-header-left"></div>
+		      <div class="datagrid-header-right">
+			<div class="input-append search">
+			  <input type="text" class="input-medium" placeholder="Search">
+			    <button class="btn"><i class="icon-search"></i></button>
+			  </div>
+			</div>
+		      </th>
+		    </tr>
+		  </thead>
+		  
+		  <tfoot>
+		    <tr>
+		      <th>
+			<div class="datagrid-footer-left" style="display:none;">
+			  <div class="grid-controls">
+			    <span><span class="grid-start"></span> - <span class="grid-end"></span> of
+			    <span class="grid-count"></span></span>
+			    <select class="grid-pagesize">
+			      <option>10</option>
+			      <option>20</option>
+			      <option>50</option>
+			      <option>100</option>
+			    </select>
+			    <span>Per Page</span>
+			  </div>
+			</div>
+			<div class="datagrid-footer-right" style="display:none;">
+			  <div class="grid-pager">
+			    <button class="btn grid-prevpage">
+			      <i class="icon-chevron-left"></i>
+			    </button>
+			    <span>Page</span>
+			    <div class="input-append dropdown combobox">
+			      <input class="span1" type="text">
+				<button class="btn" data-toggle="dropdown">
+				  <i class="caret"></i>
+				</button>
+				<ul class="dropdown-menu"></ul>
+			      </div>
+			      <span>of <span class="grid-pages"></span></span>
+			      <button class="btn grid-nextpage">
+				<i class="icon-chevron-right"></i>
+			      </button>
+			    </div>
+			  </div>
+			</th>
+		      </tr>
+		    </tfoot>
+		  </table>
+		</div>
+	      </div>
 	</div>
       </div>
     </div>
@@ -158,9 +212,9 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
     <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="kbase.js"></script>
+    <script type="text/javascript" src="lib/kbase.js"></script>
     <script type="text/javascript" src="http://malsup.github.com/jquery.blockUI.js"></script>
     <script type="text/javascript" src="http://fuelux.exacttargetapps.com/fuelux/2.2.1/loader.min.js"></script>
-    <script type="text/javascript" src="uploader.js"></script>
+    <script type="text/javascript" src="lib/uploader.js"></script>
   </body>
 </html>
