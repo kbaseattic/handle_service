@@ -31,7 +31,7 @@ $(window).load(function(){
 										  html: true,
 										  placement: 'bottom',
 										  template: '<div class="popover"><div class="popover-inner mypopover-inner"><div class="popover-content"><p></p></div></div></div>'
-									    });
+										});
 						   });
 		   $(".form-signin").keypress(function(event) {
 						  if (event.which == 13) {
@@ -184,16 +184,16 @@ function upload(fileInputElement,attributes,authToken) {
 // Datasource for FuelUX datagrid
 var ShockDataSrc = new Object();
 
-// Mapping function from column names to how to field values
+// Mapping function from column names to field values
 ShockDataSrc._colmap = {
     'Shock ID' : function (item) { return(item.id); },
     'Actions' : function (item) {
-	var info = JSON.stringify( item, undefined, 2);
+	var info = JSON.stringify( item, undefined, 2).replace(/\n?\s*[\{\}\[\]],?/g,'');
 	var html='<i rel=\"popover\" data-content2=\'' + info + '\' class="icon-search has-popover"/>' +
 	         '<i id=\"trash-' + item.id + '\" class="icon-trash"/>';
 	return( html );
     },
-    'Filename' : function (item) { return(item.file.name); },
+    'Filename' : function (item) {return(item.file.name);},
     'Size' : function (item) { return( item.file.size); },
     'Description' : function (item) { return( item.attributes.Description ); },
     'Owner' : function (item) { return( item.attributes.owner);},
