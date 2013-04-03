@@ -12,8 +12,6 @@ var defaultUserData = {
 };
 var filecount = 0;
 
-/* BEGIN UTILITY functions */
-
 $(window).load(function(){
 		   //clear the default CSS associated with the blockUI loading element so we can insert ours
 		   $.blockUI.defaults.css = {};
@@ -32,6 +30,8 @@ $(window).load(function(){
 										  placement: 'bottom',
 										  template: '<div class="popover"><div class="popover-inner mypopover-inner"><div class="popover-content"><p></p></div></div></div>'
 										});
+						       // setup delegated click handlers for trash icons in grid
+						       $('#ShockGrid').on('click', 'tbody .icon-trash', delete_confirm);
 						   });
 		   $(".form-signin").keypress(function(event) {
 						  if (event.which == 13) {
@@ -122,6 +122,18 @@ function clearForm() {
     
 }
 
+function delete_file( shockid) {
+    $.ajax({
+	       url: upload_url+"/"+shockid,
+	       type: "DELETE",
+	       beforeSend: function(xhr) { xhr.setRequestHeader( 'Authorization', 'OAuth ' + userData.auth_token)},
+	       success: function(data) { alert( "File successfully deleted"); },
+	       error: function(jqXHR, textStatus, errorThrown) { alert( "Unable to delete : "+shockid); }
+	   });
+
+    
+}
+
 
 // fileInputElement is the form field where the user selected the file
 // attributes is a hash containing the metadata attributes
@@ -181,6 +193,19 @@ function upload(fileInputElement,attributes,authToken) {
     $("#progress_display").scrollTop($("#progress_display")[0].scrollHeight);
 }
 
+// bring up delete file modal dialog
+var delete_confirm = function(e) {
+    console.log(this);
+    var dialog = $('#delete_dialog');
+    var shockid = $(this).attr('data-id');
+    var filename = $(this).attr('data-filename');
+    $('#delete_file').html("<h6>Name : "+filename+"</h6><h6>ID : "+shockid+"</h6>");
+    $('#killkillkill').attr("data-shockid", shockid);
+    $('#killkillkill').click(function() { dialog.modal("hide"); delete_file( shockid); });
+    dialog.modal('show');
+
+}
+
 // Datasource for FuelUX datagrid
 var ShockDataSrc = new Object();
 
@@ -190,7 +215,7 @@ ShockDataSrc._colmap = {
     'Actions' : function (item) {
 	var info = JSON.stringify( item, undefined, 2).replace(/\n?\s*[\{\}\[\]],?/g,'');
 	var html='<i rel=\"popover\" data-content2=\'' + info + '\' class="icon-search has-popover"/>' +
-	         '<i id=\"trash-' + item.id + '\" class="icon-trash"/>';
+	         '<i id=\"trash-' + item.id + '\" data-id=\"'+item.id+'\" data-filename=\"' + item.file.name + '\" class="icon-trash"/>';
 	return( html );
     },
     'Filename' : function (item) {return(item.file.name);},
@@ -240,6 +265,8 @@ ShockDataSrc.data = function( options, callback) {
 
 
 }
+
+/* BEGIN UTILITY functions */
 
 // Found in StackOverflow:
 // http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric

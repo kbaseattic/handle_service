@@ -147,8 +147,29 @@
 		</div>
 	      </div>
 	    </div>
+
+
 	    <div class="tab-pane" id="browse">
 	      <table id="ShockGrid" class="table table-bordered datagrid">
+		<div class="row">
+		  <div class="offset4 span4">
+		    <div id="delete_dialog" class="modal hide fade" style="display: none;">
+		      <div class="modal-header">
+			<a href="#" class="close" data-dismiss="modal">&times;</a>
+			<h3>File from Shock</h3>
+		      </div>
+		      <div class="modal-body">
+			<h4>Are you sure you want to delete file:</h4>
+			<p id='delete_file'>fileinfo</p>
+		      </div>
+		      <div class="modal-footer">
+			<a href="#" class="btn danger" id="killkillkill">Yes</a>
+			<a href="#" class="btn secondary" data-dismiss="modal">No</a>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
 		<thead>
 		  <tr>
 		    <th>
