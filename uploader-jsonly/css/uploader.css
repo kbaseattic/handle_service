@@ -195,4 +195,13 @@ div.blockMsg {
     overflow: auto;
 }
 
+.popover-content pre {
+   font-family: "courier new", courier, monospace;
+   font-size: 11px;
+}
+
+.mypopover-inner {
+    width: 400px;
+}
+
 /*End of file*/

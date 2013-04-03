@@ -12,8 +12,6 @@ var defaultUserData = {
 };
 var filecount = 0;
 
-var ShockDataSrc = new Object();
-
 /* BEGIN UTILITY functions */
 
 $(window).load(function(){
@@ -22,8 +20,19 @@ $(window).load(function(){
 		   $(document).ajaxStop($.unblockUI);
 		   $('#tabs').tab();
 		   // Initialize the browsing datagrid when it is shown
-		   console.log( ShockDataSrc);
-		   $('#tabs a[href="#browse"]').on('shown', function (e) { $('#ShockGrid').datagrid( { dataSource: ShockDataSrc })});
+		   $('#tabs a[href="#browse"]').on('shown', function (e) {
+						       $('#ShockGrid').datagrid( { dataSource: ShockDataSrc });
+						       $('#ShockGrid').popover( { selector: '.has-popover',
+										  trigger: 'click',
+										  content: function() {
+										      console.log( this);
+										      return("<pre>"+$(this).attr('data-content2')+"</pre>");
+										      },
+										  html: true,
+										  placement: 'bottom',
+										  template: '<div class="popover"><div class="popover-inner mypopover-inner"><div class="popover-content"><p></p></div></div></div>'
+									    });
+						   });
 		   $(".form-signin").keypress(function(event) {
 						  if (event.which == 13) {
 						      event.preventDefault();
@@ -173,10 +182,17 @@ function upload(fileInputElement,attributes,authToken) {
 }
 
 // Datasource for FuelUX datagrid
+var ShockDataSrc = new Object();
 
 // Mapping function from column names to how to field values
 ShockDataSrc._colmap = {
     'Shock ID' : function (item) { return(item.id); },
+    'Actions' : function (item) {
+	var info = JSON.stringify( item, undefined, 2);
+	var html='<i rel=\"popover\" data-content2=\'' + info + '\' class="icon-search has-popover"/>' +
+	         '<i id=\"trash-' + item.id + '\" class="icon-trash"/>';
+	return( html );
+    },
     'Filename' : function (item) { return(item.file.name); },
     'Size' : function (item) { return( item.file.size); },
     'Description' : function (item) { return( item.attributes.Description ); },
@@ -195,9 +211,10 @@ ShockDataSrc.columns = function() {
 					      });
 }
 
+ShockDataSrc._results = Object();
+
 ShockDataSrc.data = function( options, callback) {
     var colmap = this._colmap;
-    var that = this;
 
     $.ajax({
 	       url: upload_url,
@@ -209,7 +226,6 @@ ShockDataSrc.data = function( options, callback) {
 	       dataType: "json",
 	       beforeSend: function(xhr) { xhr.setRequestHeader( 'Authorization', 'OAuth ' + userData.auth_token)},
 	       success: function(data) {
-		   that._results = data;
 		   var results = data.D.map( function(item) {
 						 var r = {};
 						 Object.keys(colmap).map( function(attr) {
