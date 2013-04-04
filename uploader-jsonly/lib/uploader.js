@@ -189,7 +189,27 @@ function upload(fileInputElement,attributes,authToken) {
     var fd = new FormData();
     fd.append("upload", fileInputElement.files[0]);
     var attrFileBody = JSON.stringify(attributes); // the body of the new file...
-    var attrBlob = new Blob([attrFileBody], { type: "application/json" });
+    var attrBlob;
+    try {
+	attrBlob = new Blob([attrFileBody], { type: "application/json" });
+    }
+    catch(e) {
+	window.BlobBuilder = window.BlobBuilder || 
+            window.WebKitBlobBuilder || 
+            window.MozBlobBuilder || 
+            window.MSBlobBuilder;
+	if (e.name == "TypeError" && window.BlobBuilder) {
+            var bb = new BlobBuilder();
+            bb.append([attrFileBody]);
+            attrBlob = bb.getBlob("application/json");
+	}
+	else if (e.name == "InvalidStateError") {
+            attrBlob = new Blob( [attrFileBody], {type : "application/json"});
+	}
+	else {
+            console.log("This browser doesn't support Blob type");
+	}
+    }
     fd.append('attributes', attrBlob, fileInputElement.files[0].name + ".attributes" );
     xhr.send(fd);
     $("#progress_display").scrollTop($("#progress_display")[0].scrollHeight);
@@ -390,7 +410,7 @@ function showError(error) {
 
 
 function showLoadingMessage(message, element) {
-    if (element === undefined || element === null) {
+    if (typeof element === "undefined" || element === null) {
 	if (message && message.length > 0) {
 	    $("#loading_message_text").empty();
 	    $("#loading_message_text").append(message);
@@ -405,7 +425,7 @@ function showLoadingMessage(message, element) {
 
 
 function hideLoadingMessage(element) {
-    if (element === undefined || element === null) {
+    if (typeof element === "undefined" || element === null) {
         $.unblockUI();
 	$("#loading_message_text").empty();
 	$("#loading_message_text").append("Loading, please wait...");
@@ -424,7 +444,7 @@ function checkLogin() {
         hasLocalStorage = true;
     }
 
-    if (hasLocalStorage && localStorage["auth_token"] !== undefined && localStorage["auth_token"] !== "null") {
+    if (hasLocalStorage && typeof localStorage["auth_token"] !== "undefined" && localStorage["auth_token"] !== null) {
 	userData = jQuery.extend(true, {}, defaultUserData);
 	userData.auth_token = localStorage["auth_token"];
 
