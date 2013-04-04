@@ -187,7 +187,27 @@ function upload(fileInputElement,attributes,authToken) {
     var fd = new FormData();
     fd.append("upload", fileInputElement.files[0]);
     var attrFileBody = JSON.stringify(attributes); // the body of the new file...
-    var attrBlob = new Blob([attrFileBody], { type: "application/json" });
+    var attrBlob;
+    try {
+	attrBlob = new Blob([attrFileBody], { type: "application/json" });
+    }
+    catch(e) {
+	window.BlobBuilder = window.BlobBuilder || 
+            window.WebKitBlobBuilder || 
+            window.MozBlobBuilder || 
+            window.MSBlobBuilder;
+	if (e.name == "TypeError" && window.BlobBuilder) {
+            var bb = new BlobBuilder();
+            bb.append([attrFileBody]);
+            attrBlob = bb.getBlob("application/json");
+	}
+	else if (e.name == "InvalidStateError") {
+            attrBlob = new Blob( [attrFileBody], {type : "application/json"});
+	}
+	else {
+            console.log("This browser doesn't support Blob type");
+	}
+    }
     fd.append('attributes', attrBlob, fileInputElement.files[0].name + ".attributes" );
     xhr.send(fd);
     $("#progress_display").scrollTop($("#progress_display")[0].scrollHeight);
