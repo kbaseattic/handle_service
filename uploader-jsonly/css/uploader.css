@@ -200,6 +200,14 @@ div.blockMsg {
    font-size: 11px;
 }
 
+td div .mypopover {
+    max-width: 400px;
+}
+
+.tallbox {
+    height: 100%;
+    min-height: 100%;
+
 .mypopover-inner {
     width: 400px;
 }

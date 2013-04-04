@@ -19,16 +19,18 @@ $(window).load(function(){
 		   $('#tabs').tab();
 		   // Initialize the browsing datagrid when it is shown
 		   $('#tabs a[href="#browse"]').on('shown', function (e) {
-						       $('#ShockGrid').datagrid( { dataSource: ShockDataSrc });
+						       $('#ShockGrid').datagrid( { dataSource: ShockDataSrc,
+										   stretchHeight: true});
 						       $('#ShockGrid').popover( { selector: '.has-popover',
 										  trigger: 'click',
 										  content: function() {
 										      console.log( this);
 										      return("<pre>"+$(this).attr('data-content2')+"</pre>");
 										      },
+										  title: 'Complete Metadata',
 										  html: true,
 										  placement: 'bottom',
-										  template: '<div class="popover"><div class="popover-inner mypopover-inner"><div class="popover-content"><p></p></div></div></div>'
+										  template: '<div class="popover"><div class="arrow"></div><div class="popover-inner mypopover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
 										});
 						       // setup delegated click handlers for trash icons in grid
 						       $('#ShockGrid').on('click', 'tbody .icon-trash', delete_confirm);

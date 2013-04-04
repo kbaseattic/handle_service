@@ -149,38 +149,39 @@
 	    </div>
 
 
-	    <div class="tab-pane" id="browse">
-	      <table id="ShockGrid" class="table table-bordered datagrid">
-		<div class="row">
-		  <div class="offset4 span4">
-		    <div id="delete_dialog" class="modal hide fade" style="display: none;">
-		      <div class="modal-header">
-			<a href="#" class="close" data-dismiss="modal">&times;</a>
-			<h3>File from Shock</h3>
-		      </div>
-		      <div class="modal-body">
-			<h4>Are you sure you want to delete file:</h4>
-			<p id='delete_file'>fileinfo</p>
-		      </div>
-		      <div class="modal-footer">
-			<a href="#" class="btn danger" id="killkillkill">Yes</a>
-			<a href="#" class="btn secondary" data-dismiss="modal">No</a>
+	    <div class="tab-pane tallbox" id="browse">
+	      <div id="grid" class="tallbox">
+		<table id="ShockGrid" class="table table-striped table-condensed datagrid">
+		  <div class="row">
+		    <div class="offset4 span4">
+		      <div id="delete_dialog" class="modal hide fade" style="display: none;">
+			<div class="modal-header">
+			  <a href="#" class="close" data-dismiss="modal">&times;</a>
+			  <h3>File from Shock</h3>
+			</div>
+			<div class="modal-body">
+			  <h4>Are you sure you want to delete file:</h4>
+			  <p id='delete_file'>fileinfo</p>
+			</div>
+			<div class="modal-footer">
+			  <a href="#" class="btn danger" id="killkillkill">Yes</a>
+			  <a href="#" class="btn secondary" data-dismiss="modal">No</a>
+			</div>
 		      </div>
 		    </div>
 		  </div>
-		</div>
 
-		<thead>
-		  <tr>
-		    <th>
-		      <span class="datagrid-header-title">Prototype Shock Browser</span>
-		      <div class="datagrid-header-left"></div>
-		      <div class="datagrid-header-right">
-			<div class="input-append search">
-			  <input type="text" class="input-medium" id="tagsearch" placeholder="Search tags"/>
-			  <button class="btn"><i class="icon-search"></i></button>
-			  <input type="text" class="input-medium" id="kbidsearch" placeholder="Search KBase IDs"/>
-			  <button class="btn"><i class="icon-search"></i></button>
+		  <thead>
+		    <tr>
+		      <th>
+			<span class="datagrid-header-title">Prototype Shock Browser</span>
+			<div class="datagrid-header-left"></div>
+			<div class="datagrid-header-right">
+			  <div class="input-append search">
+			    <input type="text" class="input-medium" id="tagsearch" placeholder="Search tags"/>
+			    <button class="btn"><i class="icon-search"></i></button>
+			    <input type="text" class="input-medium" id="kbidsearch" placeholder="Search KBase IDs"/>
+			    <button class="btn"><i class="icon-search"></i></button>
 			  </div>
 			</div>
 		      </th>
@@ -210,24 +211,25 @@
 			    </button>
 			    <span>Page</span>
 			    <div class="input-append dropdown combobox">
-			      <input class="span1" type="text">
-				<button class="btn" data-toggle="dropdown">
-				  <i class="caret"></i>
-				</button>
-				<ul class="dropdown-menu"></ul>
-			      </div>
-			      <span>of <span class="grid-pages"></span></span>
-			      <button class="btn grid-nextpage">
-				<i class="icon-chevron-right"></i>
+			      <input class="span1" type="text"/>
+			      <button class="btn" data-toggle="dropdown">
+				<i class="caret"></i>
 			      </button>
+			      <ul class="dropdown-menu"></ul>
 			    </div>
+			    <span>of <span class="grid-pages"></span></span>
+			    <button class="btn grid-nextpage">
+			      <i class="icon-chevron-right"></i>
+			    </button>
 			  </div>
-			</th>
-		      </tr>
-		    </tfoot>
-		  </table>
-		</div>
+			</div>
+		      </th>
+		    </tr>
+		  </tfoot>
+		</table>
 	      </div>
+	    </div>
+	  </div>
 	</div>
       </div>
     </div>
