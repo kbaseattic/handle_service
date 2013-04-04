@@ -388,7 +388,7 @@ function showError(error) {
 
 
 function showLoadingMessage(message, element) {
-    if (element === undefined || element === null) {
+    if (typeof element === "undefined" || element === null) {
 	if (message && message.length > 0) {
 	    $("#loading_message_text").empty();
 	    $("#loading_message_text").append(message);
@@ -403,7 +403,7 @@ function showLoadingMessage(message, element) {
 
 
 function hideLoadingMessage(element) {
-    if (element === undefined || element === null) {
+    if (typeof element === "undefined" || element === null) {
         $.unblockUI();
 	$("#loading_message_text").empty();
 	$("#loading_message_text").append("Loading, please wait...");
@@ -422,7 +422,7 @@ function checkLogin() {
         hasLocalStorage = true;
     }
 
-    if (hasLocalStorage && localStorage["auth_token"] !== undefined && localStorage["auth_token"] !== "null") {
+    if (hasLocalStorage && typeof localStorage["auth_token"] !== "undefined" && localStorage["auth_token"] !== null) {
 	userData = jQuery.extend(true, {}, defaultUserData);
 	userData.auth_token = localStorage["auth_token"];
 
