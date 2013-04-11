@@ -206,7 +206,7 @@ td div .mypopover {
 
 .tallbox {
     height: 100%;
-    min-height: 100%;
+}
 
 .mypopover-inner {
     width: 400px;

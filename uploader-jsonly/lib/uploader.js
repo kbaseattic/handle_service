@@ -1,5 +1,5 @@
 var login_url = "http://kbase.us/services/authorization/Sessions/Login/";
-var shock_url = "https://kbase.us/services/shock-api";
+var shock_url = "http://kbase.us/services/shock-api";
 var upload_url = shock_url + "/node";
 var cdmi_url = "http://kbase.us/services/cdmi_api/";
 
@@ -17,6 +17,9 @@ $(window).load(function(){
 		   $.blockUI.defaults.css = {};
 		   $(document).ajaxStop($.unblockUI);
 		   $('#tabs').tab();
+		   // Initialize the height of the "tallbox" div that encloses the datagrid, so that
+		   // it sizes w/scrolling
+		   $('.tallbox').height( $(window).height() - 250 );
 		   // Initialize the browsing datagrid when it is shown
 		   $('#tabs a[href="#browse"]').on('shown', function (e) {
 						       $('#ShockGrid').datagrid( { dataSource: ShockDataSrc,
@@ -237,15 +240,16 @@ ShockDataSrc._colmap = {
     'Actions' : function (item) {
 	var info = JSON.stringify( item, undefined, 2).replace(/\n?\s*[\{\}\[\]],?/g,'');
 	var html='<i rel=\"popover\" data-content2=\'' + info + '\' class="icon-search has-popover"/>' +
-	         '<i id=\"trash-' + item.id + '\" data-id=\"'+item.id+'\" data-filename=\"' + item.file.name + '\" class="icon-trash"/>';
+	         '<i id=\"trash-' + item.id + '\" data-id=\"'+item.id+'\" data-filename=\"' + item.file.name + '\" class="icon-trash"/>' +
+	         '<i id=\"down-' + item.id + '\" data-id=\"'+item.id+'\" data-filename=\"' + item.file.name + '\" class="icon-arrow-down"/>';
 	return( html );
     },
     'Filename' : function (item) {return(item.file.name);},
     'Size' : function (item) { return( item.file.size); },
-    'Description' : function (item) { return( item.attributes.Description ); },
-    'Owner' : function (item) { return( item.attributes.owner);},
-    'Related KBaseIDs' : function(item) { return( item.attributes.related_kbid ? item.attributes.related_kbid.join(', ') : ''); },
-    'Tags' : function(item) { return( item.attributes.tags ? item.attributes.tags.join(', ') : ''); }
+    'Description' : function (item) { return( (item.attributes && item.attributes.Description ) ? item.attributes.Description : "None given" ); },
+    'Owner' : function (item) { return( (item.attributes && item.attributes.owner) ? item.attributes.owner : "None given" );},
+    'Related KBaseIDs' : function(item) { return( (item.attributes && item.attributes.related_kbid) ? item.attributes.related_kbid.join(', ') : ''); },
+    'Tags' : function(item) { return( ( item.attributes && item.attributes.tags) ? item.attributes.tags.join(', ') : ''); }
 }
 
 ShockDataSrc._results = Object();
@@ -263,13 +267,44 @@ ShockDataSrc._results = Object();
 ShockDataSrc.data = function( options, callback) {
     var colmap = this._colmap;
 
+    console.log(options);
+    console.log( "Page size: ",options.pageSize);
+    var filter = {
+		   'query': '',
+		   'limit': options.pageSize ? options.pageSize : 10,
+		   'skip': options.pageIndex ? options.pageIndex * options.pageSize: 0
+    };
+    if ($('#myself_only:checked').length) {
+	filter.owner = userData.user_id;
+    }
+    if (options.search) {
+    	// user can specify multiple search terms using whitespace, each of which
+	// will be used in an "AND" fashion
+	// search terms prefixed with 'fieldname=' will bind that search term to
+	// the fieldname specified, otherwise we see if the string starts with
+	// kb| and bind it to related_kbid or else consider it a tag and bind
+	// it to the tags field
+	var terms = options.search.split('\s+');
+	terms.reduce( function (filter, term) {
+			  var m;
+			  if (term.match(/^kb\|.+/)) {
+			      filter.related_kbid = term;
+			  } else if (m = term.match(/^([a-zA-Z][_\w\.]+)\=([\w:_\.\|]+)$/)) {
+			      filter[m[1]] = m[2];
+			  } else if ( m = term.match(/^(\w[\w\-\:]*)$/)) {
+			      filter.tags = m[1];
+			  } else {
+			      // didn't match known format, drop it
+			      alert( "Unrecognized search term: " + term + ". Ignoring");
+			  }
+		      },
+		    filter);
+    }
+    console.log(filter);
     $.ajax({
 	       url: upload_url,
 	       type: "GET",
-	       data: {
-		   'query': '',
-		   'owner': userData.user_id
-	       },
+	       data: filter,
 	       dataType: "json",
 	       beforeSend: function(xhr) { xhr.setRequestHeader( 'Authorization', 'OAuth ' + userData.auth_token)},
 	       success: function(data) {
@@ -280,7 +315,24 @@ ShockDataSrc.data = function( options, callback) {
 									  });
 						 return(r);
 						 });
-		   callback( { data: results} );
+		   var resultobj = {
+		       data: results,
+		       start: filter.skip,
+		       end: filter.skip + results.length,
+		   }
+		   // we hack the count field, since we don't have an actual count
+		   // if we got the full complement that we asked for then assume there
+		   // is at least 1 page more than we asked for
+		   if (results.length == filter.limit) {
+		       resultobj.count = resultobj.end + filter.limit;
+		       resultobj.page = Math.round(resultobj.end / filter.limit);
+		       resultobj.pages = resultobj.page +1;
+		   } else {
+		       resultobj.count = resultobj.end;
+		       resultobj.page = Math.round(resultobj.end / filter.limit);
+		       resultobj.pages = resultobj.page;
+		   }
+		   callback( resultobj );
 	       },
 	       error: function(jqXHR, textStatus, errorThrown) { alert( textStatus + errorThrown); }
 	   });
