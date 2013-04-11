@@ -27,7 +27,6 @@ $(window).load(function(){
 						       $('#ShockGrid').popover( { selector: '.has-popover',
 										  trigger: 'click',
 										  content: function() {
-										      console.log( this);
 										      return("<pre>"+$(this).attr('data-content2')+"</pre>");
 										      },
 										  title: 'Complete Metadata',
@@ -37,6 +36,10 @@ $(window).load(function(){
 										});
 						       // setup delegated click handlers for trash icons in grid
 						       $('#ShockGrid').on('click', 'tbody .icon-trash', delete_confirm);
+						       // setup delegated click handlers for download icons in grid
+						       // we call a handler to download to avoid pre-generating download_urls for all
+						       // files
+						       $('#ShockGrid').on('click', 'tbody .icon-arrow-down', download_confirm);
 						   });
 		   $(".form-signin").keypress(function(event) {
 						  if (event.which == 13) {
@@ -139,6 +142,18 @@ function delete_file( shockid) {
     
 }
 
+function get_downloadurl( shockid, callback) {
+    $.ajax({
+	       url: upload_url+"/"+shockid+"?download_url",
+	       type: "GET",
+	       beforeSend: function(xhr) { xhr.setRequestHeader( 'Authorization', 'OAuth ' + userData.auth_token)},
+	       success: callback,
+	       error: function(jqXHR, textStatus, errorThrown) { alert( "Unable to get download URL for : "+shockid); }
+	   });
+
+    
+}
+
 
 // fileInputElement is the form field where the user selected the file
 // attributes is a hash containing the metadata attributes
@@ -231,6 +246,20 @@ var delete_confirm = function(e) {
 
 }
 
+// bring up download file modal dialog and populate download link with new download_url
+var download_confirm = function(e) {
+    console.log(this);
+    var dialog = $('#download_dialog');
+    var shockid = $(this).attr('data-id');
+    var filename = $(this).attr('data-filename');
+    $('#download_file').html("<h6>Name : "+filename+"</h6><h6>ID : "+shockid+"</h6>");
+    $('#download_button').click(function() { dialog.modal("hide");});
+    get_downloadurl( shockid, function (data) {
+			 $('#download_button').attr("href", data.D.url);
+			 dialog.modal('show');
+		     });
+}
+
 // Datasource for FuelUX datagrid
 var ShockDataSrc = new Object();
 
@@ -300,7 +329,6 @@ ShockDataSrc.data = function( options, callback) {
 		      },
 		    filter);
     }
-    console.log(filter);
     $.ajax({
 	       url: upload_url,
 	       type: "GET",
