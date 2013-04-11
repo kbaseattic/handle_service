@@ -20,17 +20,13 @@ mkdir -p ${GOPATH}/src/github.com/MG-RAST
 cp -r Shock ${GOPATH}/src/github.com/MG-RAST/
 
 go get -v github.com/MG-RAST/Shock/...
+stop shock
 mkdir -p ${BIN_DIR} ${SERVICE_DIR} ${SERVICE_DIR} ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs/shock ${SERVICE_DIR}/data/temp
 cp ${GOPATH}/bin/shock-server ${BIN_DIR}
 rm -r ${SHOCK_SITE}
-cp -r Shock/site ${SHOCK_SITE}
+cp -r Shock/shock-server/site ${SHOCK_SITE}
 rm ${SHOCK_SITE}/assets/misc/README.md
 cp Shock/README.md ${SHOCK_SITE}/assets/misc/README.md
 cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
 
-# install uploader
-echo "installing uploader"
-cp -r uploader ${SERVICE_DIR}
-
-# services
-cp services/* ${SERVICE_DIR}
+start shock
