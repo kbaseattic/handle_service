@@ -40,6 +40,8 @@ $(window).load(function(){
 						       // we call a handler to download to avoid pre-generating download_urls for all
 						       // files
 						       $('#ShockGrid').on('click', 'tbody .icon-arrow-down', download_confirm);
+						       // refresh results if the checkbox is toggled
+						       $('#myself_only').on('click', function () { $('#ShockGrid').datagrid('reload'); });
 						   });
 		   $(".form-signin").keypress(function(event) {
 						  if (event.which == 13) {
@@ -135,7 +137,7 @@ function delete_file( shockid) {
 	       url: upload_url+"/"+shockid,
 	       type: "DELETE",
 	       beforeSend: function(xhr) { xhr.setRequestHeader( 'Authorization', 'OAuth ' + userData.auth_token)},
-	       success: function(data) { alert( "File successfully deleted"); },
+	       success: function(data) { alert( "File successfully deleted"); $('#ShockGrid').datagrid('reload'); },
 	       error: function(jqXHR, textStatus, errorThrown) { alert( "Unable to delete : "+shockid); }
 	   });
 
@@ -254,6 +256,9 @@ var download_confirm = function(e) {
     var filename = $(this).attr('data-filename');
     $('#download_file').html("<h6>Name : "+filename+"</h6><h6>ID : "+shockid+"</h6>");
     $('#download_button').click(function() { dialog.modal("hide");});
+    if (filename) {
+	$('#download_button').attr("download", filename);
+    }
     get_downloadurl( shockid, function (data) {
 			 $('#download_button').attr("href", data.D.url);
 			 dialog.modal('show');
