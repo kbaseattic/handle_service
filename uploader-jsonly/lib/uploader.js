@@ -69,12 +69,14 @@ $(window).load(function(){
 									 });
 					    var datafile = $("#datafile")[0];
 					    
-					    if ($("#datafile")[0].files[0] == undefined) {
+					    if (datafile.files.length < 1) {
 						alert("Please choose a file for upload")
 					    } else {
 						$("#upload_progress").show();
 						console.log( attrs);
-						upload(datafile,attrs,localStorage['auth_token']);
+						for (var i=0; i< datafile.files.length; i++) {
+						    upload(datafile.files[i],attrs,localStorage['auth_token']);
+						}
 						clearForm();
 					    }
 					});
@@ -86,7 +88,6 @@ $(window).load(function(){
 					      $("#fid").val("");
 					      fidlist.split(/\s+/)
 						  .forEach( function (newfid) {
-								$('#kbid_check').attr("class","label label-info").text("Checking").show();
 								// Is this a Genome or a Gene id?
 								var validator;
 								if (newfid.match(/^kb\|g\.\d+$/)) {
@@ -96,8 +97,8 @@ $(window).load(function(){
 								}
 								validator( newfid,
 									   function() {
+									       console.log( "Adding kbid: " + newfid)
 									       $('#kbidlist').append($('<li>').text(newfid));
-									       //$('#kbid_check').attr("class","label label-success").text("ID OK").fadeOut(3000);
 									   },
 									   function(res) {
 									       console.log( newfid + " is not a legitimate KBase Genome ID");
@@ -107,7 +108,10 @@ $(window).load(function(){
 									       } else {
 										   $("#fid").val(newfid);
 									       }
-									       $('#kbid_check').attr("class","label label-important").text("Bad ID").fadeOut(3000);
+									       $('#kbid_check').attr("class","label label-important")
+										   .text("Bad ID")
+										   .show()
+										   .fadeOut(3000);
 									   });
 							    });
 					  }});
@@ -135,7 +139,7 @@ function clearForm() {
 	.val('')
 	.removeAttr('checked')
 	.removeAttr('selected');
-    $('#related_kbid').empty();
+    $('#kbidlist').empty();
     $('#taglist').empty();
     $('#kbid_check').css('visibility','hidden');
     $('#tag_check').css('visibility','hidden');
@@ -170,7 +174,7 @@ function get_downloadurl( shockid, callback) {
 // fileInputElement is the form field where the user selected the file
 // attributes is a hash containing the metadata attributes
 // authToken is a legit OAuth authentication token
-function upload(fileInputElement,attributes,authToken) {
+function upload(file,attributes,authToken) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', upload_url, true); // Here we would use the Shock node ID
     xhr.setRequestHeader('Authorization', 'OAuth ' + authToken);
@@ -178,19 +182,20 @@ function upload(fileInputElement,attributes,authToken) {
     // Append a new row for this upload to the upload progress table
     uptable = $('#uploads').find('tbody');
     ++filecount;
-    fileName = fileInputElement.files[0].name;
+    var fc=filecount;
+    fileName = file.name;
     uptable.append($('<tr>')
 		   .append($('<td><h6>'+fileName+'</h6></td>'))
 		   .append($('<td>')
 			   .append($('<progress min="0" max="100" style="width: 300px;">')
-				   .attr('id','progressBar'+filecount)))
+				   .attr('id','progressBar'+fc)))
 		   .append($('<td>')
-			   .append($('<h6>Uploading</h6>').attr('id','upload_status'+filecount)))
+			   .append($('<h6>Uploading</h6>').attr('id','upload_status'+fc)))
 		   .append($('<td>')
-			   .append($('<button class="btn">Cancel</button>').attr('id','cancel'+filecount)))
+			   .append($('<button class="btn">Cancel</button>').attr('id','cancel'+fc)))
 		  );
-    $("#cancel"+filecount).on('click',function(e) {
-				  $("#cancel"+filecount).hide();
+    $("#cancel"+fc).on('click',function(e) {
+				  $("#cancel"+fc).hide();
 				  xhr.abort();
 			      });
 
@@ -198,26 +203,26 @@ function upload(fileInputElement,attributes,authToken) {
 	if (this.status == 200) {
 	    console.log(this.response);
 	    response = JSON.parse( this.response);
-	    $("#upload_status"+filecount).text("Shock ID = " + response.D.id);
-	    $("#cancel"+filecount).hide();
+	    $("#upload_status"+fc).text("Shock ID = " + response.D.id);
+	    $("#cancel"+fc).hide();
 	}
     };
-    var progressBar = $("#progressBar"+filecount);
+    var progressBar = $("#progressBar"+fc);
     xhr.upload.onprogress = function(e) {
 	if (e.lengthComputable) {
 	    progressBar.val(e.loaded /e.total * 100);
-	    $("#upload_status"+filecount).text(e.loaded+" of "+e.total+" bytes");
+	    $("#upload_status"+fc).text(e.loaded+" of "+e.total+" bytes");
 	}
     };
     xhr.addEventListener("error", function(evt) { 
-			     $('#upload_status'+filecount).text('Error during upload');
+			     $('#upload_status'+fc).text('Error during upload');
 			 }, false);
     xhr.addEventListener("abort", function(evt) { 
-			     $('#upload_status'+filecount).text('Upload aborted');
+			     $('#upload_status'+fc).text('Upload aborted');
 			 }, false);
     
     var fd = new FormData();
-    fd.append("upload", fileInputElement.files[0]);
+    fd.append("upload", file);
     var attrFileBody = JSON.stringify(attributes); // the body of the new file...
     var attrBlob;
     try {
@@ -240,7 +245,7 @@ function upload(fileInputElement,attributes,authToken) {
             console.log("This browser doesn't support Blob type");
 	}
     }
-    fd.append('attributes', attrBlob, fileInputElement.files[0].name + ".attributes" );
+    fd.append('attributes', attrBlob, file.name + ".attributes" );
     xhr.send(fd);
     $("#progress_display").scrollTop($("#progress_display")[0].scrollHeight);
 }
@@ -270,7 +275,7 @@ var download_confirm = function(e) {
 	$('#download_button').attr("download", filename);
     }
     get_downloadurl( shockid, function (data) {
-			 $('#download_button').attr("href", data.D.url);
+			 $('#download_button').attr("href", data.D.url + "/" + filename);
 			 dialog.modal('show');
 		     });
 }
