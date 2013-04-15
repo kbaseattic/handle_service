@@ -82,39 +82,49 @@ $(window).load(function(){
 		   $("#fid").keypress(function(event) {
 					  if (event.which == 13) {
 					      event.preventDefault();
-					      var newfid = $("#fid").val();
-					      $('#kbid_check').attr("class","label label-info").text("Checking").show();
-					      // Is this a Genome or a Gene id?
-					      var validator;
-					      if (newfid.match(/^kb\|g\.\d+$/)) {
-						  validator = isKBaseGenome;
-					      } else {
-						  validator = isKBaseGene;
-					      }
-					      validator( newfid,
-							 function() {
-							     $('#kbidlist').append($('<li>').text(newfid));
-							     $("#fid").val("");
-							     $('#kbid_check').attr("class","label label-success").text("ID OK").fadeOut(3000);
-							 },
-							 function(res) {
-							     console.log( newfid + " is not a legitimate KBase Genome ID");
-							     $('#kbid_check').attr("class","label label-important").text("Bad ID").fadeOut(3000);
-							 });
-					  }
-				      });
+					      var fidlist = $("#fid").val(); 
+					      $("#fid").val("");
+					      fidlist.split(/\s+/)
+						  .forEach( function (newfid) {
+								$('#kbid_check').attr("class","label label-info").text("Checking").show();
+								// Is this a Genome or a Gene id?
+								var validator;
+								if (newfid.match(/^kb\|g\.\d+$/)) {
+								    validator = isKBaseGenome;
+								} else {
+								    validator = isKBaseGene;
+								}
+								validator( newfid,
+									   function() {
+									       $('#kbidlist').append($('<li>').text(newfid));
+									       //$('#kbid_check').attr("class","label label-success").text("ID OK").fadeOut(3000);
+									   },
+									   function(res) {
+									       console.log( newfid + " is not a legitimate KBase Genome ID");
+									       var old=$("#fid").val();
+									       if (old) {
+										   $("#fid").val(newfid + " " + old);
+									       } else {
+										   $("#fid").val(newfid);
+									       }
+									       $('#kbid_check').attr("class","label label-important").text("Bad ID").fadeOut(3000);
+									   });
+							    });
+					  }});
 		   $("#newtag").keypress(function(event) {
 					     if (event.which == 13) {
 						 event.preventDefault();
-						 var newtag = $("#newtag").val();
-						 $('#newtag_check').attr("class","label label-info").text("Checking").show();
-						 if ( newtag.match(/^\w[\w\-\:]*$/) ) {
-						     $("#taglist").append($('<li>').text(newtag));
-						     $("#newtag").val("");
-						     $('#newtag_check').attr("class","label label-success").text("Tag OK").fadeOut(3000);
-						 } else {
-						     $('#newtag_check').attr("class","label label-important").text("Bad Tag").fadeOut(3000);
-						 }
+						 var newtags = $("#newtag").val();
+						 $("#newtag").val("");
+						 newtags.split(/\s+/)
+						     .forEach( function (newtag) {
+								   if ( newtag.match(/^\w[\w\-\:]*$/) ) {
+								       $("#taglist").append($('<li>').text(newtag));
+								       $("#newtag").val("");
+								   } else {
+								       $('#newtag_check').attr("class","label label-important").text("Bad Tag").show().fadeOut(3000);
+								   }
+							       });
 					     }
 					 });
 		   checkLogin();
