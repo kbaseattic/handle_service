@@ -11,6 +11,7 @@ var defaultUserData = {
     user_id: null
 };
 var filecount = 0;
+var uploadFileList = {};
 
 $(window).load(function(){
 		   //clear the default CSS associated with the blockUI loading element so we can insert ours
@@ -67,15 +68,14 @@ $(window).load(function(){
 									     field = $('#'+attr);
 									     attrs[attr] = field.pillbox('items').map( function(item) { return(item.text) } )
 									 });
-					    var datafile = $("#datafile")[0];
-					    
-					    if (datafile.files.length < 1) {
+					    var datafile = $('#fileList').pillbox('items').map( function(file) { return uploadFileList[file.text];});
+
+					    if (datafile.length < 1) {
 						alert("Please choose a file for upload")
 					    } else {
 						$("#upload_progress").show();
-						console.log( attrs);
-						for (var i=0; i< datafile.files.length; i++) {
-						    upload(datafile.files[i],attrs,localStorage['auth_token']);
+						for (var i=0; i< datafile.length; i++) {
+						    upload(datafile[i],attrs,localStorage['auth_token']);
 						}
 						clearForm();
 					    }
@@ -131,19 +131,60 @@ $(window).load(function(){
 							       });
 					     }
 					 });
+		   // Check to see if we can use html5 drag/drop stuff, if so enable dropzone div to
+		   // receive files
+		   if (window.FileReader) {
+                       var dropzone = $('#dropzone');
+		       dropzone.removeClass('hidden');
+		       dropzone[0].ondragover = function () {
+			   return(false);
+		       }
+		       dropzone[0].ondrop = dropFile;
+		       $('#datafile').change(selectFile);
+		       $('#datafile').attr('style','color:transparent');
+		   }
 		   checkLogin();
 	       });
+
+// Handle files selected by fileinput
+function selectFile( event ) {
+    event.preventDefault();
+    addFiles( event.target.files);
+    var input=$('#datafile');
+    input.wrap('<form>').closest('form').get(0).reset();
+    input.unwrap();
+}
+
+// Handle files selected by drag and drop
+function dropFile( event ) {
+    event.preventDefault();
+    var file = event.dataTransfer.files || event.target.files;
+    addFiles( file);
+    return( false);
+}
+
+function addFiles( file) {
+    for (var i=0; i<file.length; i++) {
+	if (file[i].size) {
+	    $('#fileList').append( $('<li>').text(file[i].name));
+	    uploadFileList[ file[i].name] = file[i];
+	} else {
+	    alert("Ignoring '" + file[i].name + "'. Empty files and folders may not be uploaded." );
+	}
+    }
+}
 
 function clearForm() {
     $(':input','#upload').not(':button, :submit, :hidden, :reset, [readonly]')
 	.val('')
 	.removeAttr('checked')
 	.removeAttr('selected');
+    $('#fileList').empty();
     $('#kbidlist').empty();
     $('#taglist').empty();
     $('#kbid_check').css('visibility','hidden');
     $('#tag_check').css('visibility','hidden');
-    
+    uploadFileList = {};    
 }
 
 function delete_file( shockid) {

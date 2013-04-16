@@ -68,7 +68,7 @@
 		    <fieldset>
 		      <div class="control-group">  
 			<label class="control-label" for="owner">Owner of file</label>  
-			<div class="controls">  
+			<div class="controls">
 			  <input type="text" class="input-medium" id="owner" readonly/>  
 			</div>  
 		      </div>  
@@ -76,6 +76,9 @@
 			<label class="control-label" for="datafile">Datafile for upload</label>  
 			<div class="controls">  
 			  <input class="input-file" id="datafile" type="file" multiple="multiple"/>
+			  <div id="dropzone" class="hidden dropzone pillbox tagbox">
+			    <ul id="fileList" class="fileList"></ul>
+			  </div>
 			</div>  
 		      </div>    
 		      <div class="control-group">  

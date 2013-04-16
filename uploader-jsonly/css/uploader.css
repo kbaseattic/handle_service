@@ -212,4 +212,22 @@ td div .mypopover {
     width: 400px;
 }
 
+
+.dropzone {
+    background-image:url('../img/droptext.png');
+    background-repeat:no-repeat;
+    background-position:center;
+    outline: 2px solid #e3e3e3;
+}
+
+.bg-title .title {
+    display: block;
+    position: relative;
+    text-align: right;
+}
+
+.fileList {
+    //include ...
+    z-index: 99;
+}
 /*End of file*/
