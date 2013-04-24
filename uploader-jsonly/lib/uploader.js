@@ -1,7 +1,7 @@
-var login_url = "http://kbase.us/services/authorization/Sessions/Login/";
-var shock_url = "http://kbase.us/services/shock-api";
+var login_url = "https://kbase.us/services/authorization/Sessions/Login/";
+var shock_url = "https://kbase.us/services/shock-api";
 var upload_url = shock_url + "/node";
-var cdmi_url = "http://kbase.us/services/cdmi_api/";
+var cdmi_url = "https://kbase.us/services/cdmi_api/";
 
 var cdmi_api = new CDMI_API(cdmi_url);
 var cdmi_entity_api = new CDMI_EntityAPI(cdmi_url);
@@ -203,6 +203,7 @@ function get_downloadurl( shockid, callback) {
     $.ajax({
 	       url: upload_url+"/"+shockid+"?download_url",
 	       type: "GET",
+	       dataType: "json",
 	       beforeSend: function(xhr) { xhr.setRequestHeader( 'Authorization', 'OAuth ' + userData.auth_token)},
 	       success: callback,
 	       error: function(jqXHR, textStatus, errorThrown) { alert( "Unable to get download URL for : "+shockid); }
@@ -316,6 +317,7 @@ var download_confirm = function(e) {
 	$('#download_button').attr("download", filename);
     }
     get_downloadurl( shockid, function (data) {
+			 console.log( typeof data);
 			 $('#download_button').attr("href", data.D.url + "/" + filename);
 			 dialog.modal('show');
 		     });
