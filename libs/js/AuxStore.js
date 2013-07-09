@@ -2,21 +2,45 @@
 
   Auxiliary Store javascript client library
 
+  This library allows the interaction with the Auxiliary Store via javascript methods. The normal usage would be to first initialize the library with an authentication token and Aux-Store url. It can then be used to retrieve, delete, update and create nodes in the Aux-Store. Refer to the function section below for details on the provided function calls. The upload of files uses chunking and automatically resumes failed uploads when the same file is uploaded again by the same user.
+
   FUNCTIONS
 
-  init
+  init (params)
+    initialize the AuxStore client with: SHOCK.init({ token: "myTokenString", url: "urlToAuxStore" })
 
   set_auth
+    set the authorization token with: SHOCK.set_auth("myTokenString")
 
   get_node
+    retrieve a node from SHOCK with SHOCK.get_node("myNodeId", callback)
+    The node-id parameter is mandatory. This function returns a promise that is fulfilled once the node is retrieved. The callback parameter can either be a variable or a function. A variable will be set to the data value of the node, a function will receive the data as the first parameter.
 
   get_all_nodes
+    retrieve all nodes for the current authentication setting with: SHOCK.get_all_nodes(callback)
+    This function returns a promise that is fulfilled once the nodes are retrieved. The callback parameter can either be a variable or a function. A variable will be set to the array of data values of the nodes, a function will receive the array as the first parameter.
 
   delete_node
+    delete a node from SHOCK with SHOCK.get_node("myNodeId")
+    The node-id parameter is mandatory. This function returns a promise that is fulfilled once the node is deleted.
 
   create_node
+    create a new node with: SHOCK.create_node(input, attributes, callback)
+    The input parameter can either be a file-type form field or its id. If no file is to be added to the node, this parameter must be null. The optional attributes parameter must be a JSON structure of metadata that is to be added to the node. If no metadata is to be added, this parameter must be null. The callback parameter can either be a variable or a function. A variable will be set to the data value of the created node, a function will receive node data as the first parameter. The create_node function returns a promise that is fulfilled once the node is created. 
 
   update_node
+    update the attributes of an existing node with: SHOCK.update_node("myNodeId", attributes, callback)
+    The attributes parameter must be a JSON structure of metadata that is to be added to the node. Existing values will be replaced. This function returns a promise that is fulfilled once the node is updated. The callback parameter can either be a variable or a function. A variable will be set to the data value of the node, a function will receive the data as the first parameter.
+
+  PLANNED FEATURES
+
+    * support for queries in node retrieval
+    * upload progress feedback
+    * deletion of attributes (currently not implemented in SHOCK)
+    * variable chunk size
+    * parallel chunk-upload support (feedback that allows resuming of failed chunk upload not yet implemented in SHOCK)
+
+  Please send feedback, bug-reports and questions to Tobias Paczian (paczian@mcs.anl.gov)
 
 */
 (function () {
@@ -36,14 +60,18 @@
 	if (params.token !== null) {
 	    SHOCK.set_auth(params.token);
 	}
-    }
-
-    SHOCK.set_auth = function (token) {
-	SHOCK.auth_header = {'Authorization': 'OAuth '+token}
     };
 
-    SHOCK.get_all_nodes = function (ret) {
-	var url = SHOCK.url+'/node';
+    SHOCK.set_auth = function (token) {
+	if (token != null) {
+	    SHOCK.auth_header = {'Authorization': 'OAuth '+token};
+	} else {
+	    console.log("error: no token passed to set_auth method");
+	}
+    };
+
+    SHOCK.get_node = function (node, ret) {
+	var url = SHOCK.url+'/node/'+node
 	var promise = jQuery.Deferred();
         jQuery.getJSON(url, { 
 	    success: function(data) {
@@ -80,8 +108,8 @@
 	return promise;
     };
 
-    SHOCK.get_node = function (node, ret) {
-	var url = SHOCK.url+'/node/'+node
+    SHOCK.get_all_nodes = function (ret) {
+	var url = SHOCK.url+'/node';
 	var promise = jQuery.Deferred();
         jQuery.getJSON(url, { 
 	    success: function(data) {
