@@ -4,8 +4,15 @@ SERVICE_DIR=$1
 BIN_DIR=$2
 CONF=$3
 PERL_LIB="/kb/runtime/lib/perl5/site_perl/5.16.0"
-SHOCK_SITE=/disk0/site                                                                                                                             
-SHOCK_DATA=/disk0/data
+
+if [ ${CONF} == "prod"]; then
+    SHOCK_SITE=/disk0/site                                                                                                                             
+    SHOCK_DATA=/disk0/data
+else
+    mkdir /mnt/Shock
+    SHOCK_SITE=/mnt/Shock/site                                                                                                                             
+    SHOCK_DATA=/mnt/Shock/data
+fi
 
 # build shock
 echo "installing shock"
@@ -34,5 +41,3 @@ if [ ${CONF} == "prod"]; then
 else
     cp conf/shock-test.cfg ${SERVICE_DIR}/conf/shock.cfg
 fi
-
-start shock
