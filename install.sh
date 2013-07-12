@@ -11,6 +11,7 @@ if [ ${CONF} = "prod" ]; then
     SHOCK_DATA=/disk0/data
 else
     mkdir -p /mnt/Shock/data
+    mkdir -p /mnt/Shock/logs
     SHOCK_SITE=/mnt/Shock/site                                                                                                                             
     SHOCK_DATA=/mnt/Shock/data
 fi
@@ -30,16 +31,16 @@ cp -r Shock ${GOPATH}/src/github.com/MG-RAST/
 
 go get -v github.com/MG-RAST/Shock/...
 mkdir -p ${BIN_DIR} ${SERVICE_DIR} ${SERVICE_DIR} ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs/shock ${SERVICE_DIR}/data/temp
-cp ${GOPATH}/bin/shock-server ${BIN_DIR}
+cp -v ${GOPATH}/bin/shock-server ${BIN_DIR}
 rm -r ${SHOCK_SITE}
-cp -r Shock/shock-server/site ${SHOCK_SITE}
+cp -v -r Shock/shock-server/site ${SHOCK_SITE}
 rm ${SHOCK_SITE}/assets/misc/README.md
-cp Shock/README.md ${SHOCK_SITE}/assets/misc/README.md
+cp -v Shock/README.md ${SHOCK_SITE}/assets/misc/README.md
 
 if [ ${CONF} = "prod" ]; then
-    cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
+    cp -v conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
     start shock
 else
-    cp conf/shock-test.cfg ${SERVICE_DIR}/conf/shock.cfg
+    cp -v conf/shock-test.cfg ${SERVICE_DIR}/conf/shock.cfg
     cp -v services/shock.conf /etc/init/
 fi
