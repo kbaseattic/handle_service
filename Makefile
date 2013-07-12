@@ -21,7 +21,12 @@ deploy-all: deploy-service deploy-client
 deploy-service:
 	git submodule init
 	git submodule update
-	sh install.sh $(SERVICE_DIR) $(TARGET)/bin
+	sh install.sh $(SERVICE_DIR) $(TARGET)/bin prod
+
+deploy-service-test:
+	git submodule init
+	git submodule update
+	sh install.sh $(SERVICE_DIR) $(TARGET)/bin test
 
 deploy-client: deploy-docs
 	export KB_TOP=$(TARGET); \

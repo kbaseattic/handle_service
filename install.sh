@@ -2,6 +2,7 @@
 
 SERVICE_DIR=$1
 BIN_DIR=$2
+CONF=$3
 PERL_LIB="/kb/runtime/lib/perl5/site_perl/5.16.0"
 SHOCK_SITE=/disk0/site                                                                                                                             
 SHOCK_DATA=/disk0/data
@@ -27,6 +28,11 @@ rm -r ${SHOCK_SITE}
 cp -r Shock/shock-server/site ${SHOCK_SITE}
 rm ${SHOCK_SITE}/assets/misc/README.md
 cp Shock/README.md ${SHOCK_SITE}/assets/misc/README.md
-cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
+
+if [ ${CONF} == "prod"]; then
+    cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
+else
+    cp conf/shock-test.cfg ${SERVICE_DIR}/conf/shock.cfg
+fi
 
 start shock
