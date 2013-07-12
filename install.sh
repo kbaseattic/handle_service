@@ -5,7 +5,7 @@ BIN_DIR=$2
 CONF=$3
 PERL_LIB="/kb/runtime/lib/perl5/site_perl/5.16.0"
 
-if [ ${CONF} == "prod"]; then
+if [ ${CONF} == "prod" ]; then
     SHOCK_SITE=/disk0/site                                                                                                                             
     SHOCK_DATA=/disk0/data
 else
