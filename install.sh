@@ -5,7 +5,7 @@ BIN_DIR=$2
 CONF=$3
 PERL_LIB="/kb/runtime/lib/perl5/site_perl/5.16.0"
 
-if [ ${CONF} == "prod" ]; then
+if [ ${CONF} = "prod" ]; then
     SHOCK_SITE=/disk0/site                                                                                                                             
     SHOCK_DATA=/disk0/data
 else
@@ -36,7 +36,7 @@ cp -r Shock/shock-server/site ${SHOCK_SITE}
 rm ${SHOCK_SITE}/assets/misc/README.md
 cp Shock/README.md ${SHOCK_SITE}/assets/misc/README.md
 
-if [ ${CONF} == "prod"]; then
+if [ ${CONF} = "prod" ]; then
     cp conf/shock.cfg ${SERVICE_DIR}/conf/shock.cfg
 else
     cp conf/shock-test.cfg ${SERVICE_DIR}/conf/shock.cfg
