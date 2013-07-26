@@ -22,12 +22,12 @@ deploy-all: deploy-service deploy-client
 deploy-service:
 	git submodule init
 	git submodule update
-	sh install.sh $(SERVICE_DIR) $(TARGET)/bin prod
+	sh install.sh $(SERVICE_DIR) $(TARGET) prod
 
 deploy-service-test:
 	git submodule init
 	git submodule update
-	sh install.sh $(SERVICE_DIR) $(TARGET)/bin test
+	sh install.sh $(SERVICE_DIR) $(TARGET) test
 
 deploy-client: deploy-libs deploy-scripts deploy-docs
 	export KB_TOP=$(TARGET); \
