@@ -1,8 +1,10 @@
 #!/bin/sh 
 
 SERVICE_DIR=$1
-BIN_DIR=$2
+TARGET=$2
 CONF=$3
+BIN_DIR=$TARGET/bin
+LIB_DIR=$TARGET/lib
 PERL_LIB="/kb/runtime/lib/perl5/site_perl/5.16.0"
 
 if [ ${CONF} = "prod" ]; then
@@ -32,6 +34,7 @@ cp -r Shock ${GOPATH}/src/github.com/MG-RAST/
 go get -v github.com/MG-RAST/Shock/...
 mkdir -p ${BIN_DIR} ${SERVICE_DIR} ${SERVICE_DIR} ${SERVICE_DIR}/conf ${SERVICE_DIR}/logs/shock ${SERVICE_DIR}/data/temp
 cp -v ${GOPATH}/bin/shock-server ${BIN_DIR}
+cp -v ${GOPATH}/bin/shock-client ${BIN_DIR}
 rm -r ${SHOCK_SITE}
 cp -v -r Shock/shock-server/site ${SHOCK_SITE}
 rm ${SHOCK_SITE}/assets/misc/README.md
