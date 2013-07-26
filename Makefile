@@ -14,8 +14,9 @@ SRC_PERL = $(wildcard client/bin/*.pl)
 
 all: deploy
 
-deploy: deploy-client
+deploy: deploy-client deploy-service
 
+# deploy-all is depricted, consider removing it and using the deploy target
 deploy-all: deploy-service deploy-client
 
 deploy-service:
@@ -28,7 +29,7 @@ deploy-service-test:
 	git submodule update
 	sh install.sh $(SERVICE_DIR) $(TARGET)/bin test
 
-deploy-client: deploy-docs
+deploy-client: deploy-libs deploy-scripts deploy-docs
 	export KB_TOP=$(TARGET); \
 	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
 	export KB_PERL_PATH=$(TARGET)/lib:$(TARGET)/lib/perl5 bash ; \
@@ -40,13 +41,19 @@ deploy-client: deploy-docs
 		$(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(TARGET)/bin/$$base ; \
 	done
 
+deploy-libs:
+	echo "deploy-libs not implemented yet"
+
+deploy-scripts:
+	echo "deploy-scripts not implemented yet"
+
 deploy-docs: build-docs
 	-mkdir -p $(SERVICE_DIR)/webroot
-	$(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/aux_store.html
+	# $(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/aux_store.html
 
 build-docs:
-	mkdir -p client/spec/c
-	compile_typespec client/spec/adm.spec client/spec/c
+	# mkdir -p client/spec/c
+	# compile_typespec client/spec/adm.spec client/spec/c
 
 # Test Section
 TESTS = $(wildcard test/*.t)
