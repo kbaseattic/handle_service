@@ -1,7 +1,0 @@
-{
-	"command": "dd if=/dev/zero of=test.img bs=1024 count=0 seek=1024",
-	"content": "empty",
-	"study": "Shock test",
-	"creation_date": "31-MAY-2012",
-	"methods": ["listNodes","createNode","modifyNode","viewNode"]
-}
