@@ -1,13 +1,13 @@
 /*
 
-  Auxiliary Store javascript client library
+  KBase Data Store javascript client library
 
   This library allows the interaction with the Auxiliary Store via javascript methods. The normal usage would be to first initialize the library with an authentication token and Aux-Store url. It can then be used to retrieve, delete, update and create nodes in the Aux-Store. Refer to the function section below for details on the provided function calls. The upload of files uses chunking and automatically resumes failed uploads when the same file is uploaded again by the same user.
 
   FUNCTIONS
 
   init (params)
-    initialize the AuxStore client with: SHOCK.init({ token: "myTokenString", url: "urlToAuxStore" })
+    initialize the Data Store client with: SHOCK.init({ token: "myTokenString", url: "urlToAuxStore" })
 
   set_auth
     set the authorization token with: SHOCK.set_auth("myTokenString")

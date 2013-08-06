@@ -1,6 +1,6 @@
-"""KBase ADM client library.
+"""KBase Data Client Library.
 
-adm.Client inherits from shock.Client(https://github.com/MG-RAST/Shock)
+datastore.Client inherits from shock.Client(https://github.com/MG-RAST/Shock)
 
 Authors:
 
