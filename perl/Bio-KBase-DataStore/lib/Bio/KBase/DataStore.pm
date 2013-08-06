@@ -8,8 +8,6 @@ use File::Basename;
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '0.0.1';
-
 1;
 
 sub new {
