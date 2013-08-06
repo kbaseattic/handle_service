@@ -5,9 +5,10 @@ use warnings;
 no warnings('once');
 
 use File::Basename;
-use Data::Dumper;
 use JSON;
 use LWP::UserAgent;
+
+our $VERSION = '0.0.1';
 
 1;
 
