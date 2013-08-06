@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>KBase Auxiliary Store Download</title>
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen" />
+    <link href="css/jquery.dataTables.css" rel="stylesheet" />
+    <link href="css/toastr.css" rel="stylesheet" />    
+    <link href="css/data_downloader.css" rel="stylesheet" />
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <img class="logo" src="img/kbase-images/kbase_logo.gif" />
+
+      <div class="navbar-inverse">
+        <div class="navbar-inner">
+          <ul class="nav">
+            <!-- <li id="download-main"><a href="#downloads">Download</a></li> -->
+          </ul>
+        </div>
+      </div>
+
+      <div id="content">
+        <h3>KBase Auxiliary Store Download</h3>
+        <p>The data downloader can used to browse and download KBase data.  
+            To upload data to the KBase system, use the <a src="http://dunkirk.mcs.gov/~paczian/kbase_uploader/uploader.cgi">Data Uploader</a>.
+        <h4>Data Types</h4>
+        <div id="type-header"></div>
+        <div id="type-table"></div>
+      </div>
+
+    </div>
+
+    <div class="footer-area">
+      <div class="container"> 
+        <div class="copyright">
+          <a class="doe-logo" href="http://www.science.energy.gov/">
+            <img src="img/kbase-images/doe_logo.png">
+          </a> 
+          <a class="social" href="http://www.facebook.com/pages/DOE-Systems-Biology-Knowledgebase/148332628600806">
+            <img src="img/kbase-images/facebook.png" alt="facebook">
+          </a> 
+          <a class="social" href="http://twitter.com/DOEKbase">
+            <img src="img/kbase-images/twitter.png" alt="twitter">
+          </a> 
+          <a class="social" href="/index.php/tools/blocks/blog_archive/rss.php?cID=170">
+            <img src="img/kbase-images/rss.png" alt="rss feed">
+          </a>
+          <p class="sponsor">KBase is sponsored by the U.S. Department of Energy's
+            <a href="http://science.energy.gov/ber/">Office of Biological and Environmental Research</a>.
+          </p>
+          <p>
+            <a href="http://www.anl.gov/notice.html">Privacy and Security Notice</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- modal for incorrect types -->
+    <div id="type-modal" class="modal" tabindex="-1" role="dialog" style="display:none;" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <h3 id="myModalLabel">Warning: Incorrect Type</h3>
+      </div>
+      <div id="type-modal-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button id="modal-close" class="btn" aria-hidden="true">Go Back</button>
+      </div>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="js/sammy.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/jquery.dataTables.js"></script>
+    <script src="js/toastr.js"></script>
+    <script src="js/data_downloader.js"></script>
+
+  </body>
+
+
+</html>
