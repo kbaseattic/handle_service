@@ -1,0 +1,18 @@
+#!/bin/sh
+SERVICE=aux_store
+DEPLOY_DIR=/kb/deployment
+SERVICE_DIR=$DEPLOY_DIR/services/$SERVICE
+LIB_DIR=$SERVICE_DIR/lib
+KB_BIN=/kb/runtime/bin
+
+export PATH=$KB_BIN:$DEPLOY_DIR/bin:$LIB_DIR:$PATH
+
+$SERVICE_DIR/stop_service
+echo starting uploader service
+nohup perl -I $LIB_DIR $SERVICE_DIR/uploader/uploader.pl &
+echo $! > $SERVICE_DIR/uploader.pid
+
+echo starting aux_store services
+$DEPLOY_DIR/bin/shock-server -conf $SERVICE_DIR/conf/shock.cfg &
+echo $! > $SERVICE_DIR/aux_store.pid
+sleep 1

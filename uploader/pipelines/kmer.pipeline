@@ -1,0 +1,17 @@
+{ "file_name": "kmer.pipeline",
+  "name": "k-mer statistics",
+  "description": "Create k-mer statistics on a metagenomic sequence file.",
+  "parameters": [
+                   { "name": "metagenome",
+                     "title": "sequence file",
+                     "type": "aux-store-file",
+                     "file_type": "metagenome",
+                     "description": "sequence file to be analyzed" },
+                   { "name": "id",
+                     "title": "result id",
+                     "type": "text",
+                     "description": "unique identifier for this computation result" }
+                 ],
+  "submission_url": "http://140.221.92.115:7052/kmer/$id$/compute",
+  "status_url": "http://140.221.92.115:7052/kmer/$ID$/compute",
+  "result_url": "http://140.221.92.115:7052/kmer/$ID$" }

@@ -1,0 +1,18 @@
+["metagenome","genome","model","bacteria","plant","biochemistry","fermutation","subsystem","microbe"]
+
+{
+	"cv" : ["metagenome","genome","model","bacteria","plant","biochemistry","fermutation","subsystem","microbe"],
+	"hierachy" : {
+		   "model" : { metabolic : 1 , 
+		   	       subsystems : 1 ,
+		   },
+		   "metagenome" : { sequence : {
+						"WGS" : 1,
+						"Amplicon" : 1,
+		   		    	       }, 
+		   		    analysis : 1,
+		   		  },
+		   "genome" : { sequence : 1,
+		   	        analysis : 1, }
+	},
+}
