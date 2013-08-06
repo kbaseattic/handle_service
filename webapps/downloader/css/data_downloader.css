@@ -1,0 +1,52 @@
+/* this is from the kbase.us body */
+body {
+    /*font-family: Arial, Helvetica, sans-serif;*/
+}
+
+.container {
+    width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.type-widget {
+    display: inline-block;
+    width: auto;
+    margin: 0 10px;
+    text-align: center;
+}
+
+#type-table {
+    margin: 15px 0 50px 0;
+}
+
+.footer-area {
+    border-top: 4px solid #333;
+    padding: 20px;
+}
+.copyright {
+    text-align: center;
+    font-size: 12px;
+}
+.social:hover {
+    opacity: 0.8;
+    text-decoration: none; /* override default */
+}
+.doe-logo:hover {
+    text-decoration: none;
+}
+.sponsor {
+    font-size: 14px;
+    width: 380px;
+    margin: 10px auto;
+}
+#content {
+    margin-top: 40px;
+}
+
+#type-header {
+    margin: 20px 0 0 0px;
+}
+
+
+
