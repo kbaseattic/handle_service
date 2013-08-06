@@ -1,38 +1,37 @@
-TARGET ?= /kb/deployment
-DEPLOY_RUNTIME = /kb/runtime
-SERVICE = aux_store
-SERVICE_DIR = $(TARGET)/services/$(SERVICE)
-
-# to wrap scripts and deploy them to $(TARGET)/bin using tools in the dev_container
 TOP_DIR = ../..
-TOOLS_DIR = $(TOP_DIR)/tools
-WRAP_PERL_TOOL = wrap_perl
-WRAP_PERL_SCRIPT = bash $(TOOLS_DIR)/$(WRAP_PERL_TOOL).sh
-SRC_PERL = $(wildcard client/bin/*.pl)
+include $(TOP_DIR)/tools/Makefile.common
 
-.PHONY : test
+SRC_PERL = $(wildcard scripts/*.pl)
+BIN_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_PERL))))
+LIB_PERL = $(wildcard Bio-KBase-Auth/lib/Bio/KBase/*.pm)
+
+DEPLOY_RUNTIME ?= /kb/runtime
+TARGET ?= /kb/deployment
+DEPLOY_PERL = $(addprefix $(TARGET)/bin/,$(basename $(notdir $(SRC_PERL))))
+
+LIB_PATH = $(TARGET)/lib
 
 all: deploy
 
-deploy: deploy-client deploy-service
+deploy: deploy-libs deploy-scripts
 
-# deploy-all is depricted, consider removing it and using the deploy target
-deploy-all: deploy-service deploy-client
+deploy-libs:
+	cd Bio-KBase-Auth; \
+	mkdir -p $(KB_PERL_PATH); \
+	$(DEPLOY_RUNTIME)/bin/perl ./Build.PL ; \
+	$(DEPLOY_RUNTIME)/bin/perl ./Build installdeps --install_path lib=$(KB_PERL_PATH); \
+	$(DEPLOY_RUNTIME)/bin/perl ./Build install --install_path lib=$(KB_PERL_PATH) 
+	mkdir -p $(KB_PERL_PATH)/biokbase/auth; \
+	touch $(KB_PERL_PATH)/biokbase/__init__.py; \
+	touch $(KB_PERL_PATH)/biokbase/auth/__init__.py; \
+	cp python-libs/auth_token.py $(KB_PERL_PATH)/biokbase/auth
 
-deploy-service:
-	git submodule init
-	git submodule update
-	sh install.sh $(SERVICE_DIR) $(TARGET) prod
-
-deploy-service-test:
-	git submodule init
-	git submodule update
-	sh install.sh $(SERVICE_DIR) $(TARGET) test
-
-deploy-client: deploy-libs deploy-scripts deploy-docs
+deploy-scripts: deploy-perl-scripts deploy-python-scripts
+	
+deploy-perl-scripts:
 	export KB_TOP=$(TARGET); \
 	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
-	export KB_PERL_PATH=$(TARGET)/lib:$(TARGET)/lib/perl5 bash ; \
+	export KB_PERL_PATH=$(TARGET)/lib ; \
 	for src in $(SRC_PERL) ; do \
 		basefile=`basename $$src`; \
 		base=`basename $$src .pl`; \
@@ -41,19 +40,17 @@ deploy-client: deploy-libs deploy-scripts deploy-docs
 		$(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(TARGET)/bin/$$base ; \
 	done
 
-deploy-libs:
-	echo "deploy-libs not implemented yet"
-
-deploy-scripts:
-	echo "deploy-scripts not implemented yet"
-
-deploy-docs: build-docs
-	-mkdir -p $(SERVICE_DIR)/webroot
-	# $(DEPLOY_RUNTIME)/bin/pod2html -t "Aux Store API" client/spec/c/admImpl.pm > $(SERVICE_DIR)/webroot/aux_store.html
-
-build-docs:
-	# mkdir -p client/spec/c
-	# compile_typespec client/spec/adm.spec client/spec/c
+deploy-python-scripts:
+	export KB_TOP=$(TARGET); \
+	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
+	export KB_PYTHON_PATH=$(TARGET)/lib ; \
+	for src in $(SRC_PYTHON) ; do \
+		basefile=`basename $$src`; \
+		base=`basename $$src .py`; \
+		echo install $$src $$base ; \
+		cp $$src $(TARGET)/pybin ; \
+		$(WRAP_PYTHON_SCRIPT) "$(TARGET)/pybin/$$basefile" $(TARGET)/bin/$$base ; \
+	done 
 
 # Test Section
 TESTS = $(wildcard test/*.t)
