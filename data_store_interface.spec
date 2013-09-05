@@ -1,7 +1,7 @@
-/* The DSI module provides a programmatic interfact to a
-   remote file store.
+/* The DataStoreInterface module provides a programmatic
+   access to a remote file store.
 */
-module DSI {
+module DataStoreInterface {
 
 	/* Handle provides a unique reference that enables
 	   access to the data files through functions
@@ -20,11 +20,15 @@ module DSI {
 	} Handle;
 
 	
-	/* get_handle returns a Handle object with a url*/
-	funcdef get_handle(string service_name) returns (Handle h);
-	/* prepare_upload returns a Handle object with an ID */
-	funcdef prepare_upload(Handle h) returns (Handle h);
-	/* uploads a file and returns the handle */
+	/* new_handle returns a Handle object with a url and a node id */
+	funcdef new_handle(string service_name) returns (Handle h);
+
+	/* locate returns a url of a shock server near a service */
+	funcdef locate(string service_name) returns (string url, string type);
+
+	/* initialize_handle returns a Handle object with an ID. */
+	funcdef initialize_handle(Handle h1) returns (Handle h2);
+
 };
 
 /*
