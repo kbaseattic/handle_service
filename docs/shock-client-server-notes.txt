@@ -1,0 +1,35 @@
+To get shock server running
+
+1. change Makefile to indicate TEST or PROD
+
+2. create directories for TEST or PROD depending on makefile
+        mkdir /mnt/Shock/data
+        mkdir /mnt/Shock/logs
+        mkdir /mnt/Shock/site
+        mkdir /mnt/Shock/site/assets
+        mkdir /mnt/Shock/site/assets/misc
+        mkdir /kb/deployment/services/shock_service
+        mkdir /kb/deployment/services/shock_service/conf
+
+3. start the shock server
+        source /kb/deployment/user-env.sh
+        shock-server -conf=/kb/deployment/services/shock_service/conf/shock.cfg
+
+
+
+To get the shock client running
+
+1. need to hand edit the shock-client.cfg file to have the
+   location of the shock server and port.
+
+2. you need to put the shock-client.cfg file in your home
+   directory right now because the -conf flag doesn't work
+
+2. to run the shock-client
+        source /kb/deployment/user-env.sh
+        shock-client auth set
+        shock-client create
+
+        902983f4-07c1-4ddf-adaf-1e62a1571c70
+
+~   

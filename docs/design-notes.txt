@@ -1,0 +1,6 @@
+ok, what is going on. here is what we know.
+
+1) a client wants to upload data
+2) we want that data to go to a shock server near the service it is going to be used by.
+3) this implies that the upload method is called on the service object.
+4) the data store service should hand out the url of the service to upload to.
