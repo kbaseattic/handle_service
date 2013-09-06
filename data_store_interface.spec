@@ -31,16 +31,3 @@ module DataStoreInterface {
 
 };
 
-/*
-	so what should the upload function do, other than upload
-	the data to shock?
-
-	it could store information about the upload such as what
-	is contained in the handle.
-
-	think about the remaining methods:
-	- download does not require anything not in the handle
-	- is_transfer_valid requires client user to provide the
-	  checksum. this could be done in the service Impl.
-	- delete could also be done in the Impl.
-*/
