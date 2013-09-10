@@ -5,6 +5,8 @@ BEGIN {
 	use_ok( Digest::MD5 );
 }
 
+$url = "http://localhost:9998";
+
 can_ok("Bio::KBase::DSI", qw(
 	new_handle
 	locate
@@ -16,7 +18,10 @@ can_ok("Bio::KBase::DSI", qw(
 
 isa_ok ($obj = Bio::KBase::DSI->new(), Bio::KBase::DSI);
 
-ok ($h = $obj->new_handle(), "new_handle returns defined");
+# this fails right now because under the hood the DSI object is
+# delegating to a DataStoreInterface object, and the DataStoreInterface
+# object isn't getting a valid url to connect to the service.
+ok ($h = $obj->new_handle("ServiceName"), "new_handle returns defined");
 
 ok ($h = $obj->upload($file_name.upload), "upload returns a handle");
 
