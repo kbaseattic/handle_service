@@ -4,3 +4,21 @@ ok, what is going on. here is what we know.
 2) we want that data to go to a shock server near the service it is going to be used by.
 3) this implies that the upload method is called on the service object.
 4) the data store service should hand out the url of the service to upload to.
+
+OK, so the general flow of things goes like this.
+
+A user instanciates a data store client object. Next, the user requests a handle. This is done by calling new_handle.
+
+	$h = $ds->new_handle();
+
+At this point, the handle is empty. Now the user has a choice. The user can simply initialize the handle. Initializing the handle at this point will result in the a an empty node being created on the default shock server. The handle would contain a node id from the default shock server, and the handle would contain the url of the default shock server.
+
+	$h = $ds->initialize_handle($h);
+
+Alternatively, the user can call the localize method, passing in the name of a service. This results in an attempt to find a shock server near the service. If a shock service near the service can not be found, the default shock server is used. 
+
+	$h = $ds->localize_handle($service_name, $h);
+	$h = $ds->initialize_handle($h);
+
+	# $h = $ds->initialize_handle($ds->localize($service_name, $h));
+
