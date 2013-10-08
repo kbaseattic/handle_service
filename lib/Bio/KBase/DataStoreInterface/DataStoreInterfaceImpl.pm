@@ -51,6 +51,7 @@ sub new
     };
     bless $self, $class;
     #BEGIN_CONSTRUCTOR
+	# TODO need to solve this.
 	$self->{registry} = {};
     #END_CONSTRUCTOR
 
@@ -67,7 +68,7 @@ sub new
 
 =head2 new_handle
 
-  $h = $obj->new_handle($service_name)
+  $h = $obj->new_handle()
 
 =over 4
 
@@ -76,7 +77,6 @@ sub new
 =begin html
 
 <pre>
-$service_name is a string
 $h is a Handle
 Handle is a reference to a hash where the following keys are defined:
 	file_name has a value which is a string
@@ -90,7 +90,6 @@ Handle is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$service_name is a string
 $h is a Handle
 Handle is a reference to a hash where the following keys are defined:
 	file_name has a value which is a string
@@ -114,26 +113,14 @@ new_handle returns a Handle object with a url and a node id
 sub new_handle
 {
     my $self = shift;
-    my($service_name) = @_;
-
-    my @_bad_arguments;
-    (!ref($service_name)) or push(@_bad_arguments, "Invalid type for argument \"service_name\" (value was \"$service_name\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to new_handle:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'new_handle');
-    }
 
     my $ctx = $Bio::KBase::DataStoreInterface::Service::CallContext;
     my($h);
     #BEGIN new_handle
 
-        # look to see if a shock server near the service is available
-        # otherwise, use the general kbase shock server
         $h->{file_name} = undef;
         $h->{id} = undef;
-	($h->{url}, $h->{type}) = locate($self, $service_name);
-	$h = initialize_handle($self, $h);
+
     #END new_handle
     my @_bad_returns;
     (ref($h) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h\" (value was \"$h\")");
@@ -148,9 +135,9 @@ sub new_handle
 
 
 
-=head2 locate
+=head2 localize
 
-  $url, $type = $obj->locate($service_name)
+  $h2 = $obj->localize($service_name, $h1)
 
 =over 4
 
@@ -160,8 +147,13 @@ sub new_handle
 
 <pre>
 $service_name is a string
-$url is a string
-$type is a string
+$h1 is a Handle
+$h2 is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
 
 </pre>
 
@@ -170,8 +162,13 @@ $type is a string
 =begin text
 
 $service_name is a string
-$url is a string
-$type is a string
+$h1 is a Handle
+$h2 is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
 
 
 =end text
@@ -180,30 +177,36 @@ $type is a string
 
 =item Description
 
-locate returns a url of a shock server near a service
+The localize function attempts to locate a shock server near the service.
+The localize function must be called before the Handle is initialized
+becuase when the handle is initialized, it is given a node id that maps
+to the shock server where the node was created.
 
 =back
 
 =cut
 
-sub locate
+sub localize
 {
     my $self = shift;
-    my($service_name) = @_;
+    my($service_name, $h1) = @_;
 
     my @_bad_arguments;
     (!ref($service_name)) or push(@_bad_arguments, "Invalid type for argument \"service_name\" (value was \"$service_name\")");
+    (ref($h1) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h1\" (value was \"$h1\")");
     if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to locate:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	my $msg = "Invalid arguments passed to localize:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'locate');
+							       method_name => 'localize');
     }
 
     my $ctx = $Bio::KBase::DataStoreInterface::Service::CallContext;
-    my($url, $type);
-    #BEGIN locate
-        my $registry = $self->{registry};
-        if (exists $registry->{$service_name}) {
+    my($h2);
+    #BEGIN localize
+	$h2 = $h1;
+	my ($url, $type);
+	my $registry = $self->{registry};
+	if (exists $registry->{$service_name}) {
                 $type = $registry->{$service_name}->{type};
                 $url = $registry->{$service_name}->{url};
         }
@@ -211,16 +214,20 @@ sub locate
                 $type = 'shock';
                 $url = $default_shock;
         }
-    #END locate
+	unless (defined $h2->{url}) {
+		$h2->{url} = $url;
+		$h2->{type} = $type;
+	}
+
+    #END localize
     my @_bad_returns;
-    (!ref($url)) or push(@_bad_returns, "Invalid type for return variable \"url\" (value was \"$url\")");
-    (!ref($type)) or push(@_bad_returns, "Invalid type for return variable \"type\" (value was \"$type\")");
+    (ref($h2) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h2\" (value was \"$h2\")");
     if (@_bad_returns) {
-	my $msg = "Invalid returns passed to locate:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	my $msg = "Invalid returns passed to localize:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'locate');
+							       method_name => 'localize');
     }
-    return($url, $type);
+    return($h2);
 }
 
 
