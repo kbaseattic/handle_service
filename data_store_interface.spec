@@ -21,10 +21,14 @@ module DataStoreInterface {
 
 	
 	/* new_handle returns a Handle object with a url and a node id */
-	funcdef new_handle(string service_name) returns (Handle h);
+	funcdef new_handle() returns (Handle h);
 
-	/* locate returns a url of a shock server near a service */
-	funcdef locate(string service_name) returns (string url, string type);
+	/* The localize function attempts to locate a shock server near the service.
+	   The localize function must be called before the Handle is initialized
+	   becuase when the handle is initialized, it is given a node id that maps
+	   to the shock server where the node was created.
+	 */
+	funcdef localize(string service_name, Handle h1) returns (Handle h2);
 
 	/* initialize_handle returns a Handle object with an ID. */
 	funcdef initialize_handle(Handle h1) returns (Handle h2);
