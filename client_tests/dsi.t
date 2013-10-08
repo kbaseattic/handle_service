@@ -1,4 +1,5 @@
 use Test::More;
+my $file_name = "";
 
 BEGIN {
 	use_ok( Bio::KBase::DSI );
