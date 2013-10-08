@@ -2,7 +2,7 @@ use Test::More;
 
 BEGIN {
 	use_ok( Bio::KBase::DSI );
-	use_ok( Digest::MD5 );
+	use_ok( Digest::MD5, qw(md5 md5_hex md5_base64) );
 }
 
 can_ok("Bio::KBase::DSI", qw(
