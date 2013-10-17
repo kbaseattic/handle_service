@@ -120,6 +120,7 @@ sub new_handle
 
         $h->{file_name} = undef;
         $h->{id} = undef;
+	$h = $self->initialize_handle($h);
 
     #END new_handle
     my @_bad_returns;
