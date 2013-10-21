@@ -1,9 +1,14 @@
 package Bio::KBase::DSI;
 use strict;
+
 use Bio::KBase::DataStoreInterface::Client;
+
 use LWP::UserAgent;
+use HTTP::Request::Common; # qw($DYNAMIC_FILE_UPLOAD);
+
 use JSON;
 use Data::Dumper;
+use File::Basename;
 
 =head1 Methods
 
@@ -18,7 +23,6 @@ This creates a new data store interface object. It takes as an optional paramete
 sub new {
 	my $class = shift;
 	my $url   =  @_ ? shift : undef;
-
 	my $self  = bless {}, $class;
 
 	# if a url is passed in, this is the url to instanciate
@@ -30,7 +34,6 @@ sub new {
 	$self->{ua}->env_proxy;
 	
 	if( defined $self->{url} ) {
-	  print "creating client with endpoint: $self->{url}\n";
 	  $self->{dsi} =
 	    Bio::KBase::DataStoreInterface::Client->new($url);
 	}
@@ -60,28 +63,48 @@ sub upload {
 	my $infile = shift or die "infle not passed";
 	-e $infile         or die "$infile does not exist";
 
-	my $handle;
-	if ( defined $self->{url} ) {
-	  $handle =
-	    $self->new_handle( $self->{url} )
-		or die "could not get new handle";
-	}
-	else {
-	  $handle =
-	    $self->new_handle()
-		or die "could not get new handle";
-	}
-	
 
-	# not implemented yet
-	warn "WARNING: upload not implemented";
+	my $handle;
+	$handle =
+	  $self->new_handle()
+	    or die "could not get new handle";
+	$handle = $self->localize_handle(ref $self, $handle);
+	$handle = $self->initialize_handle($handle);
+
+	# i would like to do this using HTTP::Request::Common
+	# and the PUT method, but I couldn't figure out the
+	# syntax.
+	my $url = $handle->{url} . "/node/" . $handle->{id};
+	my $cmd = "curl -X PUT -F upload=\@$infile $url";
+
+	my $json = `$cmd 2> /dev/null`;
+	die "failed to run: $cmd\n$!" if $? == -1;
+
+	my $ref = decode_json $json;
+	my $remote_md5 =
+	  $ref->{data}->{file}->{checksum}->{md5};
+	my $remote_sha1 =
+	  $ref->{data}->{file}->{checksum}->{sha1};
+	
+	die "looks like upload failed with command: $cmd\n" ,
+	  "no md5 returned from remote server"
+	    unless $remote_md5;
+
+
+	$handle->{remote_md5} = $remote_md5;
+	$handle->{remote_sha1} = $remote_sha1;
+	$handle->{file_name} = basename ($infile);
+
+	return $handle;
 }
 
 =over
 
 =item C<download>
 
-Downloads the file associated with the handle.
+Downloads the file associated with the handle. The download method takes two
+parameters. The first is the handle, the second is the name of the file to
+put the downloaded data into.
 
 =back
 
@@ -99,8 +122,21 @@ sub download {
 	$handle->{url}        or die "no url in handle";
 	defined $outfile      or die "outfile not defined";
 
-	# not implemented yet
-	warn "WARNING: download not implemented";
+	my($filename, $path) = fileparse($outfile);
+	die "$path is not writable" unless -d $path && -w $path && -x $path;
+	die "$outfile already exists" if -e $outfile;
+
+	# i would like to do this using HTTP::Request::Common
+	# and the GET method, but I couldn't figure out the
+	# syntax for the PUT above, so using curl again.
+
+	my $url = $handle->{url} . "/node/" . $handle->{id};
+	my $cmd = "curl -X GET $url/?download > $outfile";
+
+	my $json = `$cmd 2> /dev/null`;
+	die "failed to run: $cmd\n$!" if $? == -1;
+
+	return $handle;
 }
 
 sub new_handle {
@@ -108,15 +144,17 @@ sub new_handle {
         $self->{dsi}->new_handle(@_);
 }
 
-sub locate {
+sub localize_handle {
 	my $self = shift;
-	$self->{dsi}->new()->locate(@_);
+	$self->{dsi}->localize_handle(@_);
 }
 
 sub initialize_handle {
 	my $self = shift;
 	$self->{dsi}->initialize_handle(@_);
 }
+
+
 
 =head1 Authors
 
