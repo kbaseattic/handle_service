@@ -11,7 +11,7 @@ if (! exists $ENV{KB_DEPLOYMENT_CONFIG} ) {
 	$ENV{KB_DEPLOYMENT_CONFIG} = "deploy.cfg";
 } 
 $cfg = Config::Simple->new($ENV{KB_DEPLOYMENT_CONFIG});
-$url = "http://localhost:9997";
+$url = "http://localhost:9998";
 
 
 can_ok("Bio::KBase::DataStoreInterface::Client", qw(
