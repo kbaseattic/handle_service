@@ -120,6 +120,7 @@ sub new_handle
 
         $h->{file_name} = undef;
         $h->{id} = undef;
+        $h = $self->localize_handle(ref $self, $h);
 	$h = $self->initialize_handle($h);
 
     #END new_handle
@@ -136,9 +137,9 @@ sub new_handle
 
 
 
-=head2 localize
+=head2 localize_handle
 
-  $h2 = $obj->localize($service_name, $h1)
+  $h2 = $obj->localize_handle($service_name, $h1)
 
 =over 4
 
@@ -178,16 +179,17 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
-The localize function attempts to locate a shock server near the service.
-The localize function must be called before the Handle is initialized
-becuase when the handle is initialized, it is given a node id that maps
-to the shock server where the node was created.
+The localize_handle function attempts to locate a shock server near
+the service. The localize_handle function must be called before the
+           Handle is initialized becuase when the handle is initialized, it is
+           given a node id that maps to the shock server where the node was
+           created.
 
 =back
 
 =cut
 
-sub localize
+sub localize_handle
 {
     my $self = shift;
     my($service_name, $h1) = @_;
@@ -196,14 +198,14 @@ sub localize
     (!ref($service_name)) or push(@_bad_arguments, "Invalid type for argument \"service_name\" (value was \"$service_name\")");
     (ref($h1) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h1\" (value was \"$h1\")");
     if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to localize:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	my $msg = "Invalid arguments passed to localize_handle:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'localize');
+							       method_name => 'localize_handle');
     }
 
     my $ctx = $Bio::KBase::DataStoreInterface::Service::CallContext;
     my($h2);
-    #BEGIN localize
+    #BEGIN localize_handle
 	$h2 = $h1;
 	my ($url, $type);
 	my $registry = $self->{registry};
@@ -220,13 +222,13 @@ sub localize
 		$h2->{type} = $type;
 	}
 
-    #END localize
+    #END localize_handle
     my @_bad_returns;
     (ref($h2) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h2\" (value was \"$h2\")");
     if (@_bad_returns) {
-	my $msg = "Invalid returns passed to localize:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	my $msg = "Invalid returns passed to localize_handle:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'localize');
+							       method_name => 'localize_handle');
     }
     return($h2);
 }
