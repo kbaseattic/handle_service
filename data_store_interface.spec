@@ -7,16 +7,21 @@ module DataStoreInterface {
 	   access to the data files through functions
 	   provided as part of the DSI. In the case of using
 	   shock, the id is the node id. In the case of using
-	   shock the value of type is “shock”. In the future 
+	   shock the value of type is shock. In the future 
 	   these values should enumerated. The value of url is
 	   the http address of the shock server, including the
 	   protocol (http or https) and if necessary the port.
+	   The values of remote_md5 and remote_sha1 are those
+	   computed on the file in the remote data store. These
+	   can be used to verify uploads and downloads.
 	*/
 	typedef structure {
 		string file_name;
 		string id;
 		string type;
 		string url;
+		string remote_md5;
+		string remote_sha1;
 	} Handle;
 
 	
