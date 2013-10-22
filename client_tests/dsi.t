@@ -63,10 +63,7 @@ can_ok("Bio::KBase::DSI", qw(
 
 isa_ok ($obj = Bio::KBase::DSI->new($url), Bio::KBase::DSI);
 
-# this fails right now because under the hood the DSI object is
-# delegating to a DataStoreInterface object, and the DataStoreInterface
-# object isn't getting a valid url to connect to the service.
-ok ($h = $obj->new_handle("ServiceName"), "new_handle returns defined");
+ok ($h = $obj->new_handle(), "new_handle returns defined");
 
 ok (exists $h->{url}, "url in handle exists");
 
