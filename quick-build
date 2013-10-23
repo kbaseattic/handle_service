@@ -1,0 +1,9 @@
+/kb/deployment/services/data_store_interface/stop_service
+cd ../..
+source user-env.sh
+make
+make deploy
+source /kb/deployment/user-env.sh
+/kb/deployment/services/data_store_interface/start_service &
+cd modules
+cd data_store

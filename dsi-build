@@ -1,0 +1,5 @@
+/kb/deployment/services/data_store_interface/stop_service
+source user-env.sh
+cp lib/Bio/KBase/DSI.pm /kb/deployment/lib/Bio/KBase
+source /kb/deployment/user-env.sh
+/kb/deployment/services/data_store_interface/start_service &
