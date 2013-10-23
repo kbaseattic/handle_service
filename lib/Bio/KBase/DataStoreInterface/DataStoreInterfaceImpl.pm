@@ -83,6 +83,8 @@ Handle is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
 
 </pre>
 
@@ -96,6 +98,8 @@ Handle is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
 
 
 =end text
@@ -156,6 +160,8 @@ Handle is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
 
 </pre>
 
@@ -171,6 +177,8 @@ Handle is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
 
 
 =end text
@@ -254,6 +262,8 @@ Handle is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
 
 </pre>
 
@@ -268,6 +278,8 @@ Handle is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
 
 
 =end text
@@ -371,10 +383,13 @@ Handle provides a unique reference that enables
 access to the data files through functions
 provided as part of the DSI. In the case of using
 shock, the id is the node id. In the case of using
-shock the value of type is “shock”. In the future 
+shock the value of type is shock. In the future 
 these values should enumerated. The value of url is
 the http address of the shock server, including the
 protocol (http or https) and if necessary the port.
+The values of remote_md5 and remote_sha1 are those
+computed on the file in the remote data store. These
+can be used to verify uploads and downloads.
 
 
 =item Definition
@@ -387,6 +402,8 @@ file_name has a value which is a string
 id has a value which is a string
 type has a value which is a string
 url has a value which is a string
+remote_md5 has a value which is a string
+remote_sha1 has a value which is a string
 
 </pre>
 
@@ -399,6 +416,8 @@ file_name has a value which is a string
 id has a value which is a string
 type has a value which is a string
 url has a value which is a string
+remote_md5 has a value which is a string
+remote_sha1 has a value which is a string
 
 
 =end text
