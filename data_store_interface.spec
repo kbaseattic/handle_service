@@ -26,7 +26,7 @@ module DataStoreInterface {
 
 	
 	/* new_handle returns a Handle object with a url and a node id */
-	funcdef new_handle() returns (Handle h);
+	funcdef new_handle() returns (Handle h) authentication required;
 
 	/* The localize_handle function attempts to locate a shock server near
  	   the service. The localize_handle function must be called before the
@@ -38,7 +38,7 @@ module DataStoreInterface {
 		returns (Handle h2);
 
 	/* initialize_handle returns a Handle object with an ID. */
-	funcdef initialize_handle(Handle h1) returns (Handle h2);
+	funcdef initialize_handle(Handle h1) returns (Handle h2) authentication required;
 
 };
 
