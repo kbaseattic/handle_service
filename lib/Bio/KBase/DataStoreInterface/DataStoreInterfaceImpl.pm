@@ -27,16 +27,13 @@ Log::Log4perl->easy_init($INFO);
 
 our $cfg = {};
 our $default_shock;
-our $client_cfg;
 
 if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $cfg = new Config::Simple($ENV{KB_DEPLOYMENT_CONFIG}) or
 	die "could not construct new Config::Simple object";
     $default_shock = $cfg->param('data_store_interface.default-shock-server');
-    $client_cfg = $cfg->param('data_store_interface.shock-client-config');
     INFO "$$ reading config from $ENV{KB_DEPLOYMENT_CONFIG}";
     INFO "$$ using $default_shock as the default shock server";
-    INFO "$$ using $client_cfg as the shock-client config";
 }
 else {
     die "could not find KB_DEPLOYMENT_CONFIG";
@@ -315,8 +312,7 @@ sub initialize_handle
 
 	$h2 = $h1;
 
-	my $cmd = "curl -H \'Authorization: OAuth " . $ctx->{token} . "\' -X POST $default_shock/node";
-	INFO "$$ running cmd: $cmd\n";
+	my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -X POST $default_shock/node";
 	my $json_node = capture($cmd);
         my $ref = decode_json $json_node;
 
