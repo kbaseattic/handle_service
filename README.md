@@ -1,4 +1,4 @@
-data_store
+handle_service
 ==========
 
 An application programming interface for providing a typed object Handle that can be used as a reference to a node in shock.

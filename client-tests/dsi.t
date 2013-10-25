@@ -19,8 +19,8 @@ if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
 }
 else {
     $cfg = new Config::Simple(syntax=>'ini');
-    $cfg->param('data_store_interface.test-service-host', '127.0.0.1');
-    $cfg->param('data_store_interface.test-service-port', '1212');
+    $cfg->param('handle_service.test-service-host', '127.0.0.1');
+    $cfg->param('handle_service.test-service-port', '1212');
 }
 
 
@@ -30,32 +30,32 @@ my $local_md5 = Digest::MD5->new->addfile($fh)->hexdigest;
 close($fh);
 
 
-my $url = "http://" . $cfg->param('data_store_interface.test-service-host') . 
-	  ":" . $cfg->param('data_store_interface.test-service-port');
+my $url = "http://" . $cfg->param('handle_service.test-service-host') . 
+	  ":" . $cfg->param('handle_service.test-service-port');
 
 
-# the question here becomes which Bio::KBase::DSI.pm file is going
+# the question here becomes which Bio::KBase::HandleService.pm file is going
 # to be loaded. I shouldn't care. The envoronment should dictate
 # which file gets loaded based on the PERL5LIB path. When I'm developing,
 # it should be the one in the dev_container. When Mriiam tests, it should
 # be in the deployment. So it comes from user-env.sh.
 
-# what does this really mean? The url and port are passed to the DSI
-# constructor. That url is passed to the DataStoreInterface constructor.
-# The url must represent the host and port that the DataStoreInterfaceImpl
+# what does this really mean? The url and port are passed to the HandleService
+# constructor. That url is passed to the AbstractHandle constructor.
+# The url must represent the host and port that the AbstractHandleImpl
 # class is loaded on.
 
 # and I want the url and port to come from the deploy.cfg or deployment.cfg
 # files.
 
 BEGIN {
-	use_ok( Bio::KBase::DSI );
+	use_ok( Bio::KBase::HandleService );
 	use_ok( Digest::MD5, qw(md5 md5_hex md5_base64) );
 }
 
 ok(system("curl -h > /dev/null 2>&1") == 0, "can run curl");
 
-can_ok("Bio::KBase::DSI", qw(
+can_ok("Bio::KBase::HandleService", qw(
 	new_handle
 	localize_handle
 	initialize_handle
@@ -64,7 +64,7 @@ can_ok("Bio::KBase::DSI", qw(
 );
 
 
-isa_ok ($obj = Bio::KBase::DSI->new($url), Bio::KBase::DSI);
+isa_ok ($obj = Bio::KBase::HandleService->new($url), Bio::KBase::HandleService);
 
 ok ($h = $obj->new_handle(), "new_handle returns defined");
 

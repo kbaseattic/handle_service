@@ -1,4 +1,4 @@
-package Bio::KBase::DataStoreInterface::DataStoreInterfaceImpl;
+package Bio::KBase::AbstractHandle::AbstractHandleImpl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
@@ -17,7 +17,6 @@ access to a remote file store.
 =cut
 
 #BEGIN_HEADER
-# read the config file into this package.
 use Data::Dumper;
 use Config::Simple;
 use IPC::System::Simple qw(capture);
@@ -30,7 +29,7 @@ our $default_shock;
 
 if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $cfg = new Config::Simple($ENV{KB_DEPLOYMENT_CONFIG}) or
-	die "could not construct new Config::Simple object";
+        die "could not construct new Config::Simple object";
     $default_shock = $cfg->param('handle_service.default-shock-server');
     INFO "$$ reading config from $ENV{KB_DEPLOYMENT_CONFIG}";
     INFO "$$ using $default_shock as the default shock server";
@@ -38,7 +37,6 @@ if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
 else {
     die "could not find KB_DEPLOYMENT_CONFIG";
 }
-
 #END_HEADER
 
 sub new
@@ -48,10 +46,12 @@ sub new
     };
     bless $self, $class;
     #BEGIN_CONSTRUCTOR
-	# TODO need to solve this.
-	$self->{registry} = {};
-	system("curl -h > /dev/null 2>&1") == 0  or
-		die "curl not found, maybe you need to install it";
+
+        # TODO need to solve the registry thing
+        $self->{registry} = {};
+        system("curl -h > /dev/null 2>&1") == 0  or
+            die "curl not found, maybe you need to install it";
+
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
@@ -117,14 +117,14 @@ sub new_handle
 {
     my $self = shift;
 
-    my $ctx = $Bio::KBase::DataStoreInterface::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($h);
     #BEGIN new_handle
 
         $h->{file_name} = undef;
         $h->{id} = undef;
         $h = $self->localize_handle(ref $self, $h);
-	$h = $self->initialize_handle($h);
+        $h = $self->initialize_handle($h);
 
     #END new_handle
     my @_bad_returns;
@@ -210,13 +210,14 @@ sub localize_handle
 							       method_name => 'localize_handle');
     }
 
-    my $ctx = $Bio::KBase::DataStoreInterface::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($h2);
     #BEGIN localize_handle
-	$h2 = $h1;
-	my ($url, $type);
-	my $registry = $self->{registry};
-	if (exists $registry->{$service_name}) {
+
+        $h2 = $h1;
+        my ($url, $type);
+        my $registry = $self->{registry};
+        if (exists $registry->{$service_name}) {
                 $type = $registry->{$service_name}->{type};
                 $url = $registry->{$service_name}->{url};
         }
@@ -224,10 +225,10 @@ sub localize_handle
                 $type = 'shock';
                 $url = $default_shock;
         }
-	unless (defined $h2->{url}) {
-		$h2->{url} = $url;
-		$h2->{type} = $type;
-	}
+        unless (defined $h2->{url}) {
+                $h2->{url} = $url;
+                $h2->{type} = $type;
+        }
 
     #END localize_handle
     my @_bad_returns;
@@ -306,17 +307,18 @@ sub initialize_handle
 							       method_name => 'initialize_handle');
     }
 
-    my $ctx = $Bio::KBase::DataStoreInterface::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($h2);
     #BEGIN initialize_handle
 
-	$h2 = $h1;
+        $h2 = $h1;
 
-	my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -X POST $default_shock/node";
-	my $json_node = capture($cmd);
+        my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -X POST $default_shock/node";
+        my $json_node = capture($cmd);
         my $ref = decode_json $json_node;
 
         $h2->{id} = $ref->{data}->{id} or die "could not find node id in $json_node";
+
 
     #END initialize_handle
     my @_bad_returns;
@@ -380,7 +382,7 @@ sub version {
 
 Handle provides a unique reference that enables
 access to the data files through functions
-provided as part of the DSI. In the case of using
+provided as part of the HandleService. In the case of using
 shock, the id is the node id. In the case of using
 shock the value of type is shock. In the future 
 these values should enumerated. The value of url is

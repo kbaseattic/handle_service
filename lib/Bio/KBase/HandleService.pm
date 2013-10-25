@@ -1,7 +1,7 @@
-package Bio::KBase::DSI;
+package Bio::KBase::HandleService;
 use strict;
 
-use Bio::KBase::DataStoreInterface::Client;
+use Bio::KBase::AbstractHandle::Client;
 use Bio::KBase::AuthToken;
 
 use LWP::UserAgent;
@@ -27,8 +27,8 @@ sub new {
 	my $self  = bless {}, $class;
 
 	# if a url is passed in, this is the url to instanciate
-	# a DataStoreInterface client object. It reflects the
-	# server that the DataStoreInterfaceImpl is running on.
+	# a AbstractHandle client object. It reflects the
+	# server that the AbstractHandleImpl is running on.
 
 	$self->{url} = $url;
 	$self->{ua} = LWP::UserAgent->new;
@@ -36,12 +36,12 @@ sub new {
 	
 	if( defined $self->{url} ) {
 	  $self->{dsi} =
-	    Bio::KBase::DataStoreInterface::Client->new($url);
+	    Bio::KBase::AbstractHandle::Client->new($url);
 	}
 	else {
 	  # print "creating client with default endpoint\n";
 	  $self->{dsi} =
-	    Bio::KBase::DataStoreInterface::Client->new();
+	    Bio::KBase::AbstractHandle::Client->new();
 	}
 
 	return $self;
@@ -51,7 +51,7 @@ sub new {
 
 =item C<upload>
 
-Uploads the file. Calls the DataStoreInterface new_handle method, then uses the node id and the url in the new handle to upload the file.
+Uploads the file. Calls the AbstractHandle new_handle method, then uses the node id and the url in the new handle to upload the file.
 
 =back
 

@@ -6,10 +6,10 @@ DEPLOY_RUNTIME ?= /kb/runtime
 TARGET ?= /kb/deployment
 include $(TOP_DIR)/tools/Makefile.common
 
-SERVICE_SPEC = data_store_interface.spec	
-SERVICE_NAME = DataStoreInterface
+SERVICE_SPEC = handle_service.spec	
+SERVICE_NAME = AbstractHandle
 SERVICE_PORT = 1212 
-SERVICE_DIR  = data_store_interface
+SERVICE_DIR  = handle_service
 
 ifeq ($(SELF_URL),)
 	SELF_URL = http://localhost:$(SERVICE_PORT)

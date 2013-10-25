@@ -1,11 +1,11 @@
-/* The DataStoreInterface module provides a programmatic
+/* The AbstractHandle module provides a programmatic
    access to a remote file store.
 */
-module DataStoreInterface {
+module AbstractHandle {
 
 	/* Handle provides a unique reference that enables
 	   access to the data files through functions
-	   provided as part of the DSI. In the case of using
+	   provided as part of the HandleService. In the case of using
 	   shock, the id is the node id. In the case of using
 	   shock the value of type is shock. In the future 
 	   these values should enumerated. The value of url is
