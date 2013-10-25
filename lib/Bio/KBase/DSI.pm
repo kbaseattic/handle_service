@@ -2,6 +2,7 @@ package Bio::KBase::DSI;
 use strict;
 
 use Bio::KBase::DataStoreInterface::Client;
+use Bio::KBase::AuthToken;
 
 use LWP::UserAgent;
 use HTTP::Request::Common; # qw($DYNAMIC_FILE_UPLOAD);
@@ -38,7 +39,7 @@ sub new {
 	    Bio::KBase::DataStoreInterface::Client->new($url);
 	}
 	else {
-	  print "creating client with default endpoint\n";
+	  # print "creating client with default endpoint\n";
 	  $self->{dsi} =
 	    Bio::KBase::DataStoreInterface::Client->new();
 	}
@@ -74,8 +75,12 @@ sub upload {
 	# i would like to do this using HTTP::Request::Common
 	# and the PUT method, but I couldn't figure out the
 	# syntax.
+
+	my $tok = Bio::KBase::AuthToken->new();
+	# print Dumper $tok;
+
 	my $url = $handle->{url} . "/node/" . $handle->{id};
-	my $cmd = "curl -X PUT -F upload=\@$infile $url";
+	my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X PUT -F upload=\@$infile $url";
 
 	my $json = `$cmd 2> /dev/null`;
 	die "failed to run: $cmd\n$!" if $? == -1;
@@ -129,9 +134,10 @@ sub download {
 	# i would like to do this using HTTP::Request::Common
 	# and the GET method, but I couldn't figure out the
 	# syntax for the PUT above, so using curl again.
+	my $tok = Bio::KBase::AuthToken->new();
 
 	my $url = $handle->{url} . "/node/" . $handle->{id};
-	my $cmd = "curl -X GET $url/?download > $outfile";
+	my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X GET $url/?download > $outfile";
 
 	my $json = `$cmd 2> /dev/null`;
 	die "failed to run: $cmd\n$!" if $? == -1;
