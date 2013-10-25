@@ -53,6 +53,8 @@ sub new
     #BEGIN_CONSTRUCTOR
 	# TODO need to solve this.
 	$self->{registry} = {};
+	system("curl -h > /dev/null 2>&1") == 0  or
+		die "curl not found, maybe you need to install it";
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
@@ -313,11 +315,12 @@ sub initialize_handle
 
 	$h2 = $h1;
 
-        my $cmd = "shock-client";
-        my $json_node = capture("shock-client", "create", "-conf=$client_cfg");
+	my $cmd = "curl -H \'Authorization: OAuth " . $ctx->{token} . "\' -X POST $default_shock/node";
+	INFO "$$ running cmd: $cmd\n";
+	my $json_node = capture($cmd);
         my $ref = decode_json $json_node;
 
-        $h2->{id} = $ref->{id} or die "could not find node id in $json_node";
+        $h2->{id} = $ref->{data}->{id} or die "could not find node id in $json_node";
 
     #END initialize_handle
     my @_bad_returns;
