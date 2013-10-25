@@ -22,3 +22,15 @@ Alternatively, the user can call the localize method, passing in the name of a s
 
 	# $h = $ds->initialize_handle($ds->localize($service_name, $h));
 
+AUTHENTICATION
+
+The primary question becomes is authentication required. Let's just assume
+for the moment it is. If we solve this, then allowing unauthenticated traffic
+is easy.
+
+The client method get_handle is declared as authention required.
+Presumably the get_handle in the DataStoreInterfaceImpl will do the right
+thing. When the constructor is called, it will look in the environment for
+the token, otherwise fail.
+
+
