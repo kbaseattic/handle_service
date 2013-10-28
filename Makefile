@@ -8,7 +8,7 @@ include $(TOP_DIR)/tools/Makefile.common
 
 SERVICE_SPEC = handle_service.spec	
 SERVICE_NAME = AbstractHandle
-SERVICE_PORT = 1212 
+SERVICE_PORT = 7109 
 SERVICE_DIR  = handle_service
 
 ifeq ($(SELF_URL),)

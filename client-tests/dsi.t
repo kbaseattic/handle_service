@@ -19,8 +19,8 @@ if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
 }
 else {
     $cfg = new Config::Simple(syntax=>'ini');
-    $cfg->param('handle_service.test-service-host', '127.0.0.1');
-    $cfg->param('handle_service.test-service-port', '1212');
+    $cfg->param('handle_service.service-host', '127.0.0.1');
+    $cfg->param('handle_service.service-port', '7109');
 }
 
 
@@ -30,8 +30,8 @@ my $local_md5 = Digest::MD5->new->addfile($fh)->hexdigest;
 close($fh);
 
 
-my $url = "http://" . $cfg->param('handle_service.test-service-host') . 
-	  ":" . $cfg->param('handle_service.test-service-port');
+my $url = "http://" . $cfg->param('handle_service.service-host') . 
+	  ":" . $cfg->param('handle_service.service-port');
 
 
 # the question here becomes which Bio::KBase::HandleService.pm file is going
