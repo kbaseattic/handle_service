@@ -138,8 +138,8 @@ dist-r-client:
 
 # Test Section
 
-test: test-client test-scripts test-service
-	@echo "running client and script tests"
+test: test-client 
+	@echo "done running client tests"
 
 # test-all is deprecated. 
 # test-all: test-client test-scripts test-service
