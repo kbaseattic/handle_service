@@ -34,7 +34,7 @@ module AbstractHandle {
 	   given a node id that maps to the shock server where the node was
 	   created.
 	 */
-	funcdef localize_handle(string service_name, Handle h1)
+	funcdef localize_handle(Handle h1, string service_name)
 		returns (Handle h2);
 
 	/* initialize_handle returns a Handle object with an ID. */
@@ -59,14 +59,14 @@ module AbstractHandle {
 	   to be a safe assumption that the metadata won't exceed several
 	   megabytes in size.
 	*/
-	funcdef upload_metadata(string metadata_file) returns(Handle h)
+	funcdef upload_metadata(string infile) returns(Handle h)
 		authentication required;
-	funcdef download_metadata(Handle h) returns()
+	funcdef download_metadata(Handle h, string outfile) returns()
 		authentication required;
 
-	funcdef add_metadata(Handle h) returns ()
+	funcdef add_metadata(Handle h, string infile) returns ()
 		authentication required;
-	funcdef add_data(Handle h) returns()
+	funcdef add_data(Handle h, string infile) returns()
 		authentication required;
 };
 
