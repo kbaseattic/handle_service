@@ -22,7 +22,7 @@ use Config::Simple;
 use IPC::System::Simple qw(capture);
 use JSON;
 use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($INFO);
+Log::Log4perl->easy_init($DEBUG);
 
 our $cfg = {};
 our $default_shock;
@@ -123,7 +123,7 @@ sub new_handle
 
         $h->{file_name} = undef;
         $h->{id} = undef;
-        $h = $self->localize_handle(ref $self, $h);
+        $h = $self->localize_handle($h, ref $self);
         $h = $self->initialize_handle($h);
 
     #END new_handle
@@ -142,7 +142,7 @@ sub new_handle
 
 =head2 localize_handle
 
-  $h2 = $obj->localize_handle($service_name, $h1)
+  $h2 = $obj->localize_handle($h1, $service_name)
 
 =over 4
 
@@ -151,8 +151,8 @@ sub new_handle
 =begin html
 
 <pre>
-$service_name is a string
 $h1 is a Handle
+$service_name is a string
 $h2 is a Handle
 Handle is a reference to a hash where the following keys are defined:
 	file_name has a value which is a string
@@ -168,8 +168,8 @@ Handle is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$service_name is a string
 $h1 is a Handle
+$service_name is a string
 $h2 is a Handle
 Handle is a reference to a hash where the following keys are defined:
 	file_name has a value which is a string
@@ -199,11 +199,11 @@ the service. The localize_handle function must be called before the
 sub localize_handle
 {
     my $self = shift;
-    my($service_name, $h1) = @_;
+    my($h1, $service_name) = @_;
 
     my @_bad_arguments;
-    (!ref($service_name)) or push(@_bad_arguments, "Invalid type for argument \"service_name\" (value was \"$service_name\")");
     (ref($h1) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h1\" (value was \"$h1\")");
+    (!ref($service_name)) or push(@_bad_arguments, "Invalid type for argument \"service_name\" (value was \"$service_name\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to localize_handle:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -484,6 +484,340 @@ sub download
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     #BEGIN download
     #END download
+    return();
+}
+
+
+
+
+=head2 upload_metadata
+
+  $h = $obj->upload_metadata($infile)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$infile is a string
+$h is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$infile is a string
+$h is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+Not sure if these should be abstract or concrete. If concete
+then we don't have to hand roll an implemetation for the four
+different supported languages. The cost is an extra network
+hop. For now, I choose the extra network hop over implementing
+the same method by hand in for different languages. I belive it
+to be a safe assumption that the metadata won't exceed several
+megabytes in size.
+
+=back
+
+=cut
+
+sub upload_metadata
+{
+    my $self = shift;
+    my($infile) = @_;
+
+    my @_bad_arguments;
+    (!ref($infile)) or push(@_bad_arguments, "Invalid type for argument \"infile\" (value was \"$infile\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to upload_metadata:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'upload_metadata');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($h);
+    #BEGIN upload_metadata
+    #END upload_metadata
+    my @_bad_returns;
+    (ref($h) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h\" (value was \"$h\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to upload_metadata:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'upload_metadata');
+    }
+    return($h);
+}
+
+
+
+
+=head2 download_metadata
+
+  $obj->download_metadata($h, $outfile)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$h is a Handle
+$outfile is a string
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$h is a Handle
+$outfile is a string
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub download_metadata
+{
+    my $self = shift;
+    my($h, $outfile) = @_;
+
+    my @_bad_arguments;
+    (ref($h) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h\" (value was \"$h\")");
+    (!ref($outfile)) or push(@_bad_arguments, "Invalid type for argument \"outfile\" (value was \"$outfile\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to download_metadata:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'download_metadata');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    #BEGIN download_metadata
+	my $id  = $h->{id} or die "no id in handle";
+	my $url = $h->{url} or die "no url in handle";
+	if($h->{type} eq "shock") {
+		my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -o $outfile -X GET $default_shock/node/$id";
+		INFO "cmd: $cmd";
+		!system $cmd or die "could not execute curl in download_metadata";
+	}
+	else {
+		die "invalid handle type: $h->{type}";
+	}
+
+    #END download_metadata
+    return();
+}
+
+
+
+
+=head2 add_metadata
+
+  $obj->add_metadata($h, $infile)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$h is a Handle
+$infile is a string
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$h is a Handle
+$infile is a string
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub add_metadata
+{
+    my $self = shift;
+    my($h, $infile) = @_;
+
+    my @_bad_arguments;
+    (ref($h) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h\" (value was \"$h\")");
+    (!ref($infile)) or push(@_bad_arguments, "Invalid type for argument \"infile\" (value was \"$infile\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to add_metadata:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'add_metadata');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    #BEGIN add_metadata
+	my $url = $h->{url} or die "no url in handle";
+	my $id  = $h->{id} or die "no id in handle";
+	my $type = $h->{type} or die "no type in handle";
+	if ($type eq "shock") {
+		my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -X PUT -F \'attributes=\@" . $infile . "\' $default_shock/node/$id";
+		INFO "cmd: $cmd";
+        	my $json_node = capture($cmd);
+        	my $ref = decode_json $json_node;
+		if ($ref->{error}) {
+			ERROR "could not PUT metadata for id: $id";
+			ERROR "error: $ref->{error}";
+			ERROR "status: ref->{status}";
+			die "failed to put metadata for id: $id";
+		}
+	}
+	else {
+		die "don't recognize type $type";
+	}
+    #END add_metadata
+    return();
+}
+
+
+
+
+=head2 add_data
+
+  $obj->add_data($h, $infile)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$h is a Handle
+$infile is a string
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$h is a Handle
+$infile is a string
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub add_data
+{
+    my $self = shift;
+    my($h, $infile) = @_;
+
+    my @_bad_arguments;
+    (ref($h) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h\" (value was \"$h\")");
+    (!ref($infile)) or push(@_bad_arguments, "Invalid type for argument \"infile\" (value was \"$infile\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to add_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'add_data');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    #BEGIN add_data
+    #END add_data
     return();
 }
 
