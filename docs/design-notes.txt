@@ -33,4 +33,11 @@ Presumably the get_handle in the AbstractHandleImpl will do the right
 thing. When the constructor is called, it will look in the environment for
 the token, otherwise fail.
 
+For the upload_metadata and download_metadata methods. 
+Not sure if these should be abstract or concrete. If concete
+then we don't have to hand roll an implemetation for the four
+different supported languages. The cost is an extra network
+hop. For now, I choose the extra network hop over implementing
+the same method by hand in for different languages.
+A
 
