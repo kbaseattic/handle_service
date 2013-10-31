@@ -38,7 +38,18 @@ module AbstractHandle {
 		returns (Handle h2);
 
 	/* initialize_handle returns a Handle object with an ID. */
-	funcdef initialize_handle(Handle h1) returns (Handle h2) authentication required;
+	funcdef initialize_handle(Handle h1) returns (Handle h2)
+		authentication required;
+
+ 	/* These provides an empty implementation so that if a concrete
+ 	   implementation is not provided an error is thrown. These are
+ 	   the equivelant of abstract methods, with runtime rather than
+ 	   compile time inforcement.
+ 	*/
+ 	funcdef upload(string infile) returns (Handle h) 
+ 		authentication required;
+ 	funcdef download(Handle h, string outfile) returns ()
+ 		authentication required;
 
 };
 
