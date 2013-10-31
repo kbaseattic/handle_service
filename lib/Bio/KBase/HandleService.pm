@@ -69,7 +69,7 @@ sub upload {
 	$handle =
 	  $self->new_handle()
 	    or die "could not get new handle";
-	$handle = $self->localize_handle(ref $self, $handle);
+	$handle = $self->localize_handle($handle, ref $self);
 	$handle = $self->initialize_handle($handle);
 
 	# i would like to do this using HTTP::Request::Common
@@ -160,6 +160,27 @@ sub initialize_handle {
 	$self->{dsi}->initialize_handle(@_);
 }
 
+sub upload_metadata {
+	my $self = shift;
+	$self->{dsi}->upload_metadata($_);
+}
+
+sub download_metadata {
+        my $self = shift;
+        $self->{dsi}->download_metadata(@_);
+}
+
+sub add_metadata {
+        my $self = shift;
+        $self->{dsi}->add_metadata(@_);
+}
+
+sub add_data {
+        my $self = shift;
+	my $h = shift;
+	my $infile = shift;
+	warn "add_data not implemented yet";
+}
 
 
 =head1 Authors
