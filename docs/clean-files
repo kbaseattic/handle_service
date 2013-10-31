@@ -9,4 +9,7 @@ rm -rf	lib/Bio/KBase/AbstractHandle/Service.pm
 rm -rf	lib/biokbase/
 rm -rf	lib/javascript/
 rm -rf	pod2htmd.tmp
+rm -rf	docs/AbstractHandle.html
+rm -rf	lib/AbstractHandle.psgi
+rm -rf	lib/AbstractHandleImpl.py
 
