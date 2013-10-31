@@ -38,18 +38,35 @@ module AbstractHandle {
 		returns (Handle h2);
 
 	/* initialize_handle returns a Handle object with an ID. */
-	funcdef initialize_handle(Handle h1) returns (Handle h2)
+	funcdef initialize_handle(Handle h1) returns (Handle h2) 
 		authentication required;
 
- 	/* These provides an empty implementation so that if a concrete
- 	   implementation is not provided an error is thrown. These are
- 	   the equivelant of abstract methods, with runtime rather than
- 	   compile time inforcement.
- 	*/
- 	funcdef upload(string infile) returns (Handle h) 
- 		authentication required;
- 	funcdef download(Handle h, string outfile) returns ()
- 		authentication required;
+	/* These provides an empty implementation so that if a concrete
+	   implementation is not provided an error is thrown. These are
+	   the equivelant of abstract methods, with runtime rather than
+	   compile time inforcement.
+	*/
+	funcdef upload(string infile) returns(Handle h) 
+		authentication required;
+	funcdef download(Handle h, string outfile) returns()
+		authentication required;
+	
+	/* Not sure if these should be abstract or concrete. If concete
+	   then we don't have to hand roll an implemetation for the four
+	   different supported languages. The cost is an extra network
+	   hop. For now, I choose the extra network hop over implementing
+	   the same method by hand in for different languages. I belive it
+	   to be a safe assumption that the metadata won't exceed several
+	   megabytes in size.
+	*/
+	funcdef upload_metadata(string metadata_file) returns(Handle h)
+		authentication required;
+	funcdef download_metadata(Handle h) returns()
+		authentication required;
 
+	funcdef add_metadata(Handle h) returns ()
+		authentication required;
+	funcdef add_data(Handle h) returns()
+		authentication required;
 };
 
