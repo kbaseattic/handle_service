@@ -1,0 +1,7 @@
+#!/bin/sh
+
+/kb/deployment/services/handle_service/stop_service 
+cp lib/Bio/KBase/AbstractHandle/AbstractHandleImpl.pm /kb/deployment/lib/Bio/KBase/AbstractHandle/AbstractHandleImpl.pm 
+/kb/deployment/services/handle_service/start_service &
+
+
