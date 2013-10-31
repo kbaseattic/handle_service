@@ -334,6 +334,162 @@ sub initialize_handle
 
 
 
+=head2 upload
+
+  $h = $obj->upload($infile)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$infile is a string
+$h is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$infile is a string
+$h is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+These provides an empty implementation so that if a concrete
+implementation is not provided an error is thrown. These are
+the equivelant of abstract methods, with runtime rather than
+compile time inforcement.
+
+=back
+
+=cut
+
+sub upload
+{
+    my $self = shift;
+    my($infile) = @_;
+
+    my @_bad_arguments;
+    (!ref($infile)) or push(@_bad_arguments, "Invalid type for argument \"infile\" (value was \"$infile\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to upload:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'upload');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($h);
+    #BEGIN upload
+    #END upload
+    my @_bad_returns;
+    (ref($h) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h\" (value was \"$h\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to upload:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'upload');
+    }
+    return($h);
+}
+
+
+
+
+=head2 download
+
+  $obj->download($h, $outfile)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$h is a Handle
+$outfile is a string
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$h is a Handle
+$outfile is a string
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub download
+{
+    my $self = shift;
+    my($h, $outfile) = @_;
+
+    my @_bad_arguments;
+    (ref($h) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h\" (value was \"$h\")");
+    (!ref($outfile)) or push(@_bad_arguments, "Invalid type for argument \"outfile\" (value was \"$outfile\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to download:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'download');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    #BEGIN download
+    #END download
+    return();
+}
+
+
+
+
 =head2 version 
 
   $return = $obj->version()
