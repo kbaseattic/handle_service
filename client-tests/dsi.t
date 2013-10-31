@@ -2,12 +2,14 @@ use Test::More;
 use Config::Simple;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use File::Basename;
+use JSON;
 
+my $data = "./client-tests/test-reads.fa";
+my $metadata = "./client-tests/test-metadata.json";
 
-my $file_name = "./client-tests/test-reads.fa";
-my $basename = basename $file_name;
-my $download_file = "f.tmp";
-unlink $download_file if -e $download_file;
+my $basename = basename $data;
+unlink $data.download if -e $data.download;
+unlink $metadata.download if -e $metadata.download;
 
 our $cfg = {};
 our ($obj, $h);
@@ -24,7 +26,7 @@ else {
 }
 
 
-open (my $fh, '<', $file_name) or die "Can't open '$file_name': $!";
+open (my $fh, '<', $data) or die "Can't open '$data': $!";
 binmode($fh);
 my $local_md5 = Digest::MD5->new->addfile($fh)->hexdigest;
 close($fh);
@@ -60,7 +62,11 @@ can_ok("Bio::KBase::HandleService", qw(
 	localize_handle
 	initialize_handle
 	upload
-	download )
+	download
+	upload_metadata
+	download_metadata
+	add_metadata
+	add_data )
 );
 
 
@@ -79,7 +85,7 @@ ok (defined $h->{id}, "id defined in handle $h->{id}");
 
 # upload a file
 
-ok ($h = $obj->upload($file_name), "upload returns defined");
+ok ($h = $obj->upload($data), "upload returns defined");
 
 ok (ref $h eq "HASH", "upload returns a hash reference");
 
@@ -98,18 +104,25 @@ ok ($h->{file_name} eq $basename, "file name is $basename");
 
 # download a file
 
-ok ($h = $obj->download($h, $download_file), "download returns a handle");
+ok ($h = $obj->download($h, $data.download), "download returns a handle");
 
-open (my $dh, '<', $download_file) or die "Can't open $download_file: $!";
+open (my $dh, '<', $data.download) or die "Can't open $data.download: $!";
 binmode($dh);
 my $local_copy_md5 = Digest::MD5->new->addfile($dh)->hexdigest;
 close($dh);
 
 ok ($local_md5 eq $local_copy_md5, "MD5s are the same");
 
+# check the meta_data methods
+ok (! defined ($obj->add_metadata($h, $metadata)), "add_metadata returns");
+ok (! defined ($obj->download_metadata($h, $metadata.download)), "download_metadata returns");
+
+# need a couple tests that verify the metadata that are smarter than this
+ok (-e $metadata.download && (-s $metadata.download > 0), "metadata download file exits");
 
 
 # clean up
 done_testing;
-unlink $downlaod_file;
+unlink $data.download;
+unlink $metadata.download;
 
