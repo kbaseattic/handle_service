@@ -68,5 +68,27 @@ module AbstractHandle {
 		authentication required;
 	funcdef add_data(Handle h, string infile) returns()
 		authentication required;
+
+
+	/* The list_all function returns a set of handles. If the user
+	   is authenticated, it retuns the set of handles owned by the
+	   user and those that are public or shared.
+	*/
+	funcdef list_all() returns (list<Handle> l)
+		authentication optional;
+
+	/* The list function returns the set of handles that belong
+	   to the user.
+	*/
+	funcdef list_mine() returns (list<Handle> l)
+		authentication required;
+
+
+	/* Just stubbing this one out for now. The idea here is that
+	   ours is determined by way of user groups.
+	*/
+	funcdef list_ours() returns (list<Handle> l)
+		authentication required;
+
 };
 

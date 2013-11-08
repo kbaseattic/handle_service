@@ -314,6 +314,7 @@ sub initialize_handle
         $h2 = $h1;
 
         my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -X POST $default_shock/node";
+	DEBUG $cmd;
         my $json_node = capture($cmd);
         my $ref = decode_json $json_node;
 
@@ -819,6 +820,217 @@ sub add_data
     #BEGIN add_data
     #END add_data
     return();
+}
+
+
+
+
+=head2 list_all
+
+  $l = $obj->list_all()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$l is a reference to a list where each element is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$l is a reference to a list where each element is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+The list_all function returns a set of handles. If the user
+is authenticated, it retuns the set of handles owned by the
+user and those that are public or shared.
+
+=back
+
+=cut
+
+sub list_all
+{
+    my $self = shift;
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($l);
+    #BEGIN list_all
+    #END list_all
+    my @_bad_returns;
+    (ref($l) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"l\" (value was \"$l\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to list_all:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'list_all');
+    }
+    return($l);
+}
+
+
+
+
+=head2 list_mine
+
+  $l = $obj->list_mine()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$l is a reference to a list where each element is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$l is a reference to a list where each element is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+The list function returns the set of handles that belong
+to the user.
+
+=back
+
+=cut
+
+sub list_mine
+{
+    my $self = shift;
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($l);
+    #BEGIN list_mine
+    #END list_mine
+    my @_bad_returns;
+    (ref($l) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"l\" (value was \"$l\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to list_mine:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'list_mine');
+    }
+    return($l);
+}
+
+
+
+
+=head2 list_ours
+
+  $l = $obj->list_ours()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$l is a reference to a list where each element is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$l is a reference to a list where each element is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+Just stubbing this one out for now. The idea here is that
+ours is determined by way of user groups.
+
+=back
+
+=cut
+
+sub list_ours
+{
+    my $self = shift;
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($l);
+    #BEGIN list_ours
+    #END list_ours
+    my @_bad_returns;
+    (ref($l) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"l\" (value was \"$l\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to list_ours:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'list_ours');
+    }
+    return($l);
 }
 
 
