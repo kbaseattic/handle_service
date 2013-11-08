@@ -63,6 +63,8 @@ SERVER_TESTS = $(wildcard server-tests/*.t)
 
 default:
 
+.SILENT:
+
 vars:
 	@echo "nothing to do for default"
 	$(foreach v,                                      \
