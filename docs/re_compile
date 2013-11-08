@@ -1,0 +1,9 @@
+        compile_typespec \
+                --psgi AbstractHandle.psgi  \
+                --impl Bio::KBase::AbstractHandle::AbstractHandleImpl \
+                --service Bio::KBase::AbstractHandle::Service \
+                --client Bio::KBase::AbstractHandle::Client \
+                --py biokbase/AbstractHandle/Client \
+                --js javascript/AbstractHandle/Client \
+                --url http://localhost:7109 \
+                handle_service.spec lib
