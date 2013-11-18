@@ -17,6 +17,7 @@ access to a remote file store.
 =cut
 
 #BEGIN_HEADER
+use DBI;
 use Data::Dumper;
 use Config::Simple;
 use IPC::System::Simple qw(capture);
@@ -25,12 +26,15 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
 
 our $cfg = {};
-our $default_shock;
+our ($default_shock, $mysql_user, $mysql_pass, $data_source);
 
 if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $cfg = new Config::Simple($ENV{KB_DEPLOYMENT_CONFIG}) or
         die "could not construct new Config::Simple object";
     $default_shock = $cfg->param('handle_service.default-shock-server');
+    $mysql_user    = $cfg->param('handle_service.mysql-user');
+    $mysql_pass    = $cfg->param('handle_service.mysql-pass');
+    $data_source   = $cfg->param('handle_service.data-source');
     INFO "$$ reading config from $ENV{KB_DEPLOYMENT_CONFIG}";
     INFO "$$ using $default_shock as the default shock server";
 }
@@ -51,6 +55,10 @@ sub new
         $self->{registry} = {};
         system("curl -h > /dev/null 2>&1") == 0  or
             die "curl not found, maybe you need to install it";
+
+	# need some assurance that the handle is still connected.
+	$self->{dbh} = DBI->connect($data_source, $mysql_user, $mysql_pass, {});
+
 
     #END_CONSTRUCTOR
 
@@ -320,6 +328,21 @@ sub initialize_handle
 
         $h2->{id} = $ref->{data}->{id} or die "could not find node id in $json_node";
 
+	my (@fields, @values);
+	foreach my $field (keys %$h2) {
+		if(defined $h2->{$field}) {
+			push @fields, $field;
+			push @values, $self->{dbh}->quote($h2->{$field});
+		}
+	}	
+
+	my $sql = " INSERT INTO Handle ";
+	$sql   .= " (", join @fields, ",", ") ";
+	$sql   .= " values ";
+	$sql   .= " (", join @values, ",", ") ";
+
+	$self->{dbh}->prepare($sql)
+		or die "could not prepare sql, $DBI::errstr";
 
     #END initialize_handle
     my @_bad_returns;
