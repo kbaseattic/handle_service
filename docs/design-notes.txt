@@ -41,3 +41,19 @@ hop. For now, I choose the extra network hop over implementing
 the same method by hand in for different languages.
 A
 
+LOCALIZING
+
+Localizing is the act of assigning a url to the handle. Generally,
+you would expect the default production shock server to always
+be the url. However, through the use of a registry, a shock server
+can be associated with a service. The standard for this is to use
+the fully qualified class name of the client as the key to which
+a shock server url is associated.
+
+
+The current implementation allows for localizizing to happen just
+once. If the url is alrady set in a handle, the loclize function
+doesn't do anything. Caveat- nothing prevents the user from setting
+the url field in the handle to undef. If this were to happen,
+one could localize again.
+
