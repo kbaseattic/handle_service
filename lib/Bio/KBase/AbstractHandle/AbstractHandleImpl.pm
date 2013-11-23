@@ -756,7 +756,7 @@ sub add_metadata
 	if ($type eq "shock") {
 		my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -X PUT -F \'attributes=\@" . $infile . "\' $default_shock/node/$id";
 		INFO "cmd: $cmd";
-        	my $json_node = capture($cmd);
+        	my $json_node = `$cmd`;
         	my $ref = decode_json $json_node;
 		if ($ref->{error}) {
 			ERROR "could not PUT metadata for id: $id";
