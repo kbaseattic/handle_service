@@ -100,6 +100,8 @@ sub upload {
 	$handle->{remote_sha1} = $remote_sha1;
 	$handle->{file_name} = basename ($infile);
 
+	$self->persist_handle($handle);
+
 	return $handle;
 }
 
@@ -158,6 +160,11 @@ sub localize_handle {
 sub initialize_handle {
 	my $self = shift;
 	$self->{dsi}->initialize_handle(@_);
+}
+
+sub persist_handle {
+	my $self = shift;
+	$self->{dsi}->persist_handle(@_);
 }
 
 sub upload_metadata {
