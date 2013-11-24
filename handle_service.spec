@@ -24,6 +24,10 @@ module AbstractHandle {
 		string remote_sha1;
 	} Handle;
 
+
+
+	/* BASIC HANDLE CREATION FUNCTIONS */
+
 	
 	/* new_handle returns a Handle object with a url and a node id */
 	funcdef new_handle() returns (Handle h) authentication required;
@@ -41,33 +45,52 @@ module AbstractHandle {
 	funcdef initialize_handle(Handle h1) returns (Handle h2) 
 		authentication required;
 
-	/* These provides an empty implementation so that if a concrete
+	/* persist_handle writes the handle to a persistent store
+	   that can be later retrieved using the list_all, list_mine
+	   and list_ours functions.
+	*/
+	funcdef persist_handle(Handle h) returns ()
+		authentication required;
+
+
+
+	/* ABSTRACT HANDLE FUNCTIONS */
+
+
+	/* The upload and download functions  provide an empty
+	   implementation that must be provided in a client. If a concrete
 	   implementation is not provided an error is thrown. These are
 	   the equivelant of abstract methods, with runtime rather than
 	   compile time inforcement.
 	*/
 	funcdef upload(string infile) returns(Handle h) 
 		authentication required;
+
 	funcdef download(Handle h, string outfile) returns()
 		authentication required;
 	
+
+
+	/* META DATA UPLOAD AND DOWNLOAD */
+
+
 	/* Not sure if these should be abstract or concrete. If concete
-	   then we don't have to hand roll an implemetation for the four
+	   then we don not have to hand roll an implemetation for the four
 	   different supported languages. The cost is an extra network
 	   hop. For now, I choose the extra network hop over implementing
 	   the same method by hand in for different languages. I belive it
-	   to be a safe assumption that the metadata won't exceed several
+	   to be a safe assumption that the metadata will not exceed several
 	   megabytes in size.
 	*/
 	funcdef upload_metadata(string infile) returns(Handle h)
 		authentication required;
+
 	funcdef download_metadata(Handle h, string outfile) returns()
 		authentication required;
 
-	funcdef add_metadata(Handle h, string infile) returns ()
-		authentication required;
-	funcdef add_data(Handle h, string infile) returns()
-		authentication required;
+
+
+	/* STANDARD FUNCTIONS FOR LISTING ALL HANDLES */
 
 
 	/* The list_all function returns a set of handles. If the user
@@ -82,7 +105,6 @@ module AbstractHandle {
 	*/
 	funcdef list_mine() returns (list<Handle> l)
 		authentication required;
-
 
 	/* Just stubbing this one out for now. The idea here is that
 	   ours is determined by way of user groups.
