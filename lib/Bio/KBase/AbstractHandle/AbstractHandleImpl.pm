@@ -328,21 +328,7 @@ sub initialize_handle
 
         $h2->{id} = $ref->{data}->{id} or die "could not find node id in $json_node";
 
-	my (@fields, @values);
-	foreach my $field (keys %$h2) {
-		if(defined $h2->{$field}) {
-			push @fields, $field;
-			push @values, $self->{dbh}->quote($h2->{$field});
-		}
-	}	
-
-	my $sql = " INSERT INTO Handle ";
-	$sql   .= " (", join @fields, ",", ") ";
-	$sql   .= " values ";
-	$sql   .= " (", join @values, ",", ") ";
-
-	$self->{dbh}->prepare($sql)
-		or die "could not prepare sql, $DBI::errstr";
+	$self->persist_handle( $h2 );
 
     #END initialize_handle
     my @_bad_returns;
@@ -353,6 +339,108 @@ sub initialize_handle
 							       method_name => 'initialize_handle');
     }
     return($h2);
+}
+
+
+
+
+=head2 persist_handle
+
+  $obj->persist_handle($h)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$h is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$h is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+persist_handle writes the handle to a persistent store
+that can be later retrieved using the list_all, list_mine
+and list_ours functions.
+
+=back
+
+=cut
+
+sub persist_handle
+{
+    my $self = shift;
+    my($h) = @_;
+
+    my @_bad_arguments;
+    (ref($h) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h\" (value was \"$h\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to persist_handle:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'persist_handle');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    #BEGIN persist_handle
+
+	my (@fields, @values);
+        foreach my $field (keys %$h) {
+                if(defined $h->{$field}) {
+                        push @fields, $field;
+                        push @values, $self->{dbh}->quote($h->{$field});
+                }
+        }
+
+        my $sql = " INSERT INTO Handle ";
+        $sql   .= " (" . join( ", ", @fields) .  ") ";
+        $sql   .= " values ";
+        $sql   .= " (" . join( ", ", @values) .  ") ";
+
+
+	my @pairs = ();
+	foreach my $field (keys %$h) {
+		push @pairs, "$field=" . $self->{dbh}->quote($h->{$field});
+	}
+	$sql  .= "ON DUPLICATE KEY UPDATE ";
+	$sql  .= join(", ", @pairs);
+
+
+	DEBUG $sql;
+        my $sth = $self->{dbh}->prepare($sql)
+                or die "could not prepare $sql, $DBI::errstr";
+        $sth->execute()
+                or die "could not execute $sql, $DBI::errstr";
+
+
+    #END persist_handle
+    return();
 }
 
 
@@ -402,7 +490,8 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
-These provides an empty implementation so that if a concrete
+The upload and download functions  provide an empty
+implementation that must be provided in a client. If a concrete
 implementation is not provided an error is thrown. These are
 the equivelant of abstract methods, with runtime rather than
 compile time inforcement.
@@ -559,11 +648,11 @@ Handle is a reference to a hash where the following keys are defined:
 =item Description
 
 Not sure if these should be abstract or concrete. If concete
-then we don't have to hand roll an implemetation for the four
+then we don not have to hand roll an implemetation for the four
 different supported languages. The cost is an extra network
 hop. For now, I choose the extra network hop over implementing
 the same method by hand in for different languages. I belive it
-to be a safe assumption that the metadata won't exceed several
+to be a safe assumption that the metadata will not exceed several
 megabytes in size.
 
 =back
@@ -758,7 +847,7 @@ sub add_metadata
 		INFO "cmd: $cmd";
         	my $json_node = `$cmd`;
         	my $ref = decode_json $json_node;
-		if ($ref->{error}) {
+		if ($ref->{error} ne 'null') {
 			ERROR "could not PUT metadata for id: $id";
 			ERROR "error: $ref->{error}";
 			ERROR "status: ref->{status}";
