@@ -422,7 +422,7 @@ sub persist_handle
         foreach my $field (keys %$h) {
                 if(defined $h->{$field}) {
                         push @fields, $field;
-                        push @values, $self->{dbh}->quote($h->{$field});
+                        push @values, $self->{get_dbh}->()->quote($h->{$field});
                 }
         }
 
@@ -434,14 +434,14 @@ sub persist_handle
 
 	my @pairs = ();
 	foreach my $field (keys %$h) {
-		push @pairs, "$field=" . $self->{dbh}->quote($h->{$field});
+		push @pairs, "$field=" . $self->{get_dbh}->()->quote($h->{$field});
 	}
 	$sql  .= "ON DUPLICATE KEY UPDATE ";
 	$sql  .= join(", ", @pairs);
 
 
 	DEBUG $sql;
-        my $sth = $self->{dbh}->prepare($sql)
+        my $sth = $self->{get_dbh}->()->prepare($sql)
                 or die "could not prepare $sql, $DBI::errstr";
         $sth->execute()
                 or die "could not execute $sql, $DBI::errstr";
@@ -680,16 +680,19 @@ sub upload_metadata
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     #BEGIN upload_metadata
-    my $id  = $h->{id} or die "no id in handle";
-    my $url = $h->{url} or die "no url in handle";
-    if($h->{type} eq "shock") {
-        my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -o $outfile -X GET $default_shock/node/$id";
-                INFO "cmd: $cmd";
-                !system $cmd or die "could not execute curl in download_metadata";
-        }
-        else {
-                die "invalid handle type: $h->{type}";
-        }
+
+	my $id  = $h->{id}  or die "no id in handle";
+	my $url = $h->{url} or die "no url in handle";
+
+	if($h->{type} eq "shock") {
+		my $cmd = "curl -s -H \'Authorization: OAuth $ctx->{token}\' -X PUT -F attributes=\@$infile $url/node/$id";
+		INFO "cmd: $cmd";
+		!system $cmd or die "could not execute curl in download_metadata";
+	}
+	else {
+		die "invalid handle type: $h->{type}";
+	}
+
     #END upload_metadata
     return();
 }
