@@ -56,8 +56,16 @@ sub new
         system("curl -h > /dev/null 2>&1") == 0  or
             die "curl not found, maybe you need to install it";
 
-	# need some assurance that the handle is still connected.
-	$self->{dbh} = DBI->connect($data_source, $mysql_user, $mysql_pass, {});
+	my @connection = ($data_source, $mysql_user, $mysql_pass, {});
+	$self->{dbh} = DBI->connect(@connection);
+	# need some assurance that the handle is still connected. not 
+	# totally sure this will work. needs to be tested.
+	$self->{get_dbh} = sub {
+		unless ($self->{dbh}->ping) {
+			$self->{dbh} = DBI->connect(@connection); 
+		} 
+		return $self->{dbh};
+	};
 
 
     #END_CONSTRUCTOR
