@@ -57,3 +57,17 @@ doesn't do anything. Caveat- nothing prevents the user from setting
 the url field in the handle to undef. If this were to happen,
 one could localize again.
 
+METADATA
+
+Not sure if these should be abstract or concrete. If concete
+then we don not have to hand roll an implemetation for the four
+different supported languages. The cost is an extra network
+hop. For now, I choose the extra network hop over implementing
+the same method by hand in for different languages. I belive it
+to be a safe assumption that the metadata will not exceed several
+megabytes in size.
+
+To simplify the interface, we will require that the data be uploaded
+prior to the loading of metadata. By simplify, I mean reducing 
+the variable ways to use the interface to accomplish the same end
+goal.
