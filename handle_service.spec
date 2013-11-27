@@ -82,9 +82,18 @@ module AbstractHandle {
 	   to be a safe assumption that the metadata will not exceed several
 	   megabytes in size.
 	*/
-	funcdef upload_metadata(string infile) returns(Handle h)
+
+	/* The upload_metadata function uploads metadata to an existing
+	   handle. This means that the data that the handle represents
+	   has already been uploaded. Uploading meta data before the data
+	   has been uploaded is not currently supported.
+	*/
+	funcdef upload_metadata(Handle h, string infile) returns()
 		authentication required;
 
+	/* The download_metadata function downloads metadata associated
+	   with the data handle and writes it to a file.
+	*/
 	funcdef download_metadata(Handle h, string outfile) returns()
 		authentication required;
 
