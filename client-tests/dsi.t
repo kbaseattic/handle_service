@@ -65,8 +65,7 @@ can_ok("Bio::KBase::HandleService", qw(
 	download
 	upload_metadata
 	download_metadata
-	add_metadata
-	add_data )
+	 )
 );
 
 
@@ -113,11 +112,14 @@ close($dh);
 
 ok ($local_md5 eq $local_copy_md5, "MD5s are the same");
 
+
 # check the meta_data methods
-ok (! defined ($obj->add_metadata($h, $metadata)), "add_metadata returns");
+
+ok (ref $h eq 'HASH', "handle is a hash reference");
+ok (-e $metadata, "metadata file exists");
+ok (! defined ($obj->upload_metadata($h, $metadata)), "add_metadata returns");
 ok (! defined ($obj->download_metadata($h, $metadata.download)), "download_metadata returns");
 
-# need a couple tests that verify the metadata that are smarter than this
 ok (-e $metadata.download && (-s $metadata.download > 0), "metadata download file exits");
 
 
