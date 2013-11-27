@@ -169,7 +169,7 @@ sub persist_handle {
 
 sub upload_metadata {
 	my $self = shift;
-	$self->{dsi}->upload_metadata($_);
+	$self->{dsi}->upload_metadata(@_);
 }
 
 sub download_metadata {
