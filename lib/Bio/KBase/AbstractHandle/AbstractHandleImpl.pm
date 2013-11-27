@@ -605,7 +605,7 @@ sub download
 
 =head2 upload_metadata
 
-  $h = $obj->upload_metadata($infile)
+  $obj->upload_metadata($h, $infile)
 
 =over 4
 
@@ -614,8 +614,8 @@ sub download
 =begin html
 
 <pre>
-$infile is a string
 $h is a Handle
+$infile is a string
 Handle is a reference to a hash where the following keys are defined:
 	file_name has a value which is a string
 	id has a value which is a string
@@ -630,8 +630,8 @@ Handle is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$infile is a string
 $h is a Handle
+$infile is a string
 Handle is a reference to a hash where the following keys are defined:
 	file_name has a value which is a string
 	id has a value which is a string
@@ -647,13 +647,10 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
-Not sure if these should be abstract or concrete. If concete
-then we don not have to hand roll an implemetation for the four
-different supported languages. The cost is an extra network
-hop. For now, I choose the extra network hop over implementing
-the same method by hand in for different languages. I belive it
-to be a safe assumption that the metadata will not exceed several
-megabytes in size.
+The upload_metadata function uploads metadata to an existing
+handle. This means that the data that the handle represents
+has already been uploaded. Uploading meta data before the data
+has been uploaded is not currently supported.
 
 =back
 
@@ -662,9 +659,10 @@ megabytes in size.
 sub upload_metadata
 {
     my $self = shift;
-    my($infile) = @_;
+    my($h, $infile) = @_;
 
     my @_bad_arguments;
+    (ref($h) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h\" (value was \"$h\")");
     (!ref($infile)) or push(@_bad_arguments, "Invalid type for argument \"infile\" (value was \"$infile\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to upload_metadata:\n" . join("", map { "\t$_\n" } @_bad_arguments);
@@ -673,17 +671,19 @@ sub upload_metadata
     }
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
-    my($h);
     #BEGIN upload_metadata
+    my $id  = $h->{id} or die "no id in handle";
+    my $url = $h->{url} or die "no url in handle";
+    if($h->{type} eq "shock") {
+        my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -o $outfile -X GET $default_shock/node/$id";
+                INFO "cmd: $cmd";
+                !system $cmd or die "could not execute curl in download_metadata";
+        }
+        else {
+                die "invalid handle type: $h->{type}";
+        }
     #END upload_metadata
-    my @_bad_returns;
-    (ref($h) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h\" (value was \"$h\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to upload_metadata:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'upload_metadata');
-    }
-    return($h);
+    return();
 }
 
 
@@ -733,7 +733,8 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
-
+The download_metadata function downloads metadata associated
+with the data handle and writes it to a file.
 
 =back
 
@@ -767,170 +768,6 @@ sub download_metadata
 	}
 
     #END download_metadata
-    return();
-}
-
-
-
-
-=head2 add_metadata
-
-  $obj->add_metadata($h, $infile)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$h is a Handle
-$infile is a string
-Handle is a reference to a hash where the following keys are defined:
-	file_name has a value which is a string
-	id has a value which is a string
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$h is a Handle
-$infile is a string
-Handle is a reference to a hash where the following keys are defined:
-	file_name has a value which is a string
-	id has a value which is a string
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub add_metadata
-{
-    my $self = shift;
-    my($h, $infile) = @_;
-
-    my @_bad_arguments;
-    (ref($h) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h\" (value was \"$h\")");
-    (!ref($infile)) or push(@_bad_arguments, "Invalid type for argument \"infile\" (value was \"$infile\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to add_metadata:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'add_metadata');
-    }
-
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
-    #BEGIN add_metadata
-	my $url = $h->{url} or die "no url in handle";
-	my $id  = $h->{id} or die "no id in handle";
-	my $type = $h->{type} or die "no type in handle";
-	if ($type eq "shock") {
-		my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -X PUT -F \'attributes=\@" . $infile . "\' $default_shock/node/$id";
-		INFO "cmd: $cmd";
-        	my $json_node = `$cmd`;
-        	my $ref = decode_json $json_node;
-		if ($ref->{error} ne 'null') {
-			ERROR "could not PUT metadata for id: $id";
-			ERROR "error: $ref->{error}";
-			ERROR "status: ref->{status}";
-			die "failed to put metadata for id: $id";
-		}
-	}
-	else {
-		die "don't recognize type $type";
-	}
-    #END add_metadata
-    return();
-}
-
-
-
-
-=head2 add_data
-
-  $obj->add_data($h, $infile)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$h is a Handle
-$infile is a string
-Handle is a reference to a hash where the following keys are defined:
-	file_name has a value which is a string
-	id has a value which is a string
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$h is a Handle
-$infile is a string
-Handle is a reference to a hash where the following keys are defined:
-	file_name has a value which is a string
-	id has a value which is a string
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub add_data
-{
-    my $self = shift;
-    my($h, $infile) = @_;
-
-    my @_bad_arguments;
-    (ref($h) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"h\" (value was \"$h\")");
-    (!ref($infile)) or push(@_bad_arguments, "Invalid type for argument \"infile\" (value was \"$infile\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to add_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'add_data');
-    }
-
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
-    #BEGIN add_data
-    #END add_data
     return();
 }
 
