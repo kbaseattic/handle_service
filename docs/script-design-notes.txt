@@ -1,0 +1,43 @@
+COMMAND SCRIPTS
+
+localize - what does it mean to run the localize command on the
+command line? Well, it means that there is a handle that has
+been serialized to disk or represented in a string. I prefer
+the serialized to disk form, which we'll use json as the
+serialization format. The reason being we can represent the JSON
+as a string, and it will fit nicely into the typed object designs
+elsewhere in the system.
+
+To serialize to disk is simply converting the data structure
+to json and writing it to disk.
+
+In the case of the localize method, the localize method modifies
+the handle that is passed in. It is a direct modification of the
+data structure, not a copy of the data structure. So we'll 
+modify the handle file in place, not create a new handle file.
+
+
+new_handle -
+
+
+upload - what does it mean to run the upload command on the 
+command line? Well, it means that you have a file, you upload
+it, and you get a handle back. The handle will be serialized
+to disk, and will be named the same as the uploadef filename
+with a kbhs suffix.
+
+download - to download means that you have provided a handle
+in the form of a file name, the handle is deserialized from
+disk, and is used to download the file. The downloaded file
+is named by the provided outfile string. As long as the string
+maps to a valid directory with valid permissions, the path
+can be included in the outfile string.
+
+Design variant. I considered naming the output file with the
+same name as the handle, minus the .kbhs suffix. However,
+it is not clear that all handle files will have the .kbhs
+suffix. Still, we could come back to this and require that
+all handle files be named with the .kbhs suffix.
+
+
+ 
