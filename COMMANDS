@@ -1,2 +1,3 @@
 #group-name	ds	Data Store
+#command-set	scripts/(.*).pl		ds
 
