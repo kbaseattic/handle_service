@@ -64,20 +64,11 @@ sub upload {
 	my $infile = shift or die "infle not passed";
 	-e $infile         or die "$infile does not exist";
 
-
-	my $handle;
-	$handle =
+	my $handle =
 	  $self->new_handle()
 	    or die "could not get new handle";
-	$handle = $self->localize_handle($handle, ref $self);
-	$handle = $self->initialize_handle($handle);
-
-	# i would like to do this using HTTP::Request::Common
-	# and the PUT method, but I couldn't figure out the
-	# syntax.
 
 	my $tok = Bio::KBase::AuthToken->new();
-	# print Dumper $tok;
 
 	my $url = $handle->{url} . "/node/" . $handle->{id};
 	my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X PUT -F upload=\@$infile $url";
@@ -133,9 +124,6 @@ sub download {
 	die "$path is not writable" unless -d $path && -w $path && -x $path;
 	die "$outfile already exists" if -e $outfile;
 
-	# i would like to do this using HTTP::Request::Common
-	# and the GET method, but I couldn't figure out the
-	# syntax for the PUT above, so using curl again.
 	my $tok = Bio::KBase::AuthToken->new();
 
 	my $url = $handle->{url} . "/node/" . $handle->{id};
@@ -144,7 +132,7 @@ sub download {
 	my $json = `$cmd 2> /dev/null`;
 	die "failed to run: $cmd\n$!" if $? == -1;
 
-	return $handle;
+	return;
 }
 
 sub new_handle {
@@ -169,26 +157,65 @@ sub persist_handle {
 
 sub upload_metadata {
 	my $self = shift;
-	$self->{dsi}->upload_metadata(@_);
+	my $handle = shift;
+	my $infile = shift;
+
+	die "first arg to upload_metatdata not a hash" unless ref $handle eq "HASH";
+	die "second arg to upload_metadata not a file" unless -e $infile;
+
+        my $id  = $handle->{id}  or die "no id in handle";
+        my $url = $handle->{url} or die "no url in handle";
+
+        my $tok = Bio::KBase::AuthToken->new();
+
+        if($handle->{type} eq "shock") {
+		my $url = $handle->{url} . "/node/" . $handle->{id};
+		my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X PUT -F attributes=\@$infile $url > /dev/null 2>&1";
+		!system $cmd or die "could not execute curl in upload_metadata\n$cmd";
+        }
+        else {
+               die "invalid handle type: $handle->{type}";
+        }
+	return;
 }
 
 sub download_metadata {
         my $self = shift;
-        $self->{dsi}->download_metadata(@_);
+
+        # implementation here
+        my $handle = shift;
+        my $outfile = shift;
+
+        ref $handle eq "HASH" or die "handle not a hash ref";
+        $handle->{id}         or die "no id in handle";
+        $handle->{url}        or die "no url in handle";
+        defined $outfile      or die "outfile not defined";
+
+        my($filename, $path) = fileparse($outfile);
+        die "$path is not writable" unless -d $path && -w $path && -x $path;
+        die "$outfile already exists" if -e $outfile;
+
+        my $tok = Bio::KBase::AuthToken->new();
+
+        my $url = $handle->{url} . "/node/" . $handle->{id};
+        my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X GET $url";
+
+        my $json = `$cmd 2> /dev/null`;
+        die "failed to run: $cmd\n$!" if $? == -1;
+
+	my $ref = decode_json($json);
+	my $meta = encode_json $ref->{data}->{attributes};
+	open my $f, ">$outfile";
+	print $f $meta;
+	close $f;
+
+        return;
 }
 
-sub add_metadata {
-        my $self = shift;
-        $self->{dsi}->add_metadata(@_);
+sub list_handles {
+	my $self = shift;
+	$self->{dsi}->list_handles(@_);
 }
-
-sub add_data {
-        my $self = shift;
-	my $h = shift;
-	my $infile = shift;
-	warn "add_data not implemented yet";
-}
-
 
 =head1 Authors
 

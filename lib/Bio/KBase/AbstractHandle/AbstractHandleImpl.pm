@@ -123,7 +123,10 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
-new_handle returns a Handle object with a url and a node id
+The new_handle function returns a Handle object with a url and a
+node id. The new_handle function invokes the localize_handle
+method first to set the url and then invokes the initialize_handle
+function to get an ID.
 
 =back
 
@@ -136,6 +139,7 @@ sub new_handle
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($h);
     #BEGIN new_handle
+
 
         $h->{file_name} = undef;
         $h->{id} = undef;
@@ -206,7 +210,7 @@ The localize_handle function attempts to locate a shock server near
 the service. The localize_handle function must be called before the
            Handle is initialized becuase when the handle is initialized, it is
            given a node id that maps to the shock server where the node was
-           created.
+           created. This function should not be called directly.
 
 =back
 
@@ -229,6 +233,7 @@ sub localize_handle
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($h2);
     #BEGIN localize_handle
+
 
         $h2 = $h1;
         my ($url, $type);
@@ -304,7 +309,8 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
-initialize_handle returns a Handle object with an ID.
+The initialize_handle returns a Handle object with an ID. This
+function should not be called directly
 
 =back
 
@@ -326,6 +332,7 @@ sub initialize_handle
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($h2);
     #BEGIN initialize_handle
+
 
         $h2 = $h1;
 
@@ -394,9 +401,9 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
-persist_handle writes the handle to a persistent store
-that can be later retrieved using the list_all, list_mine
-and list_ours functions.
+The persist_handle writes the handle to a persistent store
+that can be later retrieved using the list_handles
+function.
 
 =back
 
@@ -425,6 +432,9 @@ sub persist_handle
                         push @values, $self->{get_dbh}->()->quote($h->{$field});
                 }
         }
+
+	push @fields, 'created_by';
+	push @values, $self->{get_dbh}->()->quote($ctx->{user_id});
 
         my $sql = " INSERT INTO Handle ";
         $sql   .= " (" . join( ", ", @fields) .  ") ";
@@ -503,6 +513,8 @@ implementation that must be provided in a client. If a concrete
 implementation is not provided an error is thrown. These are
 the equivelant of abstract methods, with runtime rather than
 compile time inforcement.
+        
+[client_implemented]
 
 =back
 
@@ -524,6 +536,64 @@ sub upload
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($h);
     #BEGIN upload
+
+    #
+    # Invoke script to implement this method: 
+    #
+    # We set up temp files for input and output of the parameters and returns.
+    # Data structures are passed via JSON in the filesystem (in temp space).
+    #
+    my %_inputs;
+    my %_filenames;
+    my %_outputs;
+    my $_coder = JSON::XS->new->ascii->pretty->allow_nonref;
+
+    {
+	my $_temp = File::Temp->new();
+	print $_temp $_coder->encode($infile);
+	close($_temp);
+	my $_file = $_temp->filename;
+	$_inputs{'infile'} = $_temp;
+	$_filenames{'infile'} = $_file;
+    }
+    
+
+    {
+	my $_temp = File::Temp->new();
+	close($_temp);
+	my $_file = $_temp->filename;
+	$_outputs{'h'} = $_temp;
+	$_filenames{'h'} = $_file;
+    }
+
+    #
+    # Now we can construct our pipeline.
+    # For now, implemented_by is a single-element array.
+    #
+    my $_cmd = q();
+    $_cmd =~ s/%([a-zA-Z0-9_]+)/\'$_filenames{$1}\'/g;
+
+    my $_res = system($_cmd);
+    if ($_res != 0)
+    {
+	die "Error $_res running command: $_cmd";
+    }
+
+
+    {
+	my $_name = q(h);
+	my $_temp = $_outputs{$_name};
+	my $_file = $_temp->filename;
+	my $_txtref = read_file($_file, scalar_ref => 1);
+	if (!ref($_txtref))
+	{
+	    die "Error executing script: output file $_name not found";
+	}
+	$h = $_coder->decode($$_txtref);
+    }
+
+
+    
     #END upload
     my @_bad_returns;
     (ref($h) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h\" (value was \"$h\")");
@@ -582,7 +652,13 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
+The upload and download functions  provide an empty
+implementation that must be provided in a client. If a concrete
+implementation is not provided an error is thrown. These are
+the equivelant of abstract methods, with runtime rather than
+compile time inforcement.
 
+[client_implemented]
 
 =back
 
@@ -604,6 +680,53 @@ sub download
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     #BEGIN download
+
+    #
+    # Invoke script to implement this method: 
+    #
+    # We set up temp files for input and output of the parameters and returns.
+    # Data structures are passed via JSON in the filesystem (in temp space).
+    #
+    my %_inputs;
+    my %_filenames;
+    my %_outputs;
+    my $_coder = JSON::XS->new->ascii->pretty->allow_nonref;
+
+    {
+	my $_temp = File::Temp->new();
+	print $_temp $_coder->encode($h);
+	close($_temp);
+	my $_file = $_temp->filename;
+	$_inputs{'h'} = $_temp;
+	$_filenames{'h'} = $_file;
+    }
+
+    {
+	my $_temp = File::Temp->new();
+	print $_temp $_coder->encode($outfile);
+	close($_temp);
+	my $_file = $_temp->filename;
+	$_inputs{'outfile'} = $_temp;
+	$_filenames{'outfile'} = $_file;
+    }
+    
+
+    #
+    # Now we can construct our pipeline.
+    # For now, implemented_by is a single-element array.
+    #
+    my $_cmd = q();
+    $_cmd =~ s/%([a-zA-Z0-9_]+)/\'$_filenames{$1}\'/g;
+
+    my $_res = system($_cmd);
+    if ($_res != 0)
+    {
+	die "Error $_res running command: $_cmd";
+    }
+
+
+
+    
     #END download
     return();
 }
@@ -660,6 +783,8 @@ handle. This means that the data that the handle represents
 has already been uploaded. Uploading meta data before the data
 has been uploaded is not currently supported.
 
+[client_implemented]
+
 =back
 
 =cut
@@ -681,13 +806,14 @@ sub upload_metadata
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     #BEGIN upload_metadata
 
+
 	my $id  = $h->{id}  or die "no id in handle";
 	my $url = $h->{url} or die "no url in handle";
 
 	if($h->{type} eq "shock") {
-		my $cmd = "curl -s -H \'Authorization: OAuth $ctx->{token}\' -X PUT -F attributes=\@$infile $url/node/$id";
+		my $cmd = "curl -s -H \'Authorization: OAuth $ctx->{token}\' -X PUT -F attributes=\'$infile\' $url/node/$id";
 		INFO "cmd: $cmd";
-		!system $cmd or die "could not execute curl in download_metadata";
+		!system $cmd or die "could not execute curl in upload_metadata\n$cmd";
 	}
 	else {
 		die "invalid handle type: $h->{type}";
@@ -747,6 +873,8 @@ Handle is a reference to a hash where the following keys are defined:
 The download_metadata function downloads metadata associated
 with the data handle and writes it to a file.
 
+[client_implemented]
+
 =back
 
 =cut
@@ -767,6 +895,7 @@ sub download_metadata
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     #BEGIN download_metadata
+
 	my $id  = $h->{id} or die "no id in handle";
 	my $url = $h->{url} or die "no url in handle";
 	if($h->{type} eq "shock") {
@@ -785,80 +914,9 @@ sub download_metadata
 
 
 
-=head2 list_all
+=head2 list_handles
 
-  $l = $obj->list_all()
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$l is a reference to a list where each element is a Handle
-Handle is a reference to a hash where the following keys are defined:
-	file_name has a value which is a string
-	id has a value which is a string
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$l is a reference to a list where each element is a Handle
-Handle is a reference to a hash where the following keys are defined:
-	file_name has a value which is a string
-	id has a value which is a string
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-The list_all function returns a set of handles. If the user
-is authenticated, it retuns the set of handles owned by the
-user and those that are public or shared.
-
-=back
-
-=cut
-
-sub list_all
-{
-    my $self = shift;
-
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
-    my($l);
-    #BEGIN list_all
-    #END list_all
-    my @_bad_returns;
-    (ref($l) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"l\" (value was \"$l\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to list_all:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'list_all');
-    }
-    return($l);
-}
-
-
-
-
-=head2 list_mine
-
-  $l = $obj->list_mine()
+  $l = $obj->list_handles()
 
 =over 4
 
@@ -898,97 +956,42 @@ Handle is a reference to a hash where the following keys are defined:
 
 =item Description
 
-The list function returns the set of handles that belong
-to the user.
+The list function returns the set of handles that were
+created by the user.
 
 =back
 
 =cut
 
-sub list_mine
+sub list_handles
 {
     my $self = shift;
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($l);
-    #BEGIN list_mine
-    #END list_mine
+    #BEGIN list_handles
+
+	my $user = $ctx->{user_id}; 
+	DEBUG Dumper $ctx;
+	$user = $self->{get_dbh}->()->quote($user);
+
+        my $sql = "SELECT * FROM Handle WHERE created_by = $user";
+        DEBUG $sql;
+
+        my $sth = $self->{get_dbh}->()->prepare($sql)
+                or die "could not prepare $sql, $DBI::errstr";
+        $sth->execute()
+                or die "could not execute $sql, $DBI::errstr";
+
+	$l = $sth->fetchall_arrayref();
+
+    #END list_handles
     my @_bad_returns;
     (ref($l) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"l\" (value was \"$l\")");
     if (@_bad_returns) {
-	my $msg = "Invalid returns passed to list_mine:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	my $msg = "Invalid returns passed to list_handles:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'list_mine');
-    }
-    return($l);
-}
-
-
-
-
-=head2 list_ours
-
-  $l = $obj->list_ours()
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$l is a reference to a list where each element is a Handle
-Handle is a reference to a hash where the following keys are defined:
-	file_name has a value which is a string
-	id has a value which is a string
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$l is a reference to a list where each element is a Handle
-Handle is a reference to a hash where the following keys are defined:
-	file_name has a value which is a string
-	id has a value which is a string
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-Just stubbing this one out for now. The idea here is that
-ours is determined by way of user groups.
-
-=back
-
-=cut
-
-sub list_ours
-{
-    my $self = shift;
-
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
-    my($l);
-    #BEGIN list_ours
-    #END list_ours
-    my @_bad_returns;
-    (ref($l) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"l\" (value was \"$l\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to list_ours:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'list_ours');
+							       method_name => 'list_handles');
     }
     return($l);
 }
