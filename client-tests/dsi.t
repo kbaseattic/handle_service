@@ -3,6 +3,7 @@ use Config::Simple;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use File::Basename;
 use JSON;
+use Data::Dumper;
 
 my $data = "./client-tests/test-reads.fa";
 my $metadata = "./client-tests/test-metadata.json";
@@ -65,6 +66,7 @@ can_ok("Bio::KBase::HandleService", qw(
 	download
 	upload_metadata
 	download_metadata
+	list_handles
 	 )
 );
 
@@ -81,6 +83,18 @@ ok (exists $h->{id}, "id in handle exists");
 
 ok (defined $h->{id}, "id defined in handle $h->{id}");
 
+
+$l = $obj->list_handles();
+
+printf '%-38s %-20s %-12s %-1s', "id","creation_date","created_by","file";
+print "\n";
+
+foreach my $h (@$l) {
+        printf '%-38s %-20s %-12s %-1s',
+                $h->[0], $h->[7], $h->[6], $h->[1];
+        print "\n";
+
+}
 
 # upload a file
 
@@ -100,10 +114,21 @@ ok ($h->{remote_md5} eq $local_md5, "uploaded file has correct md5");
 
 ok ($h->{file_name} eq $basename, "file name is $basename");
 
+$l = $obj->list_handles();
+
+printf '%-38s %-20s %-12s %-1s', "id","creation_date","created_by","file";
+print "\n";
+
+foreach my $h (@$l) {
+        printf '%-38s %-20s %-12s %-1s',
+                $h->[0], $h->[7], $h->[6], $h->[1];
+        print "\n";
+
+}
 
 # download a file
 
-ok ($h = $obj->download($h, $data.download), "download returns a handle");
+ok (! defined ($obj->download($h, $data.download)), "download returns");
 
 open (my $dh, '<', $data.download) or die "Can't open $data.download: $!";
 binmode($dh);
@@ -117,14 +142,24 @@ ok ($local_md5 eq $local_copy_md5, "MD5s are the same");
 
 ok (ref $h eq 'HASH', "handle is a hash reference");
 ok (-e $metadata, "metadata file exists");
-ok (! defined ($obj->upload_metadata($h, $metadata)), "add_metadata returns");
+ok (! defined ($obj->upload_metadata($h, $metadata)), "upload_metadata returns");
 ok (! defined ($obj->download_metadata($h, $metadata.download)), "download_metadata returns");
 
 ok (-e $metadata.download && (-s $metadata.download > 0), "metadata download file exits");
 
+$l = $obj->list_handles();
 
+printf '%-38s %-20s %-12s %-1s', "id","creation_date","created_by","file";
+print "\n";
+
+foreach my $h (@$l) {
+	printf '%-38s %-20s %-12s %-1s',
+		$h->[0], $h->[7], $h->[6], $h->[1];
+	print "\n";
+	
+}
 # clean up
 done_testing;
-unlink $data.download;
-unlink $metadata.download;
+# unlink $data.download;
+# unlink $metadata.download;
 
