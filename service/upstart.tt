@@ -1,0 +1,20 @@
+# [% kb_service_name %]
+#
+# This service maintains a [% kb_service_name %] instance 
+#
+# Make sure to set up the user run account
+# shell> groupadd [% kb_runas_user %] 
+# shell> useradd -r -g [% kb_runas_user %] [% kb_runas_user %]
+
+start on runlevel [23]
+stop on runlevel [!23]
+
+respawn
+respawn limit 10 5
+
+pre-start exec chown -R [% kb_runas_user %] [% kb_top %]/services/[% kb_service_dir %]
+
+# setuid [% kb_runas_user %] will work if you upgrade upstart to 1.4 or higher
+# Then you don't need to do the su
+
+exec su [% kb_runas_user %] -c '[% kb_top %]/services/[% kb_service_dir %]/start_service >/dev/null 2>&1'
