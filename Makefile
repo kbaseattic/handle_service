@@ -1,4 +1,4 @@
-# to track variables added herein
+ # totrack variables added herein
 VARS_OLD := $(.VARIABLES)
 
 TOP_DIR = ../..
@@ -16,7 +16,7 @@ ifeq ($(SELF_URL),)
 endif
 
 SERVICE_PSGI = $(SERVICE_NAME).psgi
-TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI)
+TPAGE_ARGS = --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI)
 
 # to wrap scripts and deploy them to $(TARGET)/bin using tools in
 # the dev_container. right now, these vars are defined in
@@ -282,8 +282,13 @@ deploy-service: deploy-cfg
 	chmod +x $(TARGET)/services/$(SERVICE_DIR)/start_service
 	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE_DIR)/stop_service
 	chmod +x $(TARGET)/services/$(SERVICE_DIR)/stop_service
-#	$(MK_CONFIG)
+	$(TPAGE) $(TPAGE_ARGS) service/upstart.tt > service/$(SERVICE_NAME).conf
+	chmod +x service/$(SERVICE_NAME).conf
 	echo "done executing deploy-service target"
+
+deploy-upstart: deploy-service
+	-cp service/$(SERVICE_NAME).conf /etc/init/
+	echo "done executing deploy-upstart target"
 
 # Deploying docs here refers to the deployment of documentation
 # of the API. We'll include a description of deploying documentation
@@ -299,6 +304,7 @@ deploy-docs: build-docs
 # compile_typespec command is called in the build-libs target.
 
 build-docs: compile-docs
+	-mkdir -p docs
 	pod2html --infile=lib/Bio/KBase/$(SERVICE_NAME)/Client.pm --outfile=docs/$(SERVICE_NAME).html
 
 # Use the compile-docs target if you want to unlink the generation of
