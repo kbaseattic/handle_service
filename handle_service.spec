@@ -29,25 +29,31 @@ module AbstractHandle {
 	/* BASIC HANDLE CREATION FUNCTIONS */
 
 	
-	/* new_handle returns a Handle object with a url and a node id */
+	/* The new_handle function returns a Handle object with a url and a
+	   node id. The new_handle function invokes the localize_handle
+	   method first to set the url and then invokes the initialize_handle
+	   function to get an ID.
+	 */
 	funcdef new_handle() returns (Handle h) authentication required;
 
 	/* The localize_handle function attempts to locate a shock server near
  	   the service. The localize_handle function must be called before the
 	   Handle is initialized becuase when the handle is initialized, it is
 	   given a node id that maps to the shock server where the node was
-	   created.
+	   created. This function should not be called directly.
 	 */
 	funcdef localize_handle(Handle h1, string service_name)
 		returns (Handle h2);
 
-	/* initialize_handle returns a Handle object with an ID. */
+	/* The initialize_handle returns a Handle object with an ID. This
+	   function should not be called directly
+	 */
 	funcdef initialize_handle(Handle h1) returns (Handle h2) 
 		authentication required;
 
-	/* persist_handle writes the handle to a persistent store
-	   that can be later retrieved using the list_all, list_mine
-	   and list_ours functions.
+	/* The persist_handle writes the handle to a persistent store
+	   that can be later retrieved using the list_handles
+	   function.
 	*/
 	funcdef persist_handle(Handle h) returns ()
 		authentication required;
@@ -62,37 +68,37 @@ module AbstractHandle {
 	   implementation is not provided an error is thrown. These are
 	   the equivelant of abstract methods, with runtime rather than
 	   compile time inforcement.
+	
+	   [client_implemented]
 	*/
 	funcdef upload(string infile) returns(Handle h) 
 		authentication required;
 
+	/* The upload and download functions  provide an empty
+           implementation that must be provided in a client. If a concrete
+           implementation is not provided an error is thrown. These are
+           the equivelant of abstract methods, with runtime rather than
+           compile time inforcement.
+
+	   [client_implemented]
+	*/
 	funcdef download(Handle h, string outfile) returns()
 		authentication required;
 	
-
-
-	/* META DATA UPLOAD AND DOWNLOAD */
-
-
-	/* Not sure if these should be abstract or concrete. If concete
-	   then we don not have to hand roll an implemetation for the four
-	   different supported languages. The cost is an extra network
-	   hop. For now, I choose the extra network hop over implementing
-	   the same method by hand in for different languages. I belive it
-	   to be a safe assumption that the metadata will not exceed several
-	   megabytes in size.
-	*/
-
 	/* The upload_metadata function uploads metadata to an existing
 	   handle. This means that the data that the handle represents
 	   has already been uploaded. Uploading meta data before the data
 	   has been uploaded is not currently supported.
+
+	   [client_implemented]
 	*/
 	funcdef upload_metadata(Handle h, string infile) returns()
 		authentication required;
 
 	/* The download_metadata function downloads metadata associated
 	   with the data handle and writes it to a file.
+
+	   [client_implemented]
 	*/
 	funcdef download_metadata(Handle h, string outfile) returns()
 		authentication required;
@@ -101,25 +107,12 @@ module AbstractHandle {
 
 	/* STANDARD FUNCTIONS FOR LISTING ALL HANDLES */
 
-
-	/* The list_all function returns a set of handles. If the user
-	   is authenticated, it retuns the set of handles owned by the
-	   user and those that are public or shared.
+	/* The list function returns the set of handles that were
+	   created by the user. 
 	*/
-	funcdef list_all() returns (list<Handle> l)
-		authentication optional;
-
-	/* The list function returns the set of handles that belong
-	   to the user.
-	*/
-	funcdef list_mine() returns (list<Handle> l)
+	funcdef list_handles() returns (list<Handle> l)
 		authentication required;
 
-	/* Just stubbing this one out for now. The idea here is that
-	   ours is determined by way of user groups.
-	*/
-	funcdef list_ours() returns (list<Handle> l)
-		authentication required;
 
 };
 
