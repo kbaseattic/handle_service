@@ -71,3 +71,23 @@ To simplify the interface, we will require that the data be uploaded
 prior to the loading of metadata. By simplify, I mean reducing 
 the variable ways to use the interface to accomplish the same end
 goal.
+
+During implementation and testing, it becomes clear that keeping
+the interface consistent requires a client implementation. Let
+me explain. The upload and download methods take a file name.
+If upload_metadata and download_metatdata are also to take a
+filename, then it must be implemented on the client.
+
+handle = upload(infile)
+upload_metadata(handle, infile)
+download(handle, outfile)
+download_metadata(handle, outfile)
+
+the alternative is
+
+handle = upload(infile)
+upload_metadata(handle, json_txt);
+download(handle, outfile)
+json_txt = download_metadata(handle)
+
+I believe the first option is more consistent and easier to remember.
