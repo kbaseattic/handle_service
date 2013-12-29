@@ -8,4 +8,4 @@ export KB_DEPLOYMENT_CONFIG=$KB_TOP/deployment.cfg
 
 pid_file=$KB_SERVICE_DIR/service.pid
 
-exec $KB_RUNTIME/bin/perl $KB_RUNTIME/bin/starman --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/lib/[% kb_psgi %]
+exec $KB_RUNTIME/bin/perl $KB_RUNTIME/bin/starman --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/lib/[% kb_psgi %] --error-log $KB_SERVICE_DIR/error.log --workers 20 
