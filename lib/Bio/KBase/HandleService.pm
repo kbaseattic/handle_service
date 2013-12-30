@@ -92,7 +92,6 @@ sub upload {
 	$handle->{file_name} = basename ($infile);
 
 	$self->persist_handle($handle);
-
 	return $handle;
 }
 
