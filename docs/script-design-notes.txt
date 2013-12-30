@@ -40,4 +40,15 @@ suffix. Still, we could come back to this and require that
 all handle files be named with the .kbhs suffix.
 
 
- 
+Standard command line syntax:
+
+upload             --input  data_file   --output handle 
+download           --handle handle      --output data_file
+
+upload_metadata    --handle handle      --input  metadata_file
+download_metadata  --handle handle      --output metadata_file
+
+list_handles
+
+
+
