@@ -10,16 +10,28 @@ my ($in, $out);
 
 GetOptions(
 	'h'	=> \$help,
+        'i=s'   => \$in,
+        'o=s'   => \$out,
 	'help'	=> \$help,
 	'man'	=> \$man,
-	'i=s'   => \$in,
-	'o=s'   => \$out,
+	'input=s'  => \$in,
+	'output=s' => \$out,
+
 ) or pod2usage(0);
+
+
 pod2usage(-exitstatus => 0,
 	  -output => \*STDOUT,
-	  -verbose => 2,
+	  -verbose => 1,
 	  -noperldoc => 1,
-	 ) if $help or $man;
+	 ) if $help;
+
+pod2usage(-exitstatus => 0,
+          -output => \*STDOUT,
+          -verbose => 2,
+          -noperldoc => 1,
+         ) if $man;
+
 
 # do a little validation on the parameters
 
@@ -43,12 +55,14 @@ else {
 # main logic
 
 my $obj = [% kb_client %]->new();
-my $rv  = [% kb_client %]->[% kb_method %]();
+my $rv  = $obj->[% kb_method %]();
 
 
 sub serialize_handle {
 	my $handle = shift or
 		die "handle not passed to serialize_handle";
+	my $oh = shift or
+		die "output file handle not passed to serialize_handle";
         my $json_text = to_json( $handle, { ascii => 1, pretty => 1 } );
 	print $oh $json_text;
 }	
@@ -72,21 +86,31 @@ sub deserialize_handle {
 
 =head1	SYNOPSIS
 
-[% kb_method %] <params>
+[% kb_method %] <options>
 
 =head1	DESCRIPTION
 
 The [% kb_method %] command calls the [% kb_method %] method of a [% kb_client %] object.
 
-=head1	COMMAND-LINE OPTIONS
+=head1	OPTIONS
 
 =over
 
-=item	-h, --help, --man  This documentation
+=item	-h, --help
 
-=item   -i
+Basic usage documentation
 
-=item   -o
+=item   --man
+
+More detailed documentation
+
+=item   -i, --input
+
+The input file, default is STDIN
+
+=item   -o, --output
+
+The output file, default is STDOUT
 
 =back
 
