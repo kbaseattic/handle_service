@@ -1,14 +1,15 @@
 #!/usr/bin/perl
 
-unless (@ARGV==3) {
-	print "Usage: tpage_command client prefix method\n";
+unless (@ARGV>=3) {
+	print "Usage: tpage_command <client> <prefix> <method> <optional author>\n";
 	exit;
 }
 
 my $kb_client = $ARGV[0];
 my $kb_prefix = $ARGV[1];
 my $kb_method = $ARGV[2];
-my $kb_author = "\"Thomas Brettin\"";
+my $kb_author = "\"KBase\"";
+$kb_author    = "\"$ARGV[3]\"" if defined $ARGV[3];
 
 $kb_script = $kb_prefix . "-" . $kb_method;
 
