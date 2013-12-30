@@ -536,64 +536,7 @@ sub upload
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($h);
     #BEGIN upload
-
-    #
-    # Invoke script to implement this method: 
-    #
-    # We set up temp files for input and output of the parameters and returns.
-    # Data structures are passed via JSON in the filesystem (in temp space).
-    #
-    my %_inputs;
-    my %_filenames;
-    my %_outputs;
-    my $_coder = JSON::XS->new->ascii->pretty->allow_nonref;
-
-    {
-	my $_temp = File::Temp->new();
-	print $_temp $_coder->encode($infile);
-	close($_temp);
-	my $_file = $_temp->filename;
-	$_inputs{'infile'} = $_temp;
-	$_filenames{'infile'} = $_file;
-    }
-    
-
-    {
-	my $_temp = File::Temp->new();
-	close($_temp);
-	my $_file = $_temp->filename;
-	$_outputs{'h'} = $_temp;
-	$_filenames{'h'} = $_file;
-    }
-
-    #
-    # Now we can construct our pipeline.
-    # For now, implemented_by is a single-element array.
-    #
-    my $_cmd = q();
-    $_cmd =~ s/%([a-zA-Z0-9_]+)/\'$_filenames{$1}\'/g;
-
-    my $_res = system($_cmd);
-    if ($_res != 0)
-    {
-	die "Error $_res running command: $_cmd";
-    }
-
-
-    {
-	my $_name = q(h);
-	my $_temp = $_outputs{$_name};
-	my $_file = $_temp->filename;
-	my $_txtref = read_file($_file, scalar_ref => 1);
-	if (!ref($_txtref))
-	{
-	    die "Error executing script: output file $_name not found";
-	}
-	$h = $_coder->decode($$_txtref);
-    }
-
-
-    
+	die "upload cannot be called on AbstractHandle";
     #END upload
     my @_bad_returns;
     (ref($h) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h\" (value was \"$h\")");
@@ -805,20 +748,7 @@ sub upload_metadata
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     #BEGIN upload_metadata
-
-
-	my $id  = $h->{id}  or die "no id in handle";
-	my $url = $h->{url} or die "no url in handle";
-
-	if($h->{type} eq "shock") {
-		my $cmd = "curl -s -H \'Authorization: OAuth $ctx->{token}\' -X PUT -F attributes=\'$infile\' $url/node/$id";
-		INFO "cmd: $cmd";
-		!system $cmd or die "could not execute curl in upload_metadata\n$cmd";
-	}
-	else {
-		die "invalid handle type: $h->{type}";
-	}
-
+	die "upload_metadata should not be called on AbstractHandle";
     #END upload_metadata
     return();
 }
@@ -895,18 +825,7 @@ sub download_metadata
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     #BEGIN download_metadata
-
-	my $id  = $h->{id} or die "no id in handle";
-	my $url = $h->{url} or die "no url in handle";
-	if($h->{type} eq "shock") {
-		my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -o $outfile -X GET $default_shock/node/$id";
-		INFO "cmd: $cmd";
-		!system $cmd or die "could not execute curl in download_metadata";
-	}
-	else {
-		die "invalid handle type: $h->{type}";
-	}
-
+	die "Cannot call download_metadata on AbstractHandle";
     #END download_metadata
     return();
 }
