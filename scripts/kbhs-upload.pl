@@ -3,6 +3,7 @@ use Bio::KBase::HandleService;
 use Getopt::Long; 
 use JSON;
 use Pod::Usage;
+use Data::Dumper;
 
 my $man  = 0;
 my $help = 0;
@@ -10,16 +11,33 @@ my ($in, $out);
 
 GetOptions(
 	'h'	=> \$help,
+        'i=s'   => \$in,
+        'o=s'   => \$out,
 	'help'	=> \$help,
 	'man'	=> \$man,
-	'i=s'   => \$in,
-	'o=s'   => \$out,
+	'input=s'  => \$in,
+	'output=s' => \$out,
+
 ) or pod2usage(0);
+
+
 pod2usage(-exitstatus => 0,
 	  -output => \*STDOUT,
-	  -verbose => 2,
+	  -verbose => 1,
 	  -noperldoc => 1,
-	 ) if $help or $man;
+	 ) if $help;
+
+pod2usage(-exitstatus => 0,
+          -output => \*STDOUT,
+          -verbose => 2,
+          -noperldoc => 1,
+         ) if $man;
+
+pod2usage(-exitstatus => 0,
+          -output => \*STDOUT,
+          -verbose => 1,
+          -noperldoc => 1,
+         ) if ! $in;
 
 # do a little validation on the parameters
 
@@ -43,10 +61,12 @@ else {
 # main logic
 
 my $obj = Bio::KBase::HandleService->new();
-my $rv  = Bio::KBase::HandleService->upload($in);
-serialize_handle($rv);
+my $rv  = $obj->upload($in);
+serialize_handle($oh, $rv);
 
 sub serialize_handle {
+	my $oh = shift or
+		die "output file handle not passed to serialize_handle";
 	my $handle = shift or
 		die "handle not passed to serialize_handle";
         my $json_text = to_json( $handle, { ascii => 1, pretty => 1 } );
@@ -72,21 +92,23 @@ upload
 
 =head1	SYNOPSIS
 
-upload <params>
+upload <options>
 
 =head1	DESCRIPTION
 
-The upload command calls the upload method of a Bio::KBase::HandleService object.
+The upload command calls the upload method of a Bio::KBase::HandleService object. It takes as input a file to upload and returns a serialized handle in JSON format. The serialized handle is written to either SDTDOUT (if --output is not specified) or to a file specified by --output.
 
-=head1	COMMAND-LINE OPTIONS
+=head1	OPTIONS
 
 =over
 
-=item	-h, --help, --man  This documentation
+=item	-h, --help   Basic usage documentation
 
-=item   -i
+=item   --man        More detailed documentation
 
-=item   -o
+=item   -i, --input  The input file containing the data to upload
+
+=item   -o, --output The output file containing the serialized data handle, default is STDOUT
 
 =back
 

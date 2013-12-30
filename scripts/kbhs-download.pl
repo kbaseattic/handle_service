@@ -7,43 +7,58 @@ use Pod::Usage;
 my $man  = 0;
 my $help = 0;
 my ($in, $out);
+my ($handle);
 
 GetOptions(
 	'h'	=> \$help,
+        'i=s'   => \$in,
+        'o=s'   => \$out,
 	'help'	=> \$help,
 	'man'	=> \$man,
-	'i=s'   => \$in,
-	'o=s'   => \$out,
+	'input=s'  => \$in,
+	'output=s' => \$out,
+	'handle=s' => \$handle,
+
 ) or pod2usage(0);
+
+
 pod2usage(-exitstatus => 0,
 	  -output => \*STDOUT,
-	  -verbose => 2,
+	  -verbose => 1,
 	  -noperldoc => 1,
-	 ) if $help or $man;
+	 ) if $help;
+
+pod2usage(-exitstatus => 0,
+          -output => \*STDOUT,
+          -verbose => 2,
+          -noperldoc => 1,
+         ) if $man;
+
+pod2usage(-exitstatus => 0,
+          -output => \*STDOUT,
+          -verbose => 1,
+          -noperldoc => 1,
+         ) if ! $out;
+
 
 # do a little validation on the parameters
 
 
 my ($ih, $oh);
 
-if ($in) {
-    open $ih, "<", $in or die "Cannot open input file $in: $!";
+if ($handle) {
+    open $ih, "<", $handle
+	or die "Cannot open input handle file $handle: $!";
 }
 else {
     $ih = \*STDIN;
 }
-if ($out) {
-    open $oh, ">", $out or die "Cannot open output file $out: $!";
-}
-else {
-    $oh = \*STDOUT;
-}
-
 
 # main logic
-my $han = deserialize($ih);
+# there must be an ih and an out
 my $obj = Bio::KBase::HandleService->new();
-my $rv  = Bio::KBase::HandleService->download($han, $out);
+my $h = deserialize_handle($ih);
+my $rv  = $obj->download($h, $out);
 
 
 sub serialize_handle {
@@ -72,21 +87,23 @@ download
 
 =head1	SYNOPSIS
 
-download <params>
+download <options>
 
 =head1	DESCRIPTION
 
-The download command calls the download method of a Bio::KBase::HandleService object.
+The download command calls the download method of a Bio::KBase::HandleService object. It takes as input a JSON serialized handle either from a file (specified by the --handle option) or STDIN (if the --handle option is not provided) and downloads the data represented by the handle to a file that is specified by the --output option.
 
-=head1	COMMAND-LINE OPTIONS
+=head1	OPTIONS
 
 =over
 
-=item	-h, --help, --man  This documentation
+=item	-h, --help   Basic usage documentation
 
-=item   -i
+=item   --man        More detailed documentation
 
-=item   -o
+=item   --handle     The input file containing the handle. If not specified, then defaults to STDIN.
+
+=item   -o, --output The file to write the downloaded data to (REQUIRED)
 
 =back
 

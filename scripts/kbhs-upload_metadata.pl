@@ -7,44 +7,57 @@ use Pod::Usage;
 my $man  = 0;
 my $help = 0;
 my ($in, $out);
+my ($handle);
 
 GetOptions(
 	'h'	=> \$help,
+        'i=s'   => \$in,
+        'o=s'   => \$out,
 	'help'	=> \$help,
 	'man'	=> \$man,
-	'i=s'   => \$in,
-	'o=s'   => \$out,
+	'input=s'  => \$in,
+	'output=s' => \$out,
+	'handle=s' => \$handle,
+
 ) or pod2usage(0);
+
+
 pod2usage(-exitstatus => 0,
 	  -output => \*STDOUT,
-	  -verbose => 2,
+	  -verbose => 1,
 	  -noperldoc => 1,
-	 ) if $help or $man;
+	 ) if $help;
 
+pod2usage(-exitstatus => 0,
+          -output => \*STDOUT,
+          -verbose => 2,
+          -noperldoc => 1,
+         ) if $man;
+
+pod2usage(-exitstatus => 0,
+          -output => \*STDOUT,
+          -verbose => 1,
+          -noperldoc => 1,
+         ) if ! $in;
 # do a little validation on the parameters
 
 
 my ($ih, $oh);
 
-if ($in) {
-    open $ih, "<", $in or die "Cannot open input file $in: $!";
+if ($handle) {
+    open $ih, "<", $handle or die "Cannot open input file $handle: $!";
 }
 else {
     $ih = \*STDIN;
-}
-if ($out) {
-    open $oh, ">", $out or die "Cannot open output file $out: $!";
-}
-else {
-    $oh = \*STDOUT;
 }
 
 
 # main logic
 
 my $obj = Bio::KBase::HandleService->new();
-my $rv  = Bio::KBase::HandleService->upload_metadata($in);
-serialize_handle($rv);
+my $h   = deserialize_handle($ih);
+my $rv  = $obj->upload_metadata($h, $in);
+
 
 sub serialize_handle {
 	my $handle = shift or
@@ -72,21 +85,31 @@ upload_metadata
 
 =head1	SYNOPSIS
 
-upload_metadata <params>
+upload_metadata <options>
 
 =head1	DESCRIPTION
 
 The upload_metadata command calls the upload_metadata method of a Bio::KBase::HandleService object.
 
-=head1	COMMAND-LINE OPTIONS
+=head1	OPTIONS
 
 =over
 
-=item	-h, --help, --man  This documentation
+=item	-h, --help
 
-=item   -i
+Basic usage documentation
 
-=item   -o
+=item   --man
+
+More detailed documentation
+
+=item   -i, --input
+
+The input file containing the metadata to upload (REQUIRED) 
+
+=item   --handle
+
+The file containing the serialized handle representing the data that the metadata specified by --input will be associated with. The handle input file defaults to STDIN if not provided as an option.
 
 =back
 
