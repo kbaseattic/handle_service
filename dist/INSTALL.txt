@@ -1,0 +1,51 @@
+INSTALL:
+
+1.  perl Makefile.PL
+2.  make
+3.  make test
+4.  make install
+
+You will need administrative privileges to install
+in the default location. See the documentation on
+Module::Build to specificy an alternative location.
+
+
+
+DEPENDANCIES:
+
+There are several perl module dependencies. Each of these
+can be installed using the cpan command. 
+
+  cpan install LWP::UserAgent
+  cpan install JSON::RPC::Client
+  cpan install Exception::Class
+  cpan install Config::Simple
+  cpan install MongoDB
+  cpan install Digest::SHA1
+  cpan install Crypt::OpenSSL::RSA
+  cpan install Convert::PEM
+  cpan install Object::Tiny::RW
+
+On an Ubuntu system, these system components need to be
+installed, and cam be installed using the apt-get command.
+
+  apt-get update
+  apt-get install make
+  apt-get install gcc
+  apt-get install openssl
+  apt-get install libssl-dev
+ 
+
+
+TESTING:
+
+
+
+NON STANDARD INSTALLATION LOCATION:
+
+1.  perl Makefile.PL BASE_DIR=/var/tmp/local
+2.  make
+3.  make test
+4.  make install
+
+
