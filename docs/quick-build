@@ -1,9 +1,0 @@
-/kb/deployment/services/handle_service/stop_service
-cd ../..
-source user-env.sh
-make
-make deploy
-source /kb/deployment/user-env.sh
-/kb/deployment/services/handle_service/start_service &
-cd modules
-cd handle_service 

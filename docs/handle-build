@@ -1,5 +1,0 @@
-/kb/deployment/services/handle_service/stop_service
-source user-env.sh
-cp lib/Bio/KBase/HandleService.pm /kb/deployment/lib/Bio/KBase
-source /kb/deployment/user-env.sh
-/kb/deployment/services/handle_service/start_service &
