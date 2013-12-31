@@ -623,53 +623,7 @@ sub download
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     #BEGIN download
-
-    #
-    # Invoke script to implement this method: 
-    #
-    # We set up temp files for input and output of the parameters and returns.
-    # Data structures are passed via JSON in the filesystem (in temp space).
-    #
-    my %_inputs;
-    my %_filenames;
-    my %_outputs;
-    my $_coder = JSON::XS->new->ascii->pretty->allow_nonref;
-
-    {
-	my $_temp = File::Temp->new();
-	print $_temp $_coder->encode($h);
-	close($_temp);
-	my $_file = $_temp->filename;
-	$_inputs{'h'} = $_temp;
-	$_filenames{'h'} = $_file;
-    }
-
-    {
-	my $_temp = File::Temp->new();
-	print $_temp $_coder->encode($outfile);
-	close($_temp);
-	my $_file = $_temp->filename;
-	$_inputs{'outfile'} = $_temp;
-	$_filenames{'outfile'} = $_file;
-    }
-    
-
-    #
-    # Now we can construct our pipeline.
-    # For now, implemented_by is a single-element array.
-    #
-    my $_cmd = q();
-    $_cmd =~ s/%([a-zA-Z0-9_]+)/\'$_filenames{$1}\'/g;
-
-    my $_res = system($_cmd);
-    if ($_res != 0)
-    {
-	die "Error $_res running command: $_cmd";
-    }
-
-
-
-    
+	die "download called on AbstractHandle";
     #END download
     return();
 }
