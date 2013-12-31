@@ -12,4 +12,5 @@ rm -rf	pod2htmd.tmp
 rm -rf	docs/AbstractHandle.html
 rm -rf	lib/AbstractHandle.psgi
 rm -rf	lib/AbstractHandleImpl.py
+rm -rf  service/AbstractHandle.conf
 
