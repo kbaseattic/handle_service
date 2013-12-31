@@ -136,6 +136,6 @@ ok(ref ( $obj->list_handles() ) eq "ARRAY", "list handles returned list");
 
 # clean up
 done_testing;
-# unlink $data.download;
-# unlink $metadata.download;
+unlink $data.download;
+unlink $metadata.download;
 
