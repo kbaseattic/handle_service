@@ -105,7 +105,7 @@ module AbstractHandle {
 
 
 
-	/* STANDARD FUNCTIONS FOR LISTING ALL HANDLES */
+	/* STANDARD FUNCTIONS FOR MANAGING HANDLES */
 
 	/* The list function returns the set of handles that were
 	   created by the user. 
@@ -113,6 +113,11 @@ module AbstractHandle {
 	funcdef list_handles() returns (list<Handle> l)
 		authentication required;
 
+	/* The delete_handles function takes a list of handles
+	   and deletes them on the handle service server.
+	*/
+	funcdef delete_handles(List<Handle> l) returns ()
+		authentication required;
 
 };
 
