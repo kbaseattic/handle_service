@@ -116,7 +116,7 @@ module AbstractHandle {
 	/* The delete_handles function takes a list of handles
 	   and deletes them on the handle service server.
 	*/
-	funcdef delete_handles(List<Handle> l) returns ()
+	funcdef delete_handles(list<Handle> l) returns ()
 		authentication required;
 
 };
