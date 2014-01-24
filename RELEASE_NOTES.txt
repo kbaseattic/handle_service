@@ -1,0 +1,5 @@
+The handle service provides handles to shock nodes.
+
+Initial release of handle service. v.0.1.0
+- programming API
+- command line interface
