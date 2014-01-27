@@ -8,7 +8,7 @@ module AssemblyInputHandle {
 	*/
 	typedef structure {
 	    string shock_id;
-		string filename;
+            string filename;
 	} Handle;
 
 	/*
