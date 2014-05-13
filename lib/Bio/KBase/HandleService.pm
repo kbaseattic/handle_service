@@ -71,7 +71,9 @@ sub upload {
 	my $tok = Bio::KBase::AuthToken->new();
 
 	my $url = $handle->{url} . "/node/" . $handle->{id};
-	my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X PUT -F upload=\@$infile $url";
+	my $auth_header;
+	$auth_header = "-H 'Authorization: OAuth $tok->{token}'" if $tok->{token};
+	my $cmd = "curl -s $auth_header -X PUT -F upload=\@$infile $url";
 
 	my $json = `$cmd 2> /dev/null`;
 	die "failed to run: $cmd\n$!" if $? == -1;
@@ -126,7 +128,9 @@ sub download {
 	my $tok = Bio::KBase::AuthToken->new();
 
 	my $url = $handle->{url} . "/node/" . $handle->{id};
-	my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X GET $url/?download > $outfile";
+	my $auth_header;
+	$auth_header = "-H 'Authorization: OAuth $tok->{token}'"  if $tok->{token};
+	my $cmd = "curl -s $auth_header -X GET $url/?download > $outfile";
 
 	my $json = `$cmd 2> /dev/null`;
 	die "failed to run: $cmd\n$!" if $? == -1;
@@ -169,7 +173,9 @@ sub upload_metadata {
 
         if($handle->{type} eq "shock") {
 		my $url = $handle->{url} . "/node/" . $handle->{id};
-		my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X PUT -F attributes=\@$infile $url > /dev/null 2>&1";
+		my $auth_header;
+		$auth_header = "-H 'Authorization: OAuth $tok->{token}'"  if $tok->{token};
+		my $cmd = "curl -s $auth_header -X PUT -F attributes=\@$infile $url > /dev/null 2>&1";
 		!system $cmd or die "could not execute curl in upload_metadata\n$cmd";
         }
         else {
@@ -197,7 +203,9 @@ sub download_metadata {
         my $tok = Bio::KBase::AuthToken->new();
 
         my $url = $handle->{url} . "/node/" . $handle->{id};
-        my $cmd = "curl -s -H \'Authorization: OAuth $tok->{token}\' -X GET $url";
+        my $auth_header;
+        $auth_header = "-H 'Authorization: OAuth $tok->{token}'"  if $tok->{token};
+        my $cmd = "curl -s $auth_header -X GET $url";
 
         my $json = `$cmd 2> /dev/null`;
         die "failed to run: $cmd\n$!" if $? == -1;

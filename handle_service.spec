@@ -34,7 +34,7 @@ module AbstractHandle {
 	   method first to set the url and then invokes the initialize_handle
 	   function to get an ID.
 	 */
-	funcdef new_handle() returns (Handle h) authentication required;
+	funcdef new_handle() returns (Handle h) authentication optional;
 
 	/* The localize_handle function attempts to locate a shock server near
  	   the service. The localize_handle function must be called before the
@@ -49,14 +49,14 @@ module AbstractHandle {
 	   function should not be called directly
 	 */
 	funcdef initialize_handle(Handle h1) returns (Handle h2) 
-		authentication required;
+		authentication optional;
 
 	/* The persist_handle writes the handle to a persistent store
 	   that can be later retrieved using the list_handles
 	   function.
 	*/
 	funcdef persist_handle(Handle h) returns ()
-		authentication required;
+		authentication optional;
 
 
 
@@ -72,7 +72,7 @@ module AbstractHandle {
 	   [client_implemented]
 	*/
 	funcdef upload(string infile) returns(Handle h) 
-		authentication required;
+		authentication optional;
 
 	/* The upload and download functions  provide an empty
            implementation that must be provided in a client. If a concrete
@@ -83,7 +83,7 @@ module AbstractHandle {
 	   [client_implemented]
 	*/
 	funcdef download(Handle h, string outfile) returns()
-		authentication required;
+		authentication optional;
 	
 	/* The upload_metadata function uploads metadata to an existing
 	   handle. This means that the data that the handle represents
@@ -93,7 +93,7 @@ module AbstractHandle {
 	   [client_implemented]
 	*/
 	funcdef upload_metadata(Handle h, string infile) returns()
-		authentication required;
+		authentication optional;
 
 	/* The download_metadata function downloads metadata associated
 	   with the data handle and writes it to a file.
@@ -101,7 +101,7 @@ module AbstractHandle {
 	   [client_implemented]
 	*/
 	funcdef download_metadata(Handle h, string outfile) returns()
-		authentication required;
+		authentication optional;
 
 
 
@@ -111,13 +111,13 @@ module AbstractHandle {
 	   created by the user. 
 	*/
 	funcdef list_handles() returns (list<Handle> l)
-		authentication required;
+		authentication optional;
 
 	/* The delete_handles function takes a list of handles
 	   and deletes them on the handle service server.
 	*/
 	funcdef delete_handles(list<Handle> l) returns ()
-		authentication required;
+		authentication optional;
 
 };
 

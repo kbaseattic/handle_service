@@ -56,6 +56,7 @@ sub new
         system("curl -h > /dev/null 2>&1") == 0  or
             die "curl not found, maybe you need to install it";
 
+	!system("curl $default_shock") or die "appears shock is unavailable at $default_shock";
 	my @connection = ($data_source, $mysql_user, $mysql_pass, {});
 	$self->{dbh} = DBI->connect(@connection);
 	# need some assurance that the handle is still connected. not 
@@ -336,7 +337,10 @@ sub initialize_handle
 
         $h2 = $h1;
 
-        my $cmd = "curl -s -H \'Authorization: OAuth " . $ctx->{token} . "\' -X POST $default_shock/node";
+	my $auth_header;
+	$auth_header = "-H 'Authorization: OAuth " . $ctx->{token} . "'" if $ctx->{token};
+
+        my $cmd = "curl -s $auth_header -X POST $default_shock/node";
 	DEBUG $cmd;
         my $json_node = capture($cmd);
         my $ref = decode_json $json_node;
@@ -844,11 +848,15 @@ sub list_handles
     my($l);
     #BEGIN list_handles
 
-	my $user = $ctx->{user_id}; 
+	my $user = 'NULL';
+	$user = $ctx->{user_id} if $ctx->{user_id}; 
 	DEBUG Dumper $ctx;
 	$user = $self->{get_dbh}->()->quote($user);
 
-        my $sql = "SELECT * FROM Handle WHERE created_by = $user";
+	my $sql  = "SELECT * FROM Handle WHERE created_by = $user";
+	if ( $user eq "'NULL'" ) {
+		$sql = "SELECT * FROM Handle WHERE created_by is NULL";
+	}
         DEBUG $sql;
 
         my $sth = $self->{get_dbh}->()->prepare($sql)
@@ -867,6 +875,77 @@ sub list_handles
 							       method_name => 'list_handles');
     }
     return($l);
+}
+
+
+
+
+=head2 delete_handles
+
+  $obj->delete_handles($l)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$l is a reference to a list where each element is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$l is a reference to a list where each element is a Handle
+Handle is a reference to a hash where the following keys are defined:
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+The delete_handles function takes a list of handles
+and deletes them on the handle service server.
+
+=back
+
+=cut
+
+sub delete_handles
+{
+    my $self = shift;
+    my($l) = @_;
+
+    my @_bad_arguments;
+    (ref($l) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"l\" (value was \"$l\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to delete_handles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'delete_handles');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    #BEGIN delete_handles
+    #END delete_handles
+    return();
 }
 
 

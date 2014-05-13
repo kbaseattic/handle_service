@@ -3,3 +3,8 @@ The handle service provides handles to shock nodes.
 Initial release of handle service. v.0.1.0
 - programming API
 - command line interface
+
+05/12/2014
+Authentiation is now optional. If used in unauthenticated
+mode, then anyone who is operating in the unauthenticated
+mode will be able to see the handle and retreive the data.
