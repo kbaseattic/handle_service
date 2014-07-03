@@ -128,12 +128,13 @@ sub download {
 	my $tok = Bio::KBase::AuthToken->new();
 
 	my $url = $handle->{url} . "/node/" . $handle->{id};
-	my $auth_header;
-	$auth_header = "-H 'Authorization: OAuth $tok->{token}'"  if $tok->{token};
-	my $cmd = "curl -s $auth_header -X GET $url/?download > $outfile";
+	my @auth_header;
+	@auth_header = ("-H", "Authorization: OAuth $tok->{token}")  if $tok->{token};
 
-	my $json = `$cmd 2> /dev/null`;
-	die "failed to run: $cmd\n$!" if $? == -1;
+	my @cmd = ("curl", "-s", @auth_header, '-o', $outfile, '-X', 'GET', "$url/?download");
+	my $rc = system(@cmd);
+
+	die "failed to run: @cmd\n$!" if $rc != 0;
 
 	return;
 }

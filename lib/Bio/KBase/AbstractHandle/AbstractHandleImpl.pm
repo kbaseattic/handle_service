@@ -26,12 +26,13 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
 
 our $cfg = {};
-our ($default_shock, $mysql_user, $mysql_pass, $data_source);
+our ($default_shock, $mysql_host, $mysql_user, $mysql_pass, $data_source);
 
 if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $cfg = new Config::Simple($ENV{KB_DEPLOYMENT_CONFIG}) or
         die "could not construct new Config::Simple object";
     $default_shock = $cfg->param('handle_service.default-shock-server');
+    $mysql_host    = $cfg->param('handle_service.mysql-host');
     $mysql_user    = $cfg->param('handle_service.mysql-user');
     $mysql_pass    = $cfg->param('handle_service.mysql-pass');
     $data_source   = $cfg->param('handle_service.data-source');
@@ -57,7 +58,12 @@ sub new
             die "curl not found, maybe you need to install it";
 
 	!system("curl $default_shock") or die "appears shock is unavailable at $default_shock";
-	my @connection = ($data_source, $mysql_user, $mysql_pass, {});
+	my $ds = $data_source;
+	if ($mysql_host)
+	{
+	    $ds .= ";host=$mysql_host";
+	}
+	my @connection = ($ds, $mysql_user, $mysql_pass, {});
 	$self->{dbh} = DBI->connect(@connection);
 	# need some assurance that the handle is still connected. not 
 	# totally sure this will work. needs to be tested.
