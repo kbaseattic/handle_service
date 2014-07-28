@@ -88,6 +88,8 @@ ok (exists $h->{hid}, "hid in handle exists");
 
 ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
 
+ok ($obj->are_readable([$h->{hid}]), "hid in h is readable");
+
 # upload a file
 
 ok ($h = $obj->upload($data), "upload returns defined");

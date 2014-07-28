@@ -22,6 +22,8 @@ use Data::Dumper;
 use Config::Simple;
 use IPC::System::Simple qw(capture);
 use JSON;
+use HTTP::Request;
+use LWP::UserAgent;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
 
@@ -856,6 +858,173 @@ sub download_metadata
 	die "Cannot call download_metadata on AbstractHandle";
     #END download_metadata
     return();
+}
+
+
+
+
+=head2 are_readable
+
+  $return = $obj->are_readable($arg_1)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$arg_1 is a reference to a list where each element is a HandleId
+$return is an int
+HandleId is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$arg_1 is a reference to a list where each element is a HandleId
+$return is an int
+HandleId is an int
+
+
+=end text
+
+
+
+=item Description
+
+Given a list of handle ids, this function determines if
+the underlying data is readable by the caller. If any
+one of the handle ids reference unreadable data this
+function returns false.
+
+=back
+
+=cut
+
+sub are_readable
+{
+    my $self = shift;
+    my($arg_1) = @_;
+
+    my @_bad_arguments;
+    (ref($arg_1) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"arg_1\" (value was \"$arg_1\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to are_readable:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'are_readable');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($return);
+    #BEGIN are_readable
+
+	$return = 0;
+	my %readable;
+	my $dbh = $self->{get_dbh}->();
+	my $sql = "select * from Handle where hid in ( ";
+	$sql   .= join ", ", @$arg_1;
+	$sql   .= " )";
+	print "are_readable: $sql\n";
+
+	my $sth = $dbh->prepare($sql) or die "can not prepare $sql\n$DBI::errstr";
+	my $rv  = $sth->execute() or die "can not execute $sql\n$DBI::errstr";
+
+	my $ua = LWP::UserAgent->new();
+
+	foreach my $record ($sth->fetchrow_hashref()) {
+		my $node = $default_shock . "/" . $record->{id};	 
+    		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
+		$ua->prepare_request($req);
+		my $get = $ua->send_request($req);
+    		if($get->is_success) {
+			$return = 1;
+		}
+		else {
+			$return = 0;
+			last;
+		}
+	}
+
+    #END are_readable
+    my @_bad_returns;
+    (!ref($return)) or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to are_readable:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'are_readable');
+    }
+    return($return);
+}
+
+
+
+
+=head2 is_readable
+
+  $return = $obj->is_readable($id)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$id is a string
+$return is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$id is a string
+$return is an int
+
+
+=end text
+
+
+
+=item Description
+
+Given a handle id, this function queries the underlying
+data store to see if the data being referred to is
+readable to by the caller.
+
+=back
+
+=cut
+
+sub is_readable
+{
+    my $self = shift;
+    my($id) = @_;
+
+    my @_bad_arguments;
+    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to is_readable:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'is_readable');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($return);
+    #BEGIN is_readable
+    #END is_readable
+    my @_bad_returns;
+    (!ref($return)) or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to is_readable:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'is_readable');
+    }
+    return($return);
 }
 
 
