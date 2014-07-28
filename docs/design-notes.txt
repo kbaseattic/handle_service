@@ -91,3 +91,20 @@ download(handle, outfile)
 json_txt = download_metadata(handle)
 
 I believe the first option is more consistent and easier to remember.
+
+WORKSPACE SUPPORT
+
+for handles to be identifiable in the workspace, they need an Id.
+1) create handle id.
+
+hid UNSIGNED INT NOT NULL AUTO_INCREMENT
+
+To create ths means that I have to back-populate the database with
+handle ids. I think the best way to do this is to dump the database
+using a custom sql command, alter the table adding the autoincrement
+field, and then using mysqlimport to reimport and let the
+autoincrement do it's thing. The dump command will be:
+
+mysql -e "select 0, * from Handle" hsi > Handle.tab
+mysql -s -e 'select 0, id,file_name,type,url,remote_md5,remote_sha1,created_by,creation_date from Handle' -u  hsi -p hsi > Handle.tab
+

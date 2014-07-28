@@ -70,6 +70,7 @@ can_ok("Bio::KBase::HandleService", qw(
 	 )
 );
 
+# create a new handle
 
 isa_ok ($obj = Bio::KBase::HandleService->new($url), Bio::KBase::HandleService);
 
@@ -83,6 +84,9 @@ ok (exists $h->{id}, "id in handle exists");
 
 ok (defined $h->{id}, "id defined in handle $h->{id}");
 
+ok (exists $h->{hid}, "hid in handle exists");
+
+ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
 
 # upload a file
 
@@ -97,6 +101,10 @@ ok (defined $h->{url}, "url defined in handle $h->{url}");
 ok (exists $h->{id}, "id in handle exists");
 
 ok (defined $h->{id}, "id defined in handle $h->{id}");
+
+ok (exists $h->{hid}, "hid in handle exists");
+
+ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
 
 ok ($h->{remote_md5} eq $local_md5, "uploaded file has correct md5");
 

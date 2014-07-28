@@ -15,7 +15,9 @@ module AbstractHandle {
 	   computed on the file in the remote data store. These
 	   can be used to verify uploads and downloads.
 	*/
+	typedef int HandleId;
 	typedef structure {
+		HandleId hid;
 		string file_name;
 		string id;
 		string type;
@@ -55,7 +57,7 @@ module AbstractHandle {
 	   that can be later retrieved using the list_handles
 	   function.
 	*/
-	funcdef persist_handle(Handle h) returns ()
+	funcdef persist_handle(Handle h) returns (int hid)
 		authentication optional;
 
 

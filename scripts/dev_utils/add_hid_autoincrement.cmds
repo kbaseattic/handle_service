@@ -1,0 +1,7 @@
+mysql -s -e 'select 0, id,file_name,type,url,remote_md5,remote_sha1,created_by,creation_date from Handle' -u  hsi -p hsi  > Handle.tab
+mysql -e 'drop database hsi' -u root
+mysql -e 'drop user hsi@localhost' -u root
+mysql -u root < hsi.sql 
+mysqlimport -u root -h localhost -L hsi Handle.tab 
+mysql -u root -e "alter table Handle add constraint unique_id UNIQUE (id)" hsi
+
