@@ -927,7 +927,7 @@ sub are_readable
 	my %readable;
 	my $dbh = $self->{get_dbh}->();
 	my $sql = "select * from Handle where hid in ( ";
-	$sql   .= join ", ", @$arg_1;
+	$sql   .= join ", ", @$arg_1; #seems like SQL injection is possible here
 	$sql   .= " )";
 	DEBUG "are_readable: $sql\n";
 
@@ -936,11 +936,11 @@ sub are_readable
 
 	my $ua = LWP::UserAgent->new();
 
-	foreach my $record ($sth->fetchrow_hashref()) {
+	while (my $record = $sth->fetchrow_hashref()) {
 		my $node = $default_shock . "/node/" . $record->{id};	 
 		DEBUG "are_readable node: $node\n";
 
-    		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
+		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
 		$ua->prepare_request($req);
 		my $get = $ua->send_request($req);
 		unless ($get->is_success) {
@@ -963,6 +963,10 @@ sub are_readable
 			die "did not recognize status (200 or 401), saw $perl_scalar->{status}";
 		}
 		
+	}
+	
+	if ($sth->rows < scalar(@{$arg_1})) {
+		$return = 0; # missing records
 	}
 
     #END are_readable
