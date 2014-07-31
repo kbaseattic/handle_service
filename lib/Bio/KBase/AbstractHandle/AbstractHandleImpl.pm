@@ -927,7 +927,7 @@ sub are_readable
 	my %readable;
 	my $dbh = $self->{get_dbh}->();
 	my $sql = "select * from Handle where hid in ( ";
-	$sql   .= join(", ", "?" x scalar(@{$arg_1}));
+	$sql   .= join(", ", ("?") x scalar(@{$arg_1}));
 	$sql   .= " )";
 	DEBUG "are_readable: $sql\n";
 
