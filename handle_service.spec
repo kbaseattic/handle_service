@@ -119,5 +119,11 @@ module AbstractHandle {
 	funcdef delete_handles(list<Handle> l) returns ()
 		authentication optional;
 
+	/*
+
+	*/
+	funcdef give (string user, string perm, Handle h)
+		returns() authentication required;
+
 };
 
