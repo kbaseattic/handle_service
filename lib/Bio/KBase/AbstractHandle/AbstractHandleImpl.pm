@@ -943,8 +943,9 @@ sub are_readable
 		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
 		$ua->prepare_request($req);
 		my $get = $ua->send_request($req);
-		unless ($get->is_success) {
-			die "did not get a response from GET request to $node";
+		if ($get->code > 499) {
+			die "There was an unexpected error contacting the Shock server: " .
+				$get->status_line;
 		}
 
 		my $json = JSON->new->allow_nonref;
@@ -952,7 +953,8 @@ sub are_readable
 		my $perl_scalar = $json->decode( $json_text );
 		DEBUG "are_readable response:  ", $json_text;
 
-		if( $perl_scalar->{status}  == 401 ) {
+		if( $perl_scalar->{status} == 401 ||  # unauthorized
+				$perl_scalar->{status} == 400 ) { # no such node, perhaps deleted
 			$return = 0;
 			last;
 		}
@@ -960,7 +962,7 @@ sub are_readable
 			$return = 1;
 		}
 		else {
-			die "did not recognize status (200 or 401), saw $perl_scalar->{status}";
+			die "did not recognize status (200, 400, or 401), saw $perl_scalar->{status}";
 		}
 		
 	}
