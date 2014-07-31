@@ -225,6 +225,11 @@ sub list_handles {
 	$self->{dsi}->list_handles(@_);
 }
 
+sub are_readable {
+	my $self = shift;
+	$self->{dsi}->are_readable(@_);
+}
+
 =head1 Authors
 
 Tom Brettin

@@ -22,6 +22,8 @@ use Data::Dumper;
 use Config::Simple;
 use IPC::System::Simple qw(capture);
 use JSON;
+use HTTP::Request;
+use LWP::UserAgent;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
 
@@ -101,12 +103,14 @@ sub new
 <pre>
 $h is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -116,12 +120,14 @@ Handle is a reference to a hash where the following keys are defined:
 
 $h is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -153,6 +159,10 @@ sub new_handle
         $h = $self->localize_handle($h, ref $self);
         $h = $self->initialize_handle($h);
 
+	# DEBUG "Calling persist_handle from new_handle.";
+	# my $hid = $self->persist_handle( $h );
+	# $h->{hid} = $hid;
+	
     #END new_handle
     my @_bad_returns;
     (ref($h) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"h\" (value was \"$h\")");
@@ -182,12 +192,14 @@ $h1 is a Handle
 $service_name is a string
 $h2 is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -199,12 +211,14 @@ $h1 is a Handle
 $service_name is a string
 $h2 is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -286,12 +300,14 @@ sub localize_handle
 $h1 is a Handle
 $h2 is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -302,12 +318,14 @@ Handle is a reference to a hash where the following keys are defined:
 $h1 is a Handle
 $h2 is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -352,8 +370,8 @@ sub initialize_handle
         my $ref = decode_json $json_node;
 
         $h2->{id} = $ref->{data}->{id} or die "could not find node id in $json_node";
-
-	$self->persist_handle( $h2 );
+	DEBUG "Calling persist_handle from initialize_handle.";
+	$h2->{hid} = $self->persist_handle( $h2 );
 
     #END initialize_handle
     my @_bad_returns;
@@ -371,7 +389,7 @@ sub initialize_handle
 
 =head2 persist_handle
 
-  $obj->persist_handle($h)
+  $hid = $obj->persist_handle($h)
 
 =over 4
 
@@ -381,13 +399,16 @@ sub initialize_handle
 
 <pre>
 $h is a Handle
+$hid is an int
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -396,13 +417,16 @@ Handle is a reference to a hash where the following keys are defined:
 =begin text
 
 $h is a Handle
+$hid is an int
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -433,42 +457,68 @@ sub persist_handle
     }
 
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($hid);
     #BEGIN persist_handle
 
-	my (@fields, @values);
-        foreach my $field (keys %$h) {
-                if(defined $h->{$field}) {
-                        push @fields, $field;
-                        push @values, $self->{get_dbh}->()->quote($h->{$field});
-                }
-        }
+	my $sql;
+        my $dbh = $self->{get_dbh}->();
 
-	push @fields, 'created_by';
-	push @values, $self->{get_dbh}->()->quote($ctx->{user_id});
+	# if the hid exists, then sql is an update
+	if(exists $h->{hid} and defined $h->{hid} ) {
+	        my @pairs = ();
+	        foreach my $field (keys %$h) {
+			next if $field eq "hid";
+	                push @pairs, "$field=" . $self->{get_dbh}->()->quote($h->{$field});
+	        }
+	        $sql  .= "UPDATE Handle SET  ";
+	        $sql  .= join(", ", @pairs);
+		$sql  .= " WHERE hid = $h->{hid} ";
+	        DEBUG $sql;
 
-        my $sql = " INSERT INTO Handle ";
-        $sql   .= " (" . join( ", ", @fields) .  ") ";
-        $sql   .= " values ";
-        $sql   .= " (" . join( ", ", @values) .  ") ";
-
-
-	my @pairs = ();
-	foreach my $field (keys %$h) {
-		push @pairs, "$field=" . $self->{get_dbh}->()->quote($h->{$field});
+        	my $sth = $dbh->prepare($sql)
+        	        or die "could not prepare $sql, $DBI::errstr";
+        	$sth->execute()
+                	or die "could not execute $sql, $DBI::errstr";
 	}
-	$sql  .= "ON DUPLICATE KEY UPDATE ";
-	$sql  .= join(", ", @pairs);
+	# else sql is an insert
+	else {
+        	my (@fields, @values);
+        	foreach my $field (keys %$h) {
+                	if(defined $h->{$field}) {
+                        	push @fields, $field;
+                        	push @values, $self->{get_dbh}->()->quote($h->{$field});
+                	}
+        	}
 
+		push @fields, 'created_by';
+		push @values, $self->{get_dbh}->()->quote($ctx->{user_id});
 
-	DEBUG $sql;
-        my $sth = $self->{get_dbh}->()->prepare($sql)
-                or die "could not prepare $sql, $DBI::errstr";
-        $sth->execute()
-                or die "could not execute $sql, $DBI::errstr";
+        	$sql    = " INSERT INTO Handle ";
+        	$sql   .= " (" . join( ", ", @fields) .  ") ";
+        	$sql   .= " values ";
+	        $sql   .= " (" . join( ", ", @values) .  ") ";
+	        DEBUG $sql;
 
+	        my $sth = $dbh->prepare($sql)
+        	        or die "could not prepare $sql, $DBI::errstr";
+        	$sth->execute()
+                	or die "could not execute $sql, $DBI::errstr";
+		unless (exists $h->{hid} and defined $h->{hid}) {
+			$h->{hid}  = $dbh->last_insert_id(undef, undef, undef, undef);
+		}
+	}
+
+	$hid = $h->{hid};		
 
     #END persist_handle
-    return();
+    my @_bad_returns;
+    (!ref($hid)) or push(@_bad_returns, "Invalid type for return variable \"hid\" (value was \"$hid\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to persist_handle:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'persist_handle');
+    }
+    return($hid);
 }
 
 
@@ -488,12 +538,14 @@ sub persist_handle
 $infile is a string
 $h is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -504,12 +556,14 @@ Handle is a reference to a hash where the following keys are defined:
 $infile is a string
 $h is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -575,12 +629,14 @@ sub upload
 $h is a Handle
 $outfile is a string
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -591,12 +647,14 @@ Handle is a reference to a hash where the following keys are defined:
 $h is a Handle
 $outfile is a string
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -655,12 +713,14 @@ sub download
 $h is a Handle
 $infile is a string
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -671,12 +731,14 @@ Handle is a reference to a hash where the following keys are defined:
 $h is a Handle
 $infile is a string
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -734,12 +796,14 @@ sub upload_metadata
 $h is a Handle
 $outfile is a string
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -750,12 +814,14 @@ Handle is a reference to a hash where the following keys are defined:
 $h is a Handle
 $outfile is a string
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -797,6 +863,196 @@ sub download_metadata
 
 
 
+=head2 are_readable
+
+  $return = $obj->are_readable($arg_1)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$arg_1 is a reference to a list where each element is a HandleId
+$return is an int
+HandleId is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$arg_1 is a reference to a list where each element is a HandleId
+$return is an int
+HandleId is an int
+
+
+=end text
+
+
+
+=item Description
+
+Given a list of handle ids, this function determines if
+the underlying data is readable by the caller. If any
+one of the handle ids reference unreadable data this
+function returns false.
+
+=back
+
+=cut
+
+sub are_readable
+{
+    my $self = shift;
+    my($arg_1) = @_;
+
+    my @_bad_arguments;
+    (ref($arg_1) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"arg_1\" (value was \"$arg_1\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to are_readable:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'are_readable');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($return);
+    #BEGIN are_readable
+
+	DEBUG "are_readable: user=", $ctx->{user_id};
+
+	$return = 0;
+	my %readable;
+	my $dbh = $self->{get_dbh}->();
+	my $sql = "select * from Handle where hid in ( ";
+	$sql   .= join(", ", ("?") x scalar(@{$arg_1}));
+	$sql   .= " )";
+	DEBUG "are_readable: $sql\n";
+
+	my $sth = $dbh->prepare($sql) or die "can not prepare $sql\n$DBI::errstr";
+	my $rv  = $sth->execute(@$arg_1) or die "can not execute $sql\n$DBI::errstr";
+
+	my $ua = LWP::UserAgent->new();
+
+	while (my $record = $sth->fetchrow_hashref()) {
+		my $node = $default_shock . "/node/" . $record->{id};	 
+		DEBUG "are_readable node: $node\n";
+
+		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
+		$ua->prepare_request($req);
+		my $get = $ua->send_request($req);
+		if ($get->code > 499) {
+			die "There was an unexpected error contacting the Shock server: " .
+				$get->status_line;
+		}
+
+		my $json = JSON->new->allow_nonref;
+		my $json_text = $get->decoded_content;
+		my $perl_scalar = $json->decode( $json_text );
+		DEBUG "are_readable response:  ", $json_text;
+
+		if( $perl_scalar->{status} == 401 ||  # unauthorized
+				$perl_scalar->{status} == 400 ) { # no such node, perhaps deleted
+			$return = 0;
+			last;
+		}
+		elsif ( $perl_scalar->{status} == 200 ) {
+			$return = 1;
+		}
+		else {
+			die "did not recognize status (200, 400, or 401), saw $perl_scalar->{status}";
+		}
+		
+	}
+	
+	if ($sth->rows < scalar(@{$arg_1})) {
+		$return = 0; # missing records
+	}
+
+    #END are_readable
+    my @_bad_returns;
+    (!ref($return)) or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to are_readable:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'are_readable');
+    }
+    return($return);
+}
+
+
+
+
+=head2 is_readable
+
+  $return = $obj->is_readable($id)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$id is a string
+$return is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$id is a string
+$return is an int
+
+
+=end text
+
+
+
+=item Description
+
+Given a handle id, this function queries the underlying
+data store to see if the data being referred to is
+readable to by the caller.
+
+=back
+
+=cut
+
+sub is_readable
+{
+    my $self = shift;
+    my($id) = @_;
+
+    my @_bad_arguments;
+    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to is_readable:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'is_readable');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($return);
+    #BEGIN is_readable
+    #END is_readable
+    my @_bad_returns;
+    (!ref($return)) or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to is_readable:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'is_readable');
+    }
+    return($return);
+}
+
+
+
+
 =head2 list_handles
 
   $l = $obj->list_handles()
@@ -810,12 +1066,14 @@ sub download_metadata
 <pre>
 $l is a reference to a list where each element is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -825,12 +1083,14 @@ Handle is a reference to a hash where the following keys are defined:
 
 $l is a reference to a list where each element is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -899,12 +1159,14 @@ sub list_handles
 <pre>
 $l is a reference to a list where each element is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 </pre>
 
@@ -914,12 +1176,14 @@ Handle is a reference to a hash where the following keys are defined:
 
 $l is a reference to a list where each element is a Handle
 Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
 	file_name has a value which is a string
 	id has a value which is a string
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
+HandleId is an int
 
 
 =end text
@@ -995,7 +1259,7 @@ sub version {
 
 
 
-=head2 Handle
+=head2 HandleId
 
 =over 4
 
@@ -1021,7 +1285,34 @@ can be used to verify uploads and downloads.
 =begin html
 
 <pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 Handle
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
 a reference to a hash where the following keys are defined:
+hid has a value which is a HandleId
 file_name has a value which is a string
 id has a value which is a string
 type has a value which is a string
@@ -1036,6 +1327,7 @@ remote_sha1 has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
+hid has a value which is a HandleId
 file_name has a value which is a string
 id has a value which is a string
 type has a value which is a string
