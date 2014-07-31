@@ -927,12 +927,12 @@ sub are_readable
 	my %readable;
 	my $dbh = $self->{get_dbh}->();
 	my $sql = "select * from Handle where hid in ( ";
-	$sql   .= join ", ", @$arg_1; #seems like SQL injection is possible here
+	$sql   .= join(", ", "?" x scalar(@{$arg_1}));
 	$sql   .= " )";
 	DEBUG "are_readable: $sql\n";
 
 	my $sth = $dbh->prepare($sql) or die "can not prepare $sql\n$DBI::errstr";
-	my $rv  = $sth->execute() or die "can not execute $sql\n$DBI::errstr";
+	my $rv  = $sth->execute(@$arg_1) or die "can not execute $sql\n$DBI::errstr";
 
 	my $ua = LWP::UserAgent->new();
 
