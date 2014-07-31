@@ -921,13 +921,15 @@ sub are_readable
     my($return);
     #BEGIN are_readable
 
+	DEBUG "are_readable: user=", $ctx->{user_id};
+
 	$return = 0;
 	my %readable;
 	my $dbh = $self->{get_dbh}->();
 	my $sql = "select * from Handle where hid in ( ";
 	$sql   .= join ", ", @$arg_1;
 	$sql   .= " )";
-	print "are_readable: $sql\n";
+	DEBUG "are_readable: $sql\n";
 
 	my $sth = $dbh->prepare($sql) or die "can not prepare $sql\n$DBI::errstr";
 	my $rv  = $sth->execute() or die "can not execute $sql\n$DBI::errstr";
@@ -935,17 +937,32 @@ sub are_readable
 	my $ua = LWP::UserAgent->new();
 
 	foreach my $record ($sth->fetchrow_hashref()) {
-		my $node = $default_shock . "/" . $record->{id};	 
+		my $node = $default_shock . "/node/" . $record->{id};	 
+		DEBUG "are_readable node: $node\n";
+
     		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
 		$ua->prepare_request($req);
 		my $get = $ua->send_request($req);
-    		if($get->is_success) {
-			$return = 1;
+		unless ($get->is_success) {
+			die "did not get a response from GET request to $node";
 		}
-		else {
+
+		my $json = JSON->new->allow_nonref;
+		my $json_text = $get->decoded_content;
+		my $perl_scalar = $json->decode( $json_text );
+		DEBUG "are_readable response:  ", $json_text;
+
+		if( $perl_scalar->{status}  == 401 ) {
 			$return = 0;
 			last;
 		}
+		elsif ( $perl_scalar->{status} == 200 ) {
+			$return = 1;
+		}
+		else {
+			die "did not recognize status (200 or 401), saw $perl_scalar->{status}";
+		}
+		
 	}
 
     #END are_readable
