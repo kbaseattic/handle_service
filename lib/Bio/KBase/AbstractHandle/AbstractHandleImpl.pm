@@ -466,26 +466,26 @@ sub persist_handle
     #BEGIN persist_handle
 
 	my $sql;
-        my $dbh = $self->{get_dbh}->();
+	my $dbh = $self->{get_dbh}->();
 
 	# if the hid exists, then sql is an update
 	if(exists $h->{hid} and defined $h->{hid} ) {
 		# strip off namespace and the separator
-		$h->{hid} =~ s/^$namespace_//;
-	        my @pairs = ();
-	        foreach my $field (keys %$h) {
+		my $ns = $namespace . "_";
+		$h->{hid} =~ s/^$ns//;
+		my @pairs = ();
+		foreach my $field (keys %$h) {
 			next if $field eq "hid";
-	                push @pairs, "$field=" . $self->{get_dbh}->()->quote($h->{$field});
-	        }
-	        $sql  .= "UPDATE Handle SET  ";
-	        $sql  .= join(", ", @pairs);
+			push @pairs, "$field=" . $self->{get_dbh}->()->quote($h->{$field});
+		}
+		$sql  .= "UPDATE Handle SET  ";
+		$sql  .= join(", ", @pairs);
 		$sql  .= " WHERE hid = $h->{hid} ";
-	        DEBUG $sql;
+		DEBUG $sql;
 
-        	my $sth = $dbh->prepare($sql)
-        	        or die "could not prepare $sql, $DBI::errstr";
-        	$sth->execute()
-                	or die "could not execute $sql, $DBI::errstr";
+		my $sth = $dbh->prepare($sql)
+			or die "could not prepare $sql, $DBI::errstr";
+		$sth->execute() or die "could not execute $sql, $DBI::errstr";
 	}
 	# else sql is an insert
 	else {
