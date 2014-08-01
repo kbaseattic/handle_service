@@ -27,6 +27,11 @@ use LWP::UserAgent;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
 
+use Bio::KBase::HandleServiceConstants 'handleNameSpace';
+
+our $namespace = handleNameSpace;
+INFO "using $namespace as the namespace for handles created by this service";
+
 our $cfg = {};
 our ($default_shock, $mysql_host, $mysql_user, $mysql_pass, $data_source);
 
@@ -465,6 +470,8 @@ sub persist_handle
 
 	# if the hid exists, then sql is an update
 	if(exists $h->{hid} and defined $h->{hid} ) {
+		# strip off namespace and the separator
+		$h->{hid} =~ s/^$namespace_//;
 	        my @pairs = ();
 	        foreach my $field (keys %$h) {
 			next if $field eq "hid";
@@ -507,8 +514,9 @@ sub persist_handle
 			$h->{hid}  = $dbh->last_insert_id(undef, undef, undef, undef);
 		}
 	}
-
-	$hid = $h->{hid};		
+	
+	# add the namespace and separator
+	$hid = $namespace . "_" . $h->{hid};		
 
     #END persist_handle
     my @_bad_returns;
