@@ -932,7 +932,13 @@ sub are_readable
 	DEBUG "are_readable: user=", $ctx->{user_id};
 
 	$return = 0;
-	my %readable;
+	
+	#strip the namespace from incoming ids
+	my $ns = $namespace . "_";
+	foreach my $id (@$arg_1) {
+		$id =~ s/^$ns//;
+	}
+	
 	my $dbh = $self->{get_dbh}->();
 	my $sql = "select * from Handle where hid in ( ";
 	$sql   .= join(", ", ("?") x scalar(@{$arg_1}));
