@@ -1,0 +1,12 @@
+Persist handle saves a new handle to the database or updates an
+existing handle. 
+
+An issue was raised that user 1 could call persist handle and the
+result would be that a handle committed by user 2 would be changed.
+Let's take a look at the impace of this.
+
+	user 2 can change the type making the handle not found
+	user 2 can change the node id
+	user 2 can change the md5
+	user 2 can not change the created_by
+	 

@@ -15,7 +15,9 @@ module AbstractHandle {
 	   computed on the file in the remote data store. These
 	   can be used to verify uploads and downloads.
 	*/
+	typedef string HandleId;
 	typedef structure {
+		HandleId hid;
 		string file_name;
 		string id;
 		string type;
@@ -55,7 +57,7 @@ module AbstractHandle {
 	   that can be later retrieved using the list_handles
 	   function.
 	*/
-	funcdef persist_handle(Handle h) returns ()
+	funcdef persist_handle(Handle h) returns (string hid)
 		authentication optional;
 
 
@@ -107,6 +109,21 @@ module AbstractHandle {
 
 	/* STANDARD FUNCTIONS FOR MANAGING HANDLES */
 
+	/* Given a list of handle ids, this function determines if
+	   the underlying data is readable by the caller. If any
+	   one of the handle ids reference unreadable data this
+	   function returns false.
+	*/
+	funcdef are_readable(list<HandleId>) returns(int)
+		authentication required;
+
+	/* Given a handle id, this function queries the underlying
+	   data store to see if the data being referred to is
+	   readable to by the caller.
+	*/
+	funcdef is_readable(string id) returns(int)
+		authentication required;
+
 	/* The list function returns the set of handles that were
 	   created by the user. 
 	*/
@@ -118,6 +135,12 @@ module AbstractHandle {
 	*/
 	funcdef delete_handles(list<Handle> l) returns ()
 		authentication optional;
+
+	/*
+
+	*/
+	funcdef give (string user, string perm, Handle h)
+		returns() authentication required;
 
 };
 

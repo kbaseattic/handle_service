@@ -1,0 +1,25 @@
+1. Use auto-deploy to override the Makefile variable.
+2. In the makefile use tpage to write a Constants.pm file
+3. In the makefile, deploy the Constants.pm file
+4. In the Impl.pm file, use Constants.pm
+
+1. the name space string is provided in the auto-deploy.cfg file to the auto-deploy program
+2. the auto-deploy program over-rides a make variable in the make file
+3. the make file uses the make variable to construct tpage args
+4. tpage uses a template and the tpage args to construct a Constants.pm file
+	the template goes in the service directory, it's needed by the service
+5. the Constants.pm file gets deployed as part of the deploy-service target
+6. the service Impl uses the Constants.pm module to obtain the name space string
+	the use statement hard codes the package structure
+	the package structure will depend on $(SERVICE_NAME) and that could
+	change, SO, don't use make variables in the package namespace.
+	
+deploy-libs does the rsync of the lib directory to $TARGET
+deploy-client depends on deploy-libs
+deploy-libs depends on build libs
+deploy-service does not depend on deploy-libs
+	therefore the call to tpage needs to be here
+	the default target doesn't work becuase auto-deploy calls deploy-
+	client or deploy-service or both.
+
+

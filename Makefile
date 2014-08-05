@@ -15,8 +15,10 @@ ifeq ($(SELF_URL),)
 	SELF_URL = http://localhost:$(SERVICE_PORT)
 endif
 
+NAMESPACE = KBH
+
 SERVICE_PSGI = $(SERVICE_NAME).psgi
-TPAGE_ARGS = --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI)
+TPAGE_ARGS = --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI) --define handle_namespace=$(NAMESPACE)
 
 # to wrap scripts and deploy them to $(TARGET)/bin using tools in
 # the dev_container. right now, these vars are defined in
@@ -284,6 +286,7 @@ deploy-service: deploy-cfg
 	chmod +x $(TARGET)/services/$(SERVICE_DIR)/stop_service
 	$(TPAGE) $(TPAGE_ARGS) service/upstart.tt > service/$(SERVICE_NAME).conf
 	chmod +x service/$(SERVICE_NAME).conf
+	$(TPAGE) $(TPAGE_ARGS) service/constants.tt > $(TARGET)/lib/Bio/KBase/HandleServiceConstants.pm
 	echo "done executing deploy-service target"
 
 deploy-upstart: deploy-service

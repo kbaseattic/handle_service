@@ -1,9 +1,8 @@
 #!/bin/sh
 
-day=$1
-rm -rf	lib/AbstractHandleImpl.py.bak-2013-12-$day*
+rm -rf	lib/AbstractHandleImpl.py.bak-2014*
 rm -rf	lib/AbstractHandleServer.py
-rm -rf	lib/Bio/KBase/AbstractHandle/AbstractHandleImpl.pm.bak-2013-12-$day*
+rm -rf	lib/Bio/KBase/AbstractHandle/AbstractHandleImpl.pm.bak-2014*
 rm -rf	lib/Bio/KBase/AbstractHandle/Client.pm
 rm -rf	lib/Bio/KBase/AbstractHandle/Service.pm
 rm -rf	lib/biokbase/

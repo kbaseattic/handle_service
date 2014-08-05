@@ -41,6 +41,86 @@ hop. For now, I choose the extra network hop over implementing
 the same method by hand in for different languages.
 A
 
+SHARING
+
+The question becomes what does it mean to share. It means that in
+the most general sense, it means that the owner of the underlying
+data authorizes someone else to have access to that data.
+
+To really understand what is possible, understanding the underlying
+storage system's notion of access control is necessary. As a result,
+it is best to delegate as much as possible to the underlying data
+storage system while keeping the access control support in this
+service to a minimum. The minimal approach will help to ensure wider
+coverage of what is possible in the underlying data management
+system..
+
+So, it seems the minimum to support is the equivelant of the unix
+file system. Allow a user to do the equivelant of:
+
+chmod uga +/- rwx handle
+
+Since there doesn't seem to be a need for the executable bit, we'll
+drop that from the design. So what we have is allowing a user to
+manage user, group, and all with read and write privileges on the
+handle. By implication, these permissions follow the handle to the
+underlying storage system.
+
+The interface would be equiilent to "give tom write on this handle".
+That translates to give(user, perm, handle).
+
+If we take this a step further, the declaration should be:
+
+	funcdef give (string user, string p, Handle h)
+		authentication required;
+
+And that's it for now.
+
+# view all acls
+curl -X GET http://<host>[:<port>]/node/<node_id>/acl/
+
+# view specific acls
+curl -X GET http://<host>[:<port>]/node/<node_id>/acl/[ all | read |
+write | delete | owner ]
+
+# changing owner (chown)
+curl -X PUT
+http://<host>[:<port>]/node/<node_id>/acl/owner?users=<user-id_or_uuid>
+
+# adding user to all acls (except owner)
+curl -X PUT
+http://<host>[:<port>]/node/<node_id>/acl/all?users=<user-ids_or_uuids>
+
+# adding user to specific acls
+curl -X PUT http://<host>[:<port>]/node/<node_id>/acl/[ read | write
+| delete ]?users=<user-ids_or_uuids>
+
+# deleting user from all acls (except owner)
+curl -X DELETE
+http://<host>[:<port>]/node/<node_id>/acl/all?users=<user-ids_or_uuids>    
+
+# deleting user to specific acls
+curl -X DELETE http://<host>[:<port>]/node/<node_id>/acl/[ read |
+write | delete ]?users=<user-ids_or_uuids>
+
+
+
+Querying:
+
+# by ACL's (enter users-ids or uuids as comma-separated list, this
+# works for query or querynode)
+curl -X GET http://<host>[:<port>]/node?querynode&[ owner | read |
+write | delete ]=<user-ids_or_uuids>
+    (note: resultant set is a subset of the nodes that are viewable
+to the authenticated user)
+
+# by public ACL's (returns nodes that have a public setting for the
+# given ACL)
+curl -X GET http://<host>[:<port>]/node?querynode&[ public_owner |
+public_read | public_write | public_delete ]=1
+
+
+
 LOCALIZING
 
 Localizing is the act of assigning a url to the handle. Generally,
@@ -91,3 +171,20 @@ download(handle, outfile)
 json_txt = download_metadata(handle)
 
 I believe the first option is more consistent and easier to remember.
+
+WORKSPACE SUPPORT
+
+for handles to be identifiable in the workspace, they need an Id.
+1) create handle id.
+
+hid UNSIGNED INT NOT NULL AUTO_INCREMENT
+
+To create ths means that I have to back-populate the database with
+handle ids. I think the best way to do this is to dump the database
+using a custom sql command, alter the table adding the autoincrement
+field, and then using mysqlimport to reimport and let the
+autoincrement do it's thing. The dump command will be:
+
+mysql -e "select 0, * from Handle" hsi > Handle.tab
+mysql -s -e 'select 0, id,file_name,type,url,remote_md5,remote_sha1,created_by,creation_date from Handle' -u  hsi -p hsi > Handle.tab
+
