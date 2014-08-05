@@ -598,6 +598,7 @@ sub persist_handle
 	# if the hid exists, then sql is an update
 	if(exists $h->{hid} and defined $h->{hid} ) {
 		if ($ctx->{user_id} == $self->created_by($h)) {
+			$hid = $self->update_handle($h);
 		}
 		else {
 			die "why on earth are you trying to alter a handle that you didn't create?";
