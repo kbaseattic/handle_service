@@ -88,7 +88,7 @@ ok (exists $h->{hid}, "hid in handle exists");
 
 ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
 
-ok ($obj->are_readable([$h->{hid}]), "hid in h is readable");
+ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h is readable");
 
 # upload a file
 
@@ -112,6 +112,7 @@ ok ($h->{remote_md5} eq $local_md5, "uploaded file has correct md5");
 
 ok ($h->{file_name} eq $basename, "file name is $basename");
 
+ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h is readable");
 
 # download a file
 
@@ -141,6 +142,20 @@ ok (-e $metadata.download && (-s $metadata.download > 0), "metadata download fil
 # test list handles
 
 ok(ref ( $obj->list_handles() ) eq "ARRAY", "list handles returned list"); 
+
+# test are_readable
+
+ok ($h = $obj->new_handle(), "new_handle returns defined");
+ok (exists $h->{url}, "url in handle exists");
+ok (defined $h->{url}, "url defined in handle $h->{url}");
+ok (exists $h->{id}, "id in handle exists");
+ok (defined $h->{id}, "id defined in handle $h->{id}");
+ok (exists $h->{hid}, "hid in handle exists");
+ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
+ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h is readable");
+
+
+# end testing are_readable
 
 
 
