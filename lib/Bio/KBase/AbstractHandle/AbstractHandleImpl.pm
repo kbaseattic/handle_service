@@ -965,6 +965,120 @@ sub download_metadata
 
 
 
+=head2 hids_to_handles
+
+  $handles = $obj->hids_to_handles($hids)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$hids is a reference to a list where each element is a HandleId
+$handles is a reference to a list where each element is a Handle
+HandleId is a string
+Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$hids is a reference to a list where each element is a HandleId
+$handles is a reference to a list where each element is a Handle
+HandleId is a string
+Handle is a reference to a hash where the following keys are defined:
+	hid has a value which is a HandleId
+	file_name has a value which is a string
+	id has a value which is a string
+	type has a value which is a string
+	url has a value which is a string
+	remote_md5 has a value which is a string
+	remote_sha1 has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+Given a list of handle ids, this function returns
+a list of handles. The function will throw an
+error if the user requesting the handles does not
+have read permission on any one of the handles.
+
+=back
+
+=cut
+
+sub hids_to_handles
+{
+    my $self = shift;
+    my($hids) = @_;
+
+    my @_bad_arguments;
+    (ref($hids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"hids\" (value was \"$hids\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to hids_to_handles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'hids_to_handles');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($handles);
+    #BEGIN hids_to_handles
+
+	# remove namespace
+        my $ns = $namespace . "_";
+        foreach my $id (@$hids) {
+                $id =~ s/^$ns//;
+        }
+
+	$handles = [];
+
+	# get handles from database
+        my $dbh = $self->{get_dbh}->();
+        my $sql = "select * from Handle where hid in ( ";
+        $sql   .= join(", ", ("?") x scalar(@{$hids}));
+        $sql   .= " )";
+        DEBUG "are_readable: $sql\n";
+
+        my $sth = $dbh->prepare($sql) or die "can not prepare $sql\n$DBI::errstr";
+        my $rv  = $sth->execute(@$hids) or die "can not execute $sql\n$DBI::errstr";
+
+	# add the namespace and build return list
+	while (my $record = $sth->fetchrow_hashref()) {
+		$record->{hid} = $namespace . "_" . $record->{hid};
+		push @$handles, $record;
+	}
+
+
+
+    #END hids_to_handles
+    my @_bad_returns;
+    (ref($handles) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"handles\" (value was \"$handles\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to hids_to_handles:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'hids_to_handles');
+    }
+    return($handles);
+}
+
+
+
+
 =head2 are_readable
 
   $return = $obj->are_readable($arg_1)
@@ -1052,7 +1166,7 @@ sub are_readable
 		$ua->prepare_request($req);
 		my $get = $ua->send_request($req);
 		if ($get->code > 499) {
-			die "There was an unexpected error contacting the Shock server: " .
+		die "There was an unexpected error contacting the Shock server: " .
 				$get->status_line;
 		}
 
