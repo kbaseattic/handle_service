@@ -172,6 +172,7 @@ ok (@$handles == 1, "hids_to_handles returns one handle");
 ok ($handles->[0]->{hid} eq $h->{hid}, "hids are the same $h->{hid}");
 ok ($handles->[0]->{id} eq $h->{id}, "ids are the same $h->{id}");
 ok (defined $handles->[0]->{file_name}, "file_name is defined as $handles->[0]->{file_name}");
+ok ( defined $handles->[0]->{remote_md5}, "remote md5 is defined as $handles->[0]{remote_md5}");
 
 # clean up
 done_testing;
