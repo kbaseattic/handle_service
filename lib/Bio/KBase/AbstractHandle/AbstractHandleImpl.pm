@@ -33,13 +33,15 @@ our $namespace = handleNameSpace;
 INFO "using $namespace as the namespace for handles created by this service";
 
 our $cfg = {};
-our ($default_shock, $mysql_host, $mysql_user, $mysql_pass, $data_source);
+our ($default_shock, $mysql_host, $mysql_port, $mysql_user, $mysql_pass,
+	$data_source);
 
 if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $cfg = new Config::Simple($ENV{KB_DEPLOYMENT_CONFIG}) or
         die "could not construct new Config::Simple object";
     $default_shock = $cfg->param('handle_service.default-shock-server');
     $mysql_host    = $cfg->param('handle_service.mysql-host');
+    $mysql_port    = $cfg->param('handle_service.mysql-port');
     $mysql_user    = $cfg->param('handle_service.mysql-user');
     $mysql_pass    = $cfg->param('handle_service.mysql-pass');
     $data_source   = $cfg->param('handle_service.data-source');
@@ -194,8 +196,13 @@ sub new
 	my $ds = $data_source;
 	if ($mysql_host)
 	{
-	    $ds .= ";host=$mysql_host";
+		$ds .= ";host=$mysql_host";
 	}
+	if ($mysql_port)
+	{
+		$ds .= ";port=$mysql_port";
+	}
+	
 	my @connection = ($ds, $mysql_user, $mysql_pass, {});
 	$self->{dbh} = DBI->connect(@connection);
 	# need some assurance that the handle is still connected. not 
