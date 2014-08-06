@@ -157,7 +157,21 @@ ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h is readable");
 
 # end testing are_readable
 
+# test hids_to_handles
+ok ($h = $obj->new_handle(), "new_handle returns defined");
+ok (exists $h->{hid}, "hid in handle exists");
+ok (ref ($obj->hids_to_handles([$h->{hid}])) eq "ARRAY", "hids_to_handles returns an arrayref");
+ok ($obj->hids_to_handles([$h->{hid}])->[0]->{hid} eq $h->{hid}, "hids are the same $h->{hid}");
 
+ok ($h = $obj->upload($data), "upload returns defined");
+ok (exists $h->{hid}, "hid in handle exists");
+ok (exists $h->{file_name}, "file_name in handle exists as $h->{file_name}");
+ok ($handles = $obj->hids_to_handles([$h->{hid}]), "hids_to_handles returnes defined");
+ok (ref ($handles) eq "ARRAY", "hids_to_handles returns an arrayref");
+ok (@$handles == 1, "hids_to_handles returns one handle");
+ok ($handles->[0]->{hid} eq $h->{hid}, "hids are the same $h->{hid}");
+ok ($handles->[0]->{id} eq $h->{id}, "ids are the same $h->{id}");
+ok (defined $handles->[0]->{file_name}, "file_name is defined as $handles->[0]->{file_name}");
 
 # clean up
 done_testing;
