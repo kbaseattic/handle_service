@@ -95,6 +95,7 @@ sub insert_handle {
         
 	my (@fields, @values);
         foreach my $field (keys %$h) {
+                next if $field eq 'hid'; # inserts always get a new id
                 if(defined $h->{$field}) {
                         push @fields, $field;
                         push @values, $self->{get_dbh}->()->quote($h->{$field});
@@ -114,9 +115,7 @@ sub insert_handle {
                 or die "could not prepare $sql, $DBI::errstr";
         $sth->execute()
                 or die "could not execute $sql, $DBI::errstr";
-        unless (exists $h->{hid} and defined $h->{hid}) {
-                $h->{hid}  = $dbh->last_insert_id(undef, undef, undef, undef);
-        }
+        $h->{hid}  = $dbh->last_insert_id(undef, undef, undef, undef);
 
 	my $ns = $namespace . "_";
 	$hid = $ns . $h->{hid};
@@ -144,26 +143,33 @@ sub update_handle {
                                                                method_name => 'persist_handle');
     }
 
-    my $hid = $h->{hid} or die "can not update a handle without a handle id";;
+    my $hid = $h->{hid} or die "can not update a handle without a handle id (hid)";
+    my $id = $h->{id} or die "can not update a handle without an id";
+    my $type = $h->{type} or die "can not update a handle without a handle type";
+    my $url = $h->{url} or die "can not update a handle without a url";
 
-        my $sql;
-        my $dbh = $self->{get_dbh}->();
+    my $sql;
+    my $dbh = $self->{get_dbh}->();
 
+    # outside users should never be able to update a handle
+    my @pairs = ();
+    foreach my $field (keys %$h) {
+        next if ($field eq "hid" || $field eq "id" || $field eq "url"
+                || $field eq "type");
+        push @pairs, "$field=" . $self->{get_dbh}->()->quote($h->{$field});
+    }
+    $sql  .= "UPDATE Handle SET  ";
+    $sql  .= join(", ", @pairs);
+    $sql  .= " WHERE hid = ? AND id = ? AND url = ? AND type = ?";
+    DEBUG $sql;
 
-        # outside users should never be able to update a handle
-        my @pairs = ();
-        foreach my $field (keys %$h) {
-                next if $field eq "hid";
-                push @pairs, "$field=" . $self->{get_dbh}->()->quote($h->{$field});
-        }
-        $sql  .= "UPDATE Handle SET  ";
-        $sql  .= join(", ", @pairs);
-        $sql  .= " WHERE hid = $h->{hid} ";
-        DEBUG $sql;
-
-        my $sth = $dbh->prepare($sql)
-                or die "could not prepare $sql, $DBI::errstr";
-        $sth->execute() or die "could not execute $sql, $DBI::errstr";
+    my $sth = $dbh->prepare($sql)
+            or die "could not prepare $sql, $DBI::errstr";
+    my $rows = $sth->execute(($h->{hid}, $h->{id}, $h->{url}, $h->{type})) or
+        die "could not execute $sql, $DBI::errstr";
+    if ($rows < 1) { # DBI returns 0E0 which is != false
+        die "Update failed - no such handle with provided hid, id, url, and type"; 
+    }
 
     my @_bad_returns;
     (!ref($hid)) or push(@_bad_returns, "Invalid type for return variable \"hid\" (value was \"$hid\")");
@@ -496,19 +502,19 @@ sub initialize_handle
     my($h2);
     #BEGIN initialize_handle
 
-
-        $h2 = $h1;
+	$h2 = $h1;
 
 	my $auth_header;
 	$auth_header = "-H 'Authorization: OAuth " . $ctx->{token} . "'" if $ctx->{token};
 
-        my $cmd = "curl -s $auth_header -X POST $default_shock/node";
+	my $cmd = "curl -s $auth_header -X POST $default_shock/node";
 	DEBUG $cmd;
-        my $json_node = capture($cmd);
-        my $ref = decode_json $json_node;
+	my $json_node = capture($cmd);
+	my $ref = decode_json $json_node;
 
-        $h2->{id} = $ref->{data}->{id} or die "could not find node id in $json_node";
-	DEBUG "Calling persist_handle from initialize_handle.";
+	$h2->{id} = $ref->{data}->{id} or die "could not find node id in $json_node";
+
+	DEBUG "Calling insert_handle from initialize_handle.";
 	$h2->{hid} = $self->insert_handle( $h2 );
 
     #END initialize_handle
@@ -600,7 +606,7 @@ sub persist_handle
 
 	my $ns = $namespace . "_";
 	# remove namespace and separator if hid provided
-        $h->{hid} =~ s/^$ns// if exists $h->{hid};
+	$h->{hid} =~ s/^$ns// if exists $h->{hid};
 
 	# if the hid exists, then sql is an update
 	if(exists $h->{hid} and defined $h->{hid} ) {
