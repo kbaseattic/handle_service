@@ -502,12 +502,6 @@ sub initialize_handle
     my($h2);
     #BEGIN initialize_handle
 
-	#Tom: not sure I understand the expected behavior of initialize handle.
-	# it makes a new handle like new_handle but also allows setting the
-	# metadata (filename, digests, etc) at the same time? Changes I made here
-	# might need some more thought, but they seem to be right based on the
-	# curl command.
-
 	$h2 = $h1;
 
 	my $auth_header;
@@ -518,9 +512,8 @@ sub initialize_handle
 	my $json_node = capture($cmd);
 	my $ref = decode_json $json_node;
 
-	$h2->{url} = $default_shock; # needs to match actual shock instance used
 	$h2->{id} = $ref->{data}->{id} or die "could not find node id in $json_node";
-	$h2->{type} = "shock"; # it's def. a shock handle
+
 	DEBUG "Calling insert_handle from initialize_handle.";
 	$h2->{hid} = $self->insert_handle( $h2 );
 
