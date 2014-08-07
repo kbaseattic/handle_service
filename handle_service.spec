@@ -110,15 +110,10 @@ module AbstractHandle {
 	/* STANDARD FUNCTIONS FOR MANAGING HANDLES */
 
 	/* Given a list of handle ids, this function returns
-	   a list of handles. 
-
-	   TODO: The function will throw an error if the user
-	   requesting the handles does not have read permission on
-	   any one of the handles.
+	   a list of handles.
 	*/
 	funcdef hids_to_handles(list<HandleId> hids)
-		returns(list<Handle> handles)
-		authentication required;
+		returns(list<Handle> handles);
 	
 	/* Given a list of handle ids, this function determines if
 	   the underlying data is readable by the caller. If any
