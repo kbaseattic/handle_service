@@ -152,7 +152,8 @@ ok (exists $h->{id}, "id in handle exists");
 ok (defined $h->{id}, "id defined in handle $h->{id}");
 ok (exists $h->{hid}, "hid in handle exists");
 ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
-ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h is readable");
+ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h are readable");
+ok ($obj->is_readable($h->{hid}), "hid $h-> in h is readable");
 
 
 # end testing are_readable
