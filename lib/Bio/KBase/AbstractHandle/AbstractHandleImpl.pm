@@ -1027,9 +1027,7 @@ Handle is a reference to a hash where the following keys are defined:
 =item Description
 
 Given a list of handle ids, this function returns
-a list of handles. The function will throw an
-error if the user requesting the handles does not
-have read permission on any one of the handles.
+a list of handles.
 
 =back
 
@@ -1169,39 +1167,39 @@ sub are_readable
 	my $sth = $dbh->prepare($sql) or die "can not prepare $sql\n$DBI::errstr";
 	my $rv  = $sth->execute(@$arg_1) or die "can not execute $sql\n$DBI::errstr";
 
-	# my $ua = LWP::UserAgent->new();
+	my $ua = LWP::UserAgent->new();
 
 	while (my $record = $sth->fetchrow_hashref()) {
-		# my $node = $default_shock . "/node/" . $record->{id};	 
+		my $node = $default_shock . "/node/" . $record->{id};	 
 		DEBUG "are_readable node: $node\n";
 
-		# my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
-		# $ua->prepare_request($req);
-		# my $get = $ua->send_request($req);
-		# if ($get->code > 499) {
-		# die "There was an unexpected error contacting the Shock server: " .
-		# 		$get->status_line;
-		# }
+		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
+		$ua->prepare_request($req);
+		my $get = $ua->send_request($req);
+		if ($get->code > 499) {
+		die "There was an unexpected error contacting the Shock server: " .
+				$get->status_line;
+		}
 
-		# my $json = JSON->new->allow_nonref;
-		# my $json_text = $get->decoded_content;
-		# my $perl_scalar = $json->decode( $json_text );
-		# DEBUG "are_readable response:  ", $json_text;
+		my $json = JSON->new->allow_nonref;
+		my $json_text = $get->decoded_content;
+		my $perl_scalar = $json->decode( $json_text );
+		DEBUG "are_readable response:  ", $json_text;
 
-		# if( $perl_scalar->{status} == 401 ||  # unauthorized
-		# 		$perl_scalar->{status} == 400 ) { # no such node, perhaps deleted
-		# 	$return = 0;
-		# 	last;
-		# }
-		# elsif ( $perl_scalar->{status} == 200 ) {
-		# 	$return = 1;
-		# }
-		# else {
-		# 	die "did not recognize status (200, 400, or 401), saw $perl_scalar->{status}";
-		# }
+		if( $perl_scalar->{status} == 401 ||  # unauthorized
+				$perl_scalar->{status} == 400 ) { # no such node, perhaps deleted
+			$return = 0;
+			last;
+		}
+		elsif ( $perl_scalar->{status} == 200 ) {
+			$return = 1;
+		}
+		else {
+			die "did not recognize status (200, 400, or 401), saw $perl_scalar->{status}";
+		}
 		
-		$return = $self->is_readable($
-		
+		#$return = $self->is_readable($return)
+		return $return;
 	}
 	
 	if ($sth->rows < scalar(@{$arg_1})) {
@@ -1285,7 +1283,7 @@ sub is_readable
         $hid =~ s/^$ns//;
 
 	my $dbh = $self->{get_dbh}->();
-	my $sql = "SELECT * FROM Handle WHERE hid = $hid;
+	my $sql = "SELECT * FROM Handle WHERE hid = $hid";
 	my $sth = $dbh->prepare($sql)
 		or die "could not prepare $sql, $DBI::errstr";
 	my $row = $sth->execute() or
