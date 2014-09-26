@@ -230,6 +230,11 @@ sub are_readable {
 	$self->{dsi}->are_readable(@_);
 }
 
+sub is_readable {
+	my $self = shift;
+	$self->{dsi}->is_readable(@_);
+}
+
 sub hids_to_handles {
 	my $self = shift;
 	$self->{dsi}->hids_to_handles(@_);
