@@ -74,7 +74,9 @@ If we take this a step further, the declaration should be:
 	funcdef give (string user, string p, Handle h)
 		authentication required;
 
-And that's it for now.
+And that's it for now.  Other than the list of valid p. This can be kept simple, using the human understandable version of the params to chmod
+
+[u{0:1}g{0:1}o{0:1}]+[r{0:1}w{0:1}]
 
 # view all acls
 curl -X GET http://<host>[:<port>]/node/<node_id>/acl/

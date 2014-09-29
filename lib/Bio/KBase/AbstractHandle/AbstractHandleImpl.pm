@@ -1027,9 +1027,7 @@ Handle is a reference to a hash where the following keys are defined:
 =item Description
 
 Given a list of handle ids, this function returns
-a list of handles. The function will throw an
-error if the user requesting the handles does not
-have read permission on any one of the handles.
+a list of handles.
 
 =back
 
@@ -1172,7 +1170,7 @@ sub are_readable
 	my $ua = LWP::UserAgent->new();
 
 	while (my $record = $sth->fetchrow_hashref()) {
-		my $node = $default_shock . "/node/" . $record->{id};	 
+		my $node = $record->{url} . "/node/" . $record->{id};	 
 		DEBUG "are_readable node: $node\n";
 
 		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
@@ -1200,6 +1198,8 @@ sub are_readable
 			die "did not recognize status (200, 400, or 401), saw $perl_scalar->{status}";
 		}
 		
+		#$return = $self->is_readable($return)
+		return $return;
 	}
 	
 	if ($sth->rows < scalar(@{$arg_1})) {
@@ -1274,6 +1274,56 @@ sub is_readable
     my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
     my($return);
     #BEGIN is_readable
+
+	my $hid = $id;
+
+        # strip the namespace from incoming hid
+	# TODO: refactor this into private method
+        my $ns = $namespace . "_";
+        $hid =~ s/^$ns//;
+
+	my $dbh = $self->{get_dbh}->();
+	my $sql = "SELECT * FROM Handle WHERE hid = $hid";
+	my $sth = $dbh->prepare($sql)
+		or die "could not prepare $sql, $DBI::errstr";
+	my $row = $sth->execute() or
+		die "could not execute $sql, $DBI::errstr";
+
+	my $record = $sth->fetchrow_hashref();
+	die "url not found for $hid" unless $record->{url};
+	die "id not found for $hid"  unless $record->{id};
+
+	my $ua = LWP::UserAgent->new();  # NEED to think about scope of $ua
+	my $uri = $record->{url} . "/node/" . $record->{id};
+	my $req = new HTTP::Request("GET",$uri,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
+        
+	$ua->prepare_request($req);
+        my $get = $ua->send_request($req);
+        if ($get->code > 499) {
+                die "There was an unexpected error contacting the Shock server: " .
+                     $get->status_line;
+        }
+
+        my $json = JSON->new->allow_nonref;
+        my $json_text = $get->decoded_content;
+        my $perl_scalar = $json->decode( $json_text );
+
+        DEBUG "are_readable response:  ", $json_text;
+
+	# 401 means unauthorized and 400 means no such node
+        if( $perl_scalar->{status} == 401 || 
+            $perl_scalar->{status} == 400 ) {
+        	$return = 0;
+        }
+        elsif ( $perl_scalar->{status} == 200 ) {
+                $return = 1;
+        }
+        else {
+                die "expedted status 200, 400, or 401 ",
+		    "but saw $perl_scalar->{status}";
+        }
+
+
     #END is_readable
     my @_bad_returns;
     (!ref($return)) or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");

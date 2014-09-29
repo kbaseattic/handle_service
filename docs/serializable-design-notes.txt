@@ -1,0 +1,18 @@
+This captures some notes on the serializable capability of the handle service module.
+
+The cli already has a serialize and deserialize method in all of the command line scripts. This comes by way of bootstrapping the construction of a command using tpage and the script.tt template.
+
+So, what am I looking for? I'm looking for a serialize capability that will serialize a handle to the file system or to the workspace or to what ever underlying storage system the user want (lets throw in accumulo just for giggles).
+
+Let's start by asking how does this look to the user?
+
+The use case is that a user has D directories, each of which contains F fastq.gz files that are to be mappeded to R reference genomes.
+
+a) The user wishes to obtain 1 vcf file for each set of fastq.gz files mapped foreach reference genome.
+
+b) The user wishes to submit the name of the directory, or a file that contains the list of directories.
+
+c) The users wishes to receive the vcf file in the directory that contains the fastq files.
+
+I'm thinking that all output should be in the form of a handle that has been serialized to disk. 
+
