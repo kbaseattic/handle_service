@@ -1170,7 +1170,7 @@ sub are_readable
 	my $ua = LWP::UserAgent->new();
 
 	while (my $record = $sth->fetchrow_hashref()) {
-		my $node = $default_shock . "/node/" . $record->{id};	 
+		my $node = $record->{url} . "/node/" . $record->{id};	 
 		DEBUG "are_readable node: $node\n";
 
 		my $req = new HTTP::Request("GET",$node,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
