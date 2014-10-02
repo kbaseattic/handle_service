@@ -185,6 +185,8 @@ ok (exists $h->{id}, "id $h->{id} in handle exists");
 ok (ref ($obj->ids_to_handles([$h->{id}])) eq "ARRAY", "ids_to_handles returns an arrayref");
 ok ($obj->ids_to_handles([$h->{id}])->[0]->{id} eq $h->{id}, "ids are the same $h->{id}");
 
+ok ($obj->ids_to_handles([$h->{id}, 'badd-node-iddd'])->[1] eq undef, "element 1 is undef");
+
 ok ($h = $obj->upload($data), "upload returns defined");
 ok (exists $h->{id}, "id in handle exists");
 ok (exists $h->{file_name}, "file_name in handle exists as $h->{file_name}");
