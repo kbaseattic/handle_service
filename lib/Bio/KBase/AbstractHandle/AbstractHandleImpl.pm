@@ -1324,7 +1324,6 @@ sub are_readable
 		}
 		
 		#$return = $self->is_readable($return)
-		return $return;
 	}
 	
 	if ($sth->rows < scalar(@{$arg_1})) {
