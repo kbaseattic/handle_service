@@ -148,5 +148,10 @@ module AbstractHandle {
 	funcdef give (string user, string perm, Handle h)
 		returns() authentication required;
 
+	/* The delete_handles function takes a list of handles
+	   and deletes them on the handle service server.
+	*/
+	funcdef ids_to_handles(list<string> ids) returns (list<Handle> handles)
+		authentication required;
 };
 
