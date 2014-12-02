@@ -1634,8 +1634,8 @@ HandleId is a string
 
 =item Description
 
-The delete_handles function takes a list of handles
-and deletes them on the handle service server.
+Given a list of ids, this function returns
+a list of handles.
 
 =back
 
