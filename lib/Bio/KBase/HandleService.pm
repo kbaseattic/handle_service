@@ -240,6 +240,10 @@ sub hids_to_handles {
 	$self->{dsi}->hids_to_handles(@_);
 }
 
+sub ids_to_handles {
+	my $self = shift;
+	$self->{dsi}->ids_to_handles(@_);
+}
 =head1 Authors
 
 Tom Brettin
