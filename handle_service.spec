@@ -148,5 +148,12 @@ module AbstractHandle {
 	funcdef give (string user, string perm, Handle h)
 		returns() authentication required;
 
+	/* Given a list of ids, this function returns
+           a list of handles. In case of Shock, the list of ids
+           are shock node ids and this function the handles, which
+           contains Shock url and related information.
+	*/
+	funcdef ids_to_handles(list<string> ids) returns (list<Handle> handles)
+		authentication required;
 };
 
