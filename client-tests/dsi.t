@@ -67,6 +67,8 @@ can_ok("Bio::KBase::HandleService", qw(
 	upload_metadata
 	download_metadata
 	list_handles
+	hids_to_handles
+	ids_to_handles
 	 )
 );
 
