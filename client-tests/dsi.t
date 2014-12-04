@@ -90,6 +90,10 @@ ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
 
 ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h is readable");
 
+ok ($obj->hids_to_handles([$h->{hid}]), "hid $h->{hid} fetchs a handle with node $h->{id}");
+
+ok ($obj->ids_to_handles([$h->{id}]), "node id $h->{id} fetchs a handle with hid $h->{hid}");
+
 # upload a file
 
 ok ($h = $obj->upload($data), "upload returns defined");
@@ -174,6 +178,27 @@ ok ($handles->[0]->{hid} eq $h->{hid}, "hids are the same $h->{hid}");
 ok ($handles->[0]->{id} eq $h->{id}, "ids are the same $h->{id}");
 ok (defined $handles->[0]->{file_name}, "file_name is defined as $handles->[0]->{file_name}");
 ok ( defined $handles->[0]->{remote_md5}, "remote md5 is defined as $handles->[0]{remote_md5}");
+
+# test ids_to_handles
+ok ($h = $obj->new_handle(), "new_handle returns defined");
+ok (exists $h->{id}, "id $h->{id} in handle exists");
+ok (ref ($obj->ids_to_handles([$h->{id}])) eq "ARRAY", "ids_to_handles returns an arrayref");
+ok ($obj->ids_to_handles([$h->{id}])->[0]->{id} eq $h->{id}, "ids are the same $h->{id}");
+
+ok ($obj->ids_to_handles([$h->{id}, 'badd-node-iddd'])->[1] eq undef, "element 1 is undef");
+
+ok ($h = $obj->upload($data), "upload returns defined");
+ok (exists $h->{id}, "id in handle exists");
+ok (exists $h->{file_name}, "file_name in handle exists as $h->{file_name}");
+ok ($handles = $obj->ids_to_handles([$h->{id}]), "ids_to_handles returnes defined");
+ok (ref ($handles) eq "ARRAY", "ids_to_handles returns an arrayref");
+ok (@$handles == 1, "ids_to_handles returns one handle");
+ok ($handles->[0]->{id} eq $h->{id}, "ids are the same $h->{id}");
+ok ($handles->[0]->{id} eq $h->{id}, "ids are the same $h->{id}");
+ok (defined $handles->[0]->{file_name}, "file_name is defined as $handles->[0]->{file_name}");
+ok ( defined $handles->[0]->{remote_md5}, "remote md5 is defined as $handles->[0]{remote_md5}");
+
+
 
 # clean up
 done_testing;
