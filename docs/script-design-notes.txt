@@ -39,6 +39,8 @@ it is not clear that all handle files will have the .kbhs
 suffix. Still, we could come back to this and require that
 all handle files be named with the .kbhs suffix.
 
+TODO: Consider design impact of adding namespace on the suffx.
+
 
 Standard command line syntax:
 
