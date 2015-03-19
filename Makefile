@@ -24,8 +24,6 @@ TPAGE_ARGS = --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --
 # the dev_container. right now, these vars are defined in
 # Makefile.common, so it's redundant here.
 TOOLS_DIR = $(TOP_DIR)/tools
-WRAP_PERL_TOOL = wrap_perl
-WRAP_PERL_SCRIPT = bash $(TOOLS_DIR)/$(WRAP_PERL_TOOL).sh
 SRC_PERL = $(wildcard scripts/*.pl)
 
 # You can change these if you are putting your tests somewhere
@@ -224,6 +222,8 @@ deploy-all: deploy-client deploy-service
 
 deploy-client: deploy-libs deploy-scripts deploy-docs vars
 
+deploy-scripts: deploy-perl-scripts
+
 # The deploy-libs and deploy-scripts targets are used to recognize
 # and delineate the client types, mainly a set of libraries that
 # implement an application programming interface and a set of 
@@ -255,18 +255,6 @@ deploy-libs: build-libs
 # The shell script can now be created because the necessary
 # environment variables are known and the location of the
 # script is known. 
-
-deploy-scripts:
-	export KB_TOP=$(TARGET); \
-	export KB_RUNTIME=$(DEPLOY_RUNTIME); \
-	export KB_PERL_PATH=$(TARGET)/lib bash ; \
-	for src in $(SRC_PERL) ; do \
-		basefile=`basename $$src`; \
-		base=`basename $$src .pl`; \
-		echo install $$src $$base ; \
-		cp $$src $(TARGET)/plbin ; \
-		$(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(TARGET)/bin/$$base ; \
-	done
 
 
 # Deploying a service refers to to deploying the capability
