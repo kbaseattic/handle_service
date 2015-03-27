@@ -315,6 +315,8 @@ compile-docs: build-libs
 # target depends on the compiled libs.
 
 build-libs:
+	touch lib/biokbase/__init__.py #do not include code in biokbase/__init__.py
+	touch lib/biokbase/$(SERVICE_NAME)/__init__.py
 	compile_typespec \
 		--psgi $(SERVICE_PSGI)  \
 		--impl Bio::KBase::$(SERVICE_NAME)::$(SERVICE_NAME)Impl \
