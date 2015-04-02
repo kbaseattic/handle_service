@@ -324,6 +324,8 @@ build-libs:
 		--js javascript/$(SERVICE_NAME)/Client \
 		--url $(SELF_URL) \
 		$(SERVICE_SPEC) lib
+	touch lib/biokbase/__init__.py #do not include code in biokbase/__init__.py
+	touch lib/biokbase/$(SERVICE_NAME)/__init__.py
 
 # the Makefile.common.rules contains a set of rules that can be used
 # in this setup. Because it is included last, it has the effect of
