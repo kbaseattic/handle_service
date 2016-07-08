@@ -16,3 +16,4 @@ perl -e 'use Data::Dumper; use Bio::KBase::AbstractHandle::AbstractHandleImpl; $
 # echo "does initialize_handle() work"
 perl -e 'use Data::Dumper; use Bio::KBase::AbstractHandle::AbstractHandleImpl; $dsi=Bio::KBase::AbstractHandle::AbstractHandleImpl->new(); print Dumper $dsi->initialize_handle($dsi->new_handle());'
 
+perl id2handle.t

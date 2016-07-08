@@ -1,0 +1,63 @@
+These are the existing funcdefs:
+
+	funcdef new_handle() returns (Handle h) authentication optional;
+	funcdef localize_handle(Handle h1, string service_name)
+	funcdef initialize_handle(Handle h1) returns (Handle h2) 
+	funcdef persist_handle(Handle h) returns (string hid)
+	funcdef upload(string infile) returns(Handle h) 
+	funcdef download(Handle h, string outfile) returns()
+	funcdef upload_metadata(Handle h, string infile) returns()
+	funcdef download_metadata(Handle h, string outfile) returns()
+	funcdef hids_to_handles(list<HandleId> hids)
+	funcdef are_readable(list<HandleId>) returns(int)
+	funcdef is_readable(string id) returns(int)
+	funcdef list_handles() returns (list<Handle> l)
+	funcdef delete_handles(list<Handle> l) returns ()
+	funcdef give (string user, string perm, Handle h)
+	funcdef ids_to_handles(list<string> ids) returns (list<Handle> handles)
+
+These funcdefs are documented as ABSTRACT:
+
+        funcdef upload(string infile) returns(Handle h)
+        funcdef download(Handle h, string outfile) returns()
+        funcdef upload_metadata(Handle h, string infile) returns()
+        funcdef download_metadata(Handle h, string outfile) returns()
+
+And therefore have an implementation provided. This implementation
+is provided in a CONCRETE class. 
+
+The CONCRETE class implements the ABSTRACT funcdefs. The CONCRETE
+class delegates the remaining funcdefs to the type compiler.
+
+An ABSTRACT object should not be instanciated by or used directly by a
+CLIENT object.
+
+The translation of this pattern is illustrated here.
+
+The HandleService object provides an implementation for the upload,
+download, upload_metadata and download_metadata functions. The
+HandleService object provides implmentations for the remaining
+methods that are declared in the AbstractHandle by delegating to an
+instance of the AbstractHandle.
+
+AbstractHandle objects should not be instanciated by the client or
+called directly by the client. This policy is represented in the use
+of Abstract in the name of the class.
+
+HandleService objects instanciate AbstractHandle objects. 
+
+HandleService objects provide the implementation of those methods declared
+ABSTRACT in the handle_service IDD.
+
+HandleService objects delegate the execution of the remaining methods declared in the IDD to the AbstractHandle object.
+
+The implementation of these methods is provided in the client
+library created by compiling the IDD.
+
+
+ON THE CHANGE REQUEST:
+
+lib/biokbase/AbstractHandle/Client.py
+lib/Bio/KBase/AbstractHandle/Client.pm
+
+
