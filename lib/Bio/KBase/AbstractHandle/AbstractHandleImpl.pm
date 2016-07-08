@@ -1423,7 +1423,7 @@ sub is_owner
 	my $ua = LWP::UserAgent->new();
 
 	while (my $record = $sth->fetchrow_hashref()) {
-		my $aclurl = $record->{url} . "/node/" . $record->{id} . "/acl/";	 
+		my $aclurl = $record->{url} . "/node/" . $record->{id} . "/acl/?verbosity=full";	 
 		DEBUG "is_owner aclurl: $aclurl\n";
 
 		my $req = new HTTP::Request("GET",$aclurl,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
@@ -1445,7 +1445,7 @@ sub is_owner
 			last;
 		} elsif ( $perl_scalar->{status} != 200 ) {
 			die "did not recognize status (200, 400, or 401), saw $perl_scalar->{status}";
-		} elsif ($perl_scalar->{data}->{owner} != $ctx->{user_id}) {
+		} elsif ($perl_scalar->{data}->{owner}->{username} ne $ctx->{user_id}) {
 			$return = 0;
 			last;
 		}
