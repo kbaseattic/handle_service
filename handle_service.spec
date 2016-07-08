@@ -131,6 +131,12 @@ module AbstractHandle {
 	funcdef are_readable(list<HandleId>) returns(int)
 		authentication required;
 
+	/* Given a list of handle ids, this function determines if the underlying
+	   data is owned by the caller. If any one of the handle ids reference
+	   unreadable data this function returns false.
+	*/
+	funcdef is_owner(list<HandleId>) returns(int) authentication required;
+	
 	/* Given a handle id, this function queries the underlying
 	   data store to see if the data being referred to is
 	   readable to by the caller.

@@ -245,11 +245,11 @@ sub new
 =begin html
 
 <pre>
-$h is a Handle
+$h is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -263,11 +263,11 @@ NodeId is a string
 
 =begin text
 
-$h is a Handle
+$h is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -334,13 +334,13 @@ sub new_handle
 =begin html
 
 <pre>
-$h1 is a Handle
+$h1 is an AbstractHandle.Handle
 $service_name is a string
-$h2 is a Handle
+$h2 is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -354,13 +354,13 @@ NodeId is a string
 
 =begin text
 
-$h1 is a Handle
+$h1 is an AbstractHandle.Handle
 $service_name is a string
-$h2 is a Handle
+$h2 is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -445,12 +445,12 @@ sub localize_handle
 =begin html
 
 <pre>
-$h1 is a Handle
-$h2 is a Handle
+$h1 is an AbstractHandle.Handle
+$h2 is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -464,12 +464,12 @@ NodeId is a string
 
 =begin text
 
-$h1 is a Handle
-$h2 is a Handle
+$h1 is an AbstractHandle.Handle
+$h2 is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -548,12 +548,12 @@ sub initialize_handle
 =begin html
 
 <pre>
-$h is a Handle
+$h is an AbstractHandle.Handle
 $hid is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -567,12 +567,12 @@ NodeId is a string
 
 =begin text
 
-$h is a Handle
+$h is an AbstractHandle.Handle
 $hid is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -659,11 +659,11 @@ sub persist_handle
 
 <pre>
 $infile is a string
-$h is a Handle
+$h is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -678,11 +678,11 @@ NodeId is a string
 =begin text
 
 $infile is a string
-$h is a Handle
+$h is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -751,12 +751,12 @@ sub upload
 =begin html
 
 <pre>
-$h is a Handle
+$h is an AbstractHandle.Handle
 $outfile is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -770,12 +770,12 @@ NodeId is a string
 
 =begin text
 
-$h is a Handle
+$h is an AbstractHandle.Handle
 $outfile is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -837,12 +837,12 @@ sub download
 =begin html
 
 <pre>
-$h is a Handle
+$h is an AbstractHandle.Handle
 $infile is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -856,12 +856,12 @@ NodeId is a string
 
 =begin text
 
-$h is a Handle
+$h is an AbstractHandle.Handle
 $infile is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -922,12 +922,12 @@ sub upload_metadata
 =begin html
 
 <pre>
-$h is a Handle
+$h is an AbstractHandle.Handle
 $outfile is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -941,12 +941,12 @@ NodeId is a string
 
 =begin text
 
-$h is a Handle
+$h is an AbstractHandle.Handle
 $outfile is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1005,13 +1005,13 @@ sub download_metadata
 =begin html
 
 <pre>
-$ids is a reference to a list where each element is a NodeId
-$handles is a reference to a list where each element is a Handle
+$ids is a reference to a list where each element is an AbstractHandle.NodeId
+$handles is a reference to a list where each element is an AbstractHandle.Handle
 NodeId is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1024,13 +1024,13 @@ HandleId is a string
 
 =begin text
 
-$ids is a reference to a list where each element is a NodeId
-$handles is a reference to a list where each element is a Handle
+$ids is a reference to a list where each element is an AbstractHandle.NodeId
+$handles is a reference to a list where each element is an AbstractHandle.Handle
 NodeId is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1112,13 +1112,13 @@ sub ids_to_handles
 =begin html
 
 <pre>
-$hids is a reference to a list where each element is a HandleId
-$handles is a reference to a list where each element is a Handle
+$hids is a reference to a list where each element is an AbstractHandle.HandleId
+$handles is a reference to a list where each element is an AbstractHandle.Handle
 HandleId is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1131,13 +1131,13 @@ NodeId is a string
 
 =begin text
 
-$hids is a reference to a list where each element is a HandleId
-$handles is a reference to a list where each element is a Handle
+$hids is a reference to a list where each element is an AbstractHandle.HandleId
+$handles is a reference to a list where each element is an AbstractHandle.Handle
 HandleId is a string
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1226,7 +1226,7 @@ sub hids_to_handles
 =begin html
 
 <pre>
-$arg_1 is a reference to a list where each element is a HandleId
+$arg_1 is a reference to a list where each element is an AbstractHandle.HandleId
 $return is an int
 HandleId is a string
 
@@ -1236,7 +1236,7 @@ HandleId is a string
 
 =begin text
 
-$arg_1 is a reference to a list where each element is a HandleId
+$arg_1 is a reference to a list where each element is an AbstractHandle.HandleId
 $return is an int
 HandleId is a string
 
@@ -1337,6 +1337,131 @@ sub are_readable
 	my $msg = "Invalid returns passed to are_readable:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'are_readable');
+    }
+    return($return);
+}
+
+
+
+
+=head2 is_owner
+
+  $return = $obj->is_owner($arg_1)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$arg_1 is a reference to a list where each element is an AbstractHandle.HandleId
+$return is an int
+HandleId is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$arg_1 is a reference to a list where each element is an AbstractHandle.HandleId
+$return is an int
+HandleId is a string
+
+
+=end text
+
+
+
+=item Description
+
+Given a list of handle ids, this function determines if the underlying
+data is owned by the caller. If any one of the handle ids reference
+unreadable data this function returns false.
+
+=back
+
+=cut
+
+sub is_owner
+{
+    my $self = shift;
+    my($arg_1) = @_;
+
+    my @_bad_arguments;
+    (ref($arg_1) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"arg_1\" (value was \"$arg_1\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to is_owner:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'is_owner');
+    }
+
+    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my($return);
+    #BEGIN is_owner
+	
+	DEBUG "is_owner: user=", $ctx->{user_id};
+
+	$return = 1;
+	
+	#strip the namespace from incoming ids
+	my $ns = $namespace . "_";
+	foreach my $id (@$arg_1) {
+		$id =~ s/^$ns//;
+	}
+	
+	my $dbh = $self->{get_dbh}->();
+	my $sql = "select * from Handle where hid in ( ";
+	$sql   .= join(", ", ("?") x scalar(@{$arg_1}));
+	$sql   .= " )";
+	DEBUG "is_owner: $sql\n";
+
+	my $sth = $dbh->prepare($sql) or die "can not prepare $sql\n$DBI::errstr";
+	my $rv  = $sth->execute(@$arg_1) or die "can not execute $sql\n$DBI::errstr";
+
+	my $ua = LWP::UserAgent->new();
+
+	while (my $record = $sth->fetchrow_hashref()) {
+		my $aclurl = $record->{url} . "/node/" . $record->{id} . "/acl/";	 
+		DEBUG "is_owner aclurl: $aclurl\n";
+
+		my $req = new HTTP::Request("GET",$aclurl,HTTP::Headers->new('Authorization' => "OAuth $ctx->{token}"));
+		$ua->prepare_request($req);
+		my $get = $ua->send_request($req);
+		if ($get->code > 499) {
+		die "There was an unexpected error contacting the Shock server: " .
+				$get->status_line;
+		}
+
+		my $json = JSON->new->allow_nonref;
+		my $json_text = $get->decoded_content;
+		my $perl_scalar = $json->decode( $json_text );
+		DEBUG "is_owner response:  ", $json_text;
+
+		if( $perl_scalar->{status} == 401 ||  # unauthorized
+				$perl_scalar->{status} == 400 ) { # no such node, perhaps deleted
+			$return = 0;
+			last;
+		} elsif ( $perl_scalar->{status} != 200 ) {
+			die "did not recognize status (200, 400, or 401), saw $perl_scalar->{status}";
+		} elsif ($perl_scalar->{data}->{owner} != $ctx->{user_id}) {
+			$return = 0;
+			last;
+		}
+	}
+	
+	if ($sth->rows < scalar(@{$arg_1})) {
+		$return = 0; # missing records
+	}
+
+    #END is_owner
+    my @_bad_returns;
+    (!ref($return)) or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to is_owner:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'is_owner');
     }
     return($return);
 }
@@ -1473,11 +1598,11 @@ sub is_readable
 =begin html
 
 <pre>
-$l is a reference to a list where each element is a Handle
+$l is a reference to a list where each element is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1491,11 +1616,11 @@ NodeId is a string
 
 =begin text
 
-$l is a reference to a list where each element is a Handle
+$l is a reference to a list where each element is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1568,11 +1693,11 @@ sub list_handles
 =begin html
 
 <pre>
-$l is a reference to a list where each element is a Handle
+$l is a reference to a list where each element is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1586,11 +1711,11 @@ NodeId is a string
 
 =begin text
 
-$l is a reference to a list where each element is a Handle
+$l is a reference to a list where each element is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1647,11 +1772,11 @@ sub delete_handles
 <pre>
 $user is a string
 $perm is a string
-$h is a Handle
+$h is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1667,11 +1792,11 @@ NodeId is a string
 
 $user is a string
 $perm is a string
-$h is a Handle
+$h is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a NodeId
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
@@ -1728,16 +1853,17 @@ sub give
 
 <pre>
 $ids is a reference to a list where each element is a string
-$handles is a reference to a list where each element is a Handle
+$handles is a reference to a list where each element is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a string
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
 HandleId is a string
+NodeId is a string
 
 </pre>
 
@@ -1746,16 +1872,17 @@ HandleId is a string
 =begin text
 
 $ids is a reference to a list where each element is a string
-$handles is a reference to a list where each element is a Handle
+$handles is a reference to a list where each element is an AbstractHandle.Handle
 Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is a HandleId
+	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
-	id has a value which is a string
+	id has a value which is an AbstractHandle.NodeId
 	type has a value which is a string
 	url has a value which is a string
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
 HandleId is a string
+NodeId is a string
 
 
 =end text
@@ -1765,7 +1892,9 @@ HandleId is a string
 =item Description
 
 Given a list of ids, this function returns
-a list of handles.
+a list of handles. In case of Shock, the list of ids
+are shock node ids and this function the handles, which
+contains Shock url and related information.
 
 =back
 
@@ -1936,9 +2065,9 @@ a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-hid has a value which is a HandleId
+hid has a value which is an AbstractHandle.HandleId
 file_name has a value which is a string
-id has a value which is a NodeId
+id has a value which is an AbstractHandle.NodeId
 type has a value which is a string
 url has a value which is a string
 remote_md5 has a value which is a string
@@ -1951,9 +2080,9 @@ remote_sha1 has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-hid has a value which is a HandleId
+hid has a value which is an AbstractHandle.HandleId
 file_name has a value which is a string
-id has a value which is a NodeId
+id has a value which is an AbstractHandle.NodeId
 type has a value which is a string
 url has a value which is a string
 remote_md5 has a value which is a string
