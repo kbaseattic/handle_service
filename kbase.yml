@@ -1,3 +1,4 @@
+# This file exists only to populate the version in the Impl file.y
 module-name:
     AbstractHandle
 
