@@ -1,0 +1,14 @@
+module-name:
+    AbstractHandle
+
+module-description:
+    Core KBase service that manages Handle objects.
+
+service-language:
+    perl
+
+module-version:
+    0.2.0
+
+owners:
+    [kkeller, scanon, mrcreosote]

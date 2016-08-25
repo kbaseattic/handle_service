@@ -2,14 +2,17 @@
 VARS_OLD := $(.VARIABLES)
 
 TOP_DIR = ../..
+LIB_DIR = lib/
 DEPLOY_RUNTIME ?= /kb/runtime
 TARGET ?= /kb/deployment
 include $(TOP_DIR)/tools/Makefile.common
 
-SERVICE_SPEC = handle_service.spec	
+SPEC_FILE = handle_service.spec
 SERVICE_NAME = AbstractHandle
+SERVICE_CAPS = AbstractHandle
 SERVICE_PORT = 7109 
 SERVICE_DIR  = handle_service
+SERVICE_CONFIG = handle_service
 
 ifeq ($(SELF_URL),)
 	SELF_URL = http://localhost:$(SERVICE_PORT)
@@ -18,7 +21,7 @@ endif
 NAMESPACE = KBH
 
 SERVICE_PSGI = $(SERVICE_NAME).psgi
-TPAGE_ARGS = --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI) --define handle_namespace=$(NAMESPACE)
+TPAGE_ARGS = --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) --define kb_service_config_stanza=$(SERVICE_CONFIG) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI) --define handle_namespace=$(NAMESPACE)
 
 # to wrap scripts and deploy them to $(TARGET)/bin using tools in
 # the dev_container. right now, these vars are defined in
@@ -315,17 +318,14 @@ compile-docs: build-libs
 # target depends on the compiled libs.
 
 build-libs:
-	compile_typespec \
-		--psgi $(SERVICE_PSGI)  \
-		--impl Bio::KBase::$(SERVICE_NAME)::$(SERVICE_NAME)Impl \
-		--service Bio::KBase::$(SERVICE_NAME)::Service \
-		--client Bio::KBase::$(SERVICE_NAME)::Client \
-		--py biokbase/$(SERVICE_NAME)/Client \
-		--js javascript/$(SERVICE_NAME)/Client \
-		--url $(SELF_URL) \
-		$(SERVICE_SPEC) lib
-	touch lib/biokbase/__init__.py #do not include code in biokbase/__init__.py
-	touch lib/biokbase/$(SERVICE_NAME)/__init__.py
+	kb-sdk compile $(SPEC_FILE) \
+                --out $(LIB_DIR) \
+		--plpsginame $(SERVICE_CAPS).psgi  \
+		--plimplname Bio::KBase::$(SERVICE_CAPS)::$(SERVICE_CAPS)Impl \
+		--plsrvname Bio::KBase::$(SERVICE_CAPS)::Service \
+		--plclname Bio::KBase::$(SERVICE_CAPS)::Client \
+		--pyclname biokbase/$(SERVICE_CAPS)/Client \
+		--jsclname javascript/$(SERVICE_CAPS)/Client
 
 # the Makefile.common.rules contains a set of rules that can be used
 # in this setup. Because it is included last, it has the effect of
