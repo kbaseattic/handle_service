@@ -325,7 +325,8 @@ build-libs:
 		--plsrvname Bio::KBase::$(SERVICE_CAPS)::Service \
 		--plclname Bio::KBase::$(SERVICE_CAPS)::Client \
 		--pyclname biokbase/$(SERVICE_CAPS)/Client \
-		--jsclname javascript/$(SERVICE_CAPS)/Client
+		--jsclname javascript/$(SERVICE_CAPS)/Client \
+		--url $(SELF_URL)
 
 # the Makefile.common.rules contains a set of rules that can be used
 # in this setup. Because it is included last, it has the effect of
