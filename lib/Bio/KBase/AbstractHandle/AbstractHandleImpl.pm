@@ -3,7 +3,9 @@ use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
 # http://semver.org 
-our $VERSION = "0.1.0";
+our $VERSION = "0.2.0";
+our $GIT_URL = "https://github.com/kkellerlbl/handle_service";
+our $GIT_COMMIT_HASH = "66a570a9b050a15e6d4c59b01ba2e73e5bb8161e";
 
 =head1 NAME
 
@@ -994,113 +996,6 @@ sub download_metadata
 
 
 
-=head2 ids_to_handles
-
-  $handles = $obj->ids_to_handles($ids)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$ids is a reference to a list where each element is an AbstractHandle.NodeId
-$handles is a reference to a list where each element is an AbstractHandle.Handle
-NodeId is a string
-Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is an AbstractHandle.HandleId
-	file_name has a value which is a string
-	id has a value which is an AbstractHandle.NodeId
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-HandleId is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$ids is a reference to a list where each element is an AbstractHandle.NodeId
-$handles is a reference to a list where each element is an AbstractHandle.Handle
-NodeId is a string
-Handle is a reference to a hash where the following keys are defined:
-	hid has a value which is an AbstractHandle.HandleId
-	file_name has a value which is a string
-	id has a value which is an AbstractHandle.NodeId
-	type has a value which is a string
-	url has a value which is a string
-	remote_md5 has a value which is a string
-	remote_sha1 has a value which is a string
-HandleId is a string
-
-
-=end text
-
-
-
-=item Description
-
-Given a list of node ids, this function returns
-a list of handles.
-
-=back
-
-=cut
-
-sub ids_to_handles
-{
-    my $self = shift;
-    my($ids) = @_;
-
-    my @_bad_arguments;
-    (ref($ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ids\" (value was \"$ids\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to ids_to_handles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'ids_to_handles');
-    }
-
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
-    my($handles);
-    #BEGIN ids_to_handles
-
-	$handles = [];
-
-        # get handles from database
-        my $dbh = $self->{get_dbh}->();
-        my $sql = "select * from Handle where id in ( ";
-        $sql   .= join(", ", ("?") x scalar(@{$ids}));
-        $sql   .= " )";
-        DEBUG "are_readable: $sql\n";
-
-        my $sth = $dbh->prepare($sql) or die "can not prepare $sql\n$DBI::errstr";
-        my $rv  = $sth->execute(@$ids) or die "can not execute $sql\n$DBI::errstr";
-
-        # add the namespace and build return list
-        while (my $record = $sth->fetchrow_hashref()) {
-                $record->{hid} = $namespace . "_" . $record->{hid};
-                push @$handles, $record;
-        }
-
-
-    #END ids_to_handles
-    my @_bad_returns;
-    (ref($handles) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"handles\" (value was \"$handles\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to ids_to_handles:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'ids_to_handles');
-    }
-    return($handles);
-}
-
-
-
-
 =head2 hids_to_handles
 
   $handles = $obj->hids_to_handles($hids)
@@ -1852,8 +1747,9 @@ sub give
 =begin html
 
 <pre>
-$ids is a reference to a list where each element is a string
+$ids is a reference to a list where each element is an AbstractHandle.NodeId
 $handles is a reference to a list where each element is an AbstractHandle.Handle
+NodeId is a string
 Handle is a reference to a hash where the following keys are defined:
 	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
@@ -1863,7 +1759,6 @@ Handle is a reference to a hash where the following keys are defined:
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
 HandleId is a string
-NodeId is a string
 
 </pre>
 
@@ -1871,8 +1766,9 @@ NodeId is a string
 
 =begin text
 
-$ids is a reference to a list where each element is a string
+$ids is a reference to a list where each element is an AbstractHandle.NodeId
 $handles is a reference to a list where each element is an AbstractHandle.Handle
+NodeId is a string
 Handle is a reference to a hash where the following keys are defined:
 	hid has a value which is an AbstractHandle.HandleId
 	file_name has a value which is a string
@@ -1882,7 +1778,6 @@ Handle is a reference to a hash where the following keys are defined:
 	remote_md5 has a value which is a string
 	remote_sha1 has a value which is a string
 HandleId is a string
-NodeId is a string
 
 
 =end text
@@ -1948,9 +1843,9 @@ sub ids_to_handles
 
 
 
-=head2 version 
+=head2 status 
 
-  $return = $obj->version()
+  $return = $obj->status()
 
 =over 4
 
@@ -1972,14 +1867,19 @@ $return is a string
 
 =item Description
 
-Return the module version. This is a Semantic Versioning number.
+Return the module status. This is a structure including Semantic Versioning number, state and git info.
 
 =back
 
 =cut
 
-sub version {
-    return $VERSION;
+sub status {
+    my($return);
+    #BEGIN_STATUS
+    $return = {"state" => "OK", "message" => "", "version" => $VERSION,
+               "git_url" => $GIT_URL, "git_commit_hash" => $GIT_COMMIT_HASH};
+    #END_STATUS
+    return($return);
 }
 
 =head1 TYPES
