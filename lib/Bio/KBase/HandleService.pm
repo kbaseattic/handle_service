@@ -235,6 +235,12 @@ sub is_readable {
 	$self->{dsi}->is_readable(@_);
 }
 
+
+sub is_owner {
+	my $self = shift;
+	$self->{dsi}->is_owner(@_);
+}
+
 sub hids_to_handles {
 	my $self = shift;
 	$self->{dsi}->hids_to_handles(@_);

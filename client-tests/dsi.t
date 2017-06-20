@@ -92,6 +92,8 @@ ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
 
 ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h is readable");
 
+ok ($obj->is_owner([$h->{hid}]), "hid $h->{hid} in h is owned by user");
+
 ok ($obj->hids_to_handles([$h->{hid}]), "hid $h->{hid} fetchs a handle with node $h->{id}");
 
 ok ($obj->ids_to_handles([$h->{id}]), "node id $h->{id} fetchs a handle with hid $h->{hid}");
@@ -119,6 +121,8 @@ ok ($h->{remote_md5} eq $local_md5, "uploaded file has correct md5");
 ok ($h->{file_name} eq $basename, "file name is $basename");
 
 ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h is readable");
+
+ok ($obj->is_owner([$h->{hid}]), "hid $h->{hid} in h is owned by user");
 
 # download a file
 
@@ -149,7 +153,7 @@ ok (-e $metadata.download && (-s $metadata.download > 0), "metadata download fil
 
 ok(ref ( $obj->list_handles() ) eq "ARRAY", "list handles returned list"); 
 
-# test are_readable
+# test are_readable and is_owner
 
 ok ($h = $obj->new_handle(), "new_handle returns defined");
 ok (exists $h->{url}, "url in handle exists");
@@ -160,9 +164,9 @@ ok (exists $h->{hid}, "hid in handle exists");
 ok (defined $h->{hid}, "hid defined in handle $h->{hid}");
 ok ($obj->are_readable([$h->{hid}]), "hid $h->{hid} in h are readable");
 ok ($obj->is_readable($h->{hid}), "hid $h-> in h is readable");
+ok ($obj->is_owner([$h->{hid}]), "hid $h->{hid} in h is owned by user");
 
-
-# end testing are_readable
+# end testing are_readable and is_owner
 
 # test hids_to_handles
 ok ($h = $obj->new_handle(), "new_handle returns defined");

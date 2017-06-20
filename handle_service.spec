@@ -111,12 +111,6 @@ module AbstractHandle {
 
 	/* STANDARD FUNCTIONS FOR MANAGING HANDLES */
 
-	/* Given a list of node ids, this function returns
-	   a list of handles.
-	*/
-	funcdef ids_to_handles(list<NodeId> ids)
-		returns(list<Handle> handles);
-
 	/* Given a list of handle ids, this function returns
 	   a list of handles.
 	*/
@@ -131,6 +125,12 @@ module AbstractHandle {
 	funcdef are_readable(list<HandleId>) returns(int)
 		authentication required;
 
+	/* Given a list of handle ids, this function determines if the underlying
+	   data is owned by the caller. If any one of the handle ids reference
+	   unreadable data this function returns false.
+	*/
+	funcdef is_owner(list<HandleId>) returns(int) authentication required;
+	
 	/* Given a handle id, this function queries the underlying
 	   data store to see if the data being referred to is
 	   readable to by the caller.
@@ -161,7 +161,7 @@ module AbstractHandle {
            are shock node ids and this function the handles, which
            contains Shock url and related information.
 	*/
-	funcdef ids_to_handles(list<string> ids) returns (list<Handle> handles)
+	funcdef ids_to_handles(list<NodeId> ids) returns (list<Handle> handles)
 		authentication required;
 };
 
