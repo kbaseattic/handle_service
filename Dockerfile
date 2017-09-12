@@ -6,8 +6,11 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG BRANCH=develop
 
-RUN apt-get install -y default-libmysqlclient-dev default-mysql-client-core && \
-    cpanm DBI DBD::mysql IPC::System::Simple Log::Log4perl
+RUN apt-get update && \
+    apt-get install -y default-libmysqlclient-dev default-mysql-client-core && \
+    cpanm DBI DBD::mysql IPC::System::Simple Log::Log4perl && \
+    rm -r /var/lib/apt/lists /var/cache/apt/archives
+
 
 COPY deployment /kb/deployment
 
