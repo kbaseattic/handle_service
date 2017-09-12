@@ -11,7 +11,6 @@ RUN apt-get update && \
     cpanm DBI DBD::mysql IPC::System::Simple Log::Log4perl && \
     rm -r /var/lib/apt/lists /var/cache/apt/archives
 
-
 COPY deployment /kb/deployment
 
 # The BUILD_DATE value seem to bust the docker cache when the timestamp changes, move to
@@ -21,3 +20,5 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.schema-version="1.0.0-rc1" \
       us.kbase.vcs-branch=$BRANCH
+
+ENTRYPOINT [ "/kb/deployment/bin/entrypoint.sh" ]
