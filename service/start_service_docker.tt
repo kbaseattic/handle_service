@@ -1,0 +1,12 @@
+#!/bin/sh
+export KB_TOP=[% kb_top %]
+export KB_RUNTIME=[% kb_runtime %]
+export PATH=$KB_TOP/bin:$KB_RUNTIME/bin:$PATH
+export PERL5LIB=$KB_TOP/lib
+export KB_SERVICE_DIR=$KB_TOP/services/[% kb_service_dir %]
+export KB_SERVICE_NAME=[% kb_service_config_stanza %]
+export KB_DEPLOYMENT_CONFIG=$KB_TOP/conf/deployment.cfg
+
+pid_file=$KB_SERVICE_DIR/service.pid
+
+exec /usr/bin/perl $KB_RUNTIME/bin/starman --listen :[% kb_service_port %] --pid $pid_file $KB_SERVICE_DIR/[% kb_psgi %] --error-log $KB_SERVICE_DIR/error.log  --access-log $KB_SERVICE_DIR/access.log --workers 20 

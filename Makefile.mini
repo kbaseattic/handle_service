@@ -1,0 +1,57 @@
+# This makefile is intended to be used to get around the dev container dependencies
+# in the main Makefile, and only has enough to build the runnable docker image
+#
+# The dependencies to be aware of with this Makefile are:
+# 1) Docker engine
+# 2) The perl template toolkit ( use cpanm Template to install)
+#
+# This is the name for the docker image to be generated
+IMAGE_NAME := "kbase/handle_service"
+
+# Path to tpage executable
+TPAGE := "tpage"
+
+LIB_DIR = lib/
+TARGET := /kb/deployment
+RUNTIME := /usr/local
+DESTDIR := deployment
+
+SPEC_FILE = handle_service.spec
+SERVICE_NAME = AbstractHandle
+SERVICE_CAPS = AbstractHandle
+SERVICE_PORT = 7109
+SERVICE_DIR  = handle_service
+SERVICE_CONFIG  = handle_service
+
+ifeq ($(SELF_URL),)
+        SELF_URL = http://localhost:$(SERVICE_PORT)
+endif
+
+SERVICE_PSGI = $(SERVICE_NAME).psgi
+TPAGE_ARGS = --define kb_runtime=$(RUNTIME) --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --define kb_service_name=$(SERVICE_NAME) --define kb_service_config_stanza=$(SERVICE_CONFIG) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI)
+
+deploy-service:
+	mkdir -p ./$(DESTDIR)/services/$(SERVICE_DIR)
+	mkdir -p ./$(DESTDIR)/lib/Bio/KBase
+	$(TPAGE) $(TPAGE_ARGS) service/start_service_docker.tt > ./$(DESTDIR)/services/$(SERVICE_DIR)/start_service
+	chmod +x ./$(DESTDIR)/services/$(SERVICE_DIR)/start_service
+	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > ./$(DESTDIR)/services/$(SERVICE_DIR)/stop_service
+	chmod +x ./$(DESTDIR)/services/$(SERVICE_DIR)/stop_service
+	$(TPAGE) $(TPAGE_ARGS) service/upstart.tt > service/$(SERVICE_NAME).conf
+	chmod +x service/$(SERVICE_NAME).conf
+	$(TPAGE) $(TPAGE_ARGS) service/constants.tt > ./$(DESTDIR)/lib/Bio/KBase/HandleServiceConstants.pm
+	cp lib/Bio/KBase/AbstractHandle/AbstractHandle.psgi ./$(DESTDIR)/services/$(SERVICE_DIR)/
+	echo "done executing deploy-service target"
+
+# Targets that build the docker image for the handleservice, and push it into dockerhub
+docker_image: deploy-service
+	cp -R lib deployment/
+	./getKBaseLibs.sh deployment/lib https://ithub.com/kbase/handle_service https://github.com/kbase/typecomp https://github.com/kbase/kb_sdk.git
+	mkdir -p deployment/lib/Bio/KBase
+	wget -rO deployment/lib/Bio/KBase/Auth.pm https://raw.githubusercontent.com/kbase/auth/master/Bio-KBase-Auth/lib/Bio/KBase/Auth.pm
+	wget -rO deployment/lib/Bio/KBase/AuthToken.pm https://raw.githubusercontent.com/kbase/auth/master/Bio-KBase-Auth/lib/Bio/KBase/AuthToken.pm
+	IMAGE_NAME=$(IMAGE_NAME) hooks/build
+
+push_image:
+
+	IMAGE_NAME=$(IMAGE_NAME) ./push2dockerhub.sh
