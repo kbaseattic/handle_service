@@ -52,7 +52,7 @@ deploy-service:
 # Targets that build the docker image for the handleservice, and push it into dockerhub
 docker_image: deploy-service
 	cp -R lib deployment/
-	./getKBaseLibs.sh deployment/lib git@github.com:kbase/handle_service git@github.com:kbase/typecomp git@github.com:kbase/kb_sdk.git
+	./getKBaseLibs.sh deployment/lib https://ithub.com/kbase/handle_service https://github.com/kbase/typecomp https://github.com/kbase/kb_sdk.git
 	mkdir -p deployment/lib/Bio/KBase
 	wget -rO deployment/lib/Bio/KBase/Auth.pm https://raw.githubusercontent.com/kbase/auth/master/Bio-KBase-Auth/lib/Bio/KBase/Auth.pm
 	wget -rO deployment/lib/Bio/KBase/AuthToken.pm https://raw.githubusercontent.com/kbase/auth/master/Bio-KBase-Auth/lib/Bio/KBase/AuthToken.pm
