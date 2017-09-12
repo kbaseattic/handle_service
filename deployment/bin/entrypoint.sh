@@ -89,4 +89,4 @@ export KB_DEPLOYMENT_CONFIG=$DIR/../conf/deployment.cfg
 
 # Try to expand the template and then startup the jetty server if only that succeeds
 ${J2} $TEMPLATE $DATA_SRC > $KB_DEPLOYMENT_CONFIG && \
-$DIR/services/handle_service/start_service
+$DIR/../services/handle_service/start_service
