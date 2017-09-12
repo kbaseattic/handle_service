@@ -9,7 +9,7 @@
 IMAGE_NAME := "kbase/handle_service"
 
 # Path to tpage executable
-TPAGE := "/usr/local/bin/tpage"
+TPAGE := "tpage"
 
 LIB_DIR = lib/
 TARGET := /kb/deployment
