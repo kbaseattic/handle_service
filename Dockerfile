@@ -7,7 +7,7 @@ ARG VCS_REF
 ARG BRANCH=develop
 
 RUN apt-get update && \
-    apt-get install -y default-libmysqlclient-dev default-mysql-client-core && \
+    apt-get install -y default-libmysqlclient-dev default-mysql-client-core curl && \
     cpanm DBI DBD::mysql IPC::System::Simple Log::Log4perl && \
     rm -r /var/lib/apt/lists /var/cache/apt/archives
 

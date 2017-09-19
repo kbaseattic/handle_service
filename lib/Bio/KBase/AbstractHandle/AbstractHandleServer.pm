@@ -763,7 +763,7 @@ unless (caller) {
     my($input_file,$output_file,$token) = @ARGV;
     my @dispatch;
     {
-        use AbstractHandleImpl;
+        use Bio::KBase::AbstractHandle::AbstractHandleImpl;
         my $obj = AbstractHandleImpl->new;
         push(@dispatch, 'AbstractHandle' => $obj);
     }
