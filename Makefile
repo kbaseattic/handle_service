@@ -322,8 +322,8 @@ build-libs:
                 --out $(LIB_DIR) \
 		--plpsginame $(SERVICE_CAPS).psgi  \
 		--plimplname Bio::KBase::$(SERVICE_CAPS)::$(SERVICE_CAPS)Impl \
-		--plsrvname Bio::KBase::$(SERVICE_CAPS)::Service \
-		--plclname Bio::KBase::$(SERVICE_CAPS)::Client \
+		--plsrvname Bio::KBase::$(SERVICE_CAPS)::$(SERVICE_CAPS)Server \
+		--plclname Bio::KBase::$(SERVICE_CAPS)::$(SERVICE_CAPS)Client \
 		--pyclname biokbase/$(SERVICE_CAPS)/Client \
 		--jsclname javascript/$(SERVICE_CAPS)/Client \
 		--url $(SELF_URL)
