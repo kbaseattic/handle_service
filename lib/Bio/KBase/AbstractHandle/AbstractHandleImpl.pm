@@ -93,7 +93,7 @@ sub insert_handle {
 
         my $sql;
         my $dbh = $self->{get_dbh}->();
-	my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+	my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
         
 	my (@fields, @values);
         foreach my $field (keys %$h) {
@@ -297,7 +297,7 @@ sub new_handle
 {
     my $self = shift;
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($h);
     #BEGIN new_handle
 
@@ -401,7 +401,7 @@ sub localize_handle
 							       method_name => 'localize_handle');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($h2);
     #BEGIN localize_handle
 
@@ -506,7 +506,7 @@ sub initialize_handle
 							       method_name => 'initialize_handle');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($h2);
     #BEGIN initialize_handle
 
@@ -610,7 +610,7 @@ sub persist_handle
 							       method_name => 'persist_handle');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($hid);
     #BEGIN persist_handle
 
@@ -724,7 +724,7 @@ sub upload
 							       method_name => 'upload');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($h);
     #BEGIN upload
 	die "upload cannot be called on AbstractHandle";
@@ -818,7 +818,7 @@ sub download
 							       method_name => 'download');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     #BEGIN download
 	die "download called on AbstractHandle";
     #END download
@@ -903,7 +903,7 @@ sub upload_metadata
 							       method_name => 'upload_metadata');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     #BEGIN upload_metadata
 	die "upload_metadata should not be called on AbstractHandle";
     #END upload_metadata
@@ -986,7 +986,7 @@ sub download_metadata
 							       method_name => 'download_metadata');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     #BEGIN download_metadata
 	die "Cannot call download_metadata on AbstractHandle";
     #END download_metadata
@@ -1066,7 +1066,7 @@ sub hids_to_handles
 							       method_name => 'hids_to_handles');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($handles);
     #BEGIN hids_to_handles
 
@@ -1164,7 +1164,7 @@ sub are_readable
 							       method_name => 'are_readable');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($return);
     #BEGIN are_readable
 
@@ -1292,7 +1292,7 @@ sub is_owner
 							       method_name => 'is_owner');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($return);
     #BEGIN is_owner
 	
@@ -1415,7 +1415,7 @@ sub is_readable
 							       method_name => 'is_readable');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($return);
     #BEGIN is_readable
 
@@ -1541,7 +1541,7 @@ sub list_handles
 {
     my $self = shift;
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($l);
     #BEGIN list_handles
 
@@ -1645,7 +1645,7 @@ sub delete_handles
 							       method_name => 'delete_handles');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     #BEGIN delete_handles
     #END delete_handles
     return();
@@ -1727,7 +1727,7 @@ sub give
 							       method_name => 'give');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     #BEGIN give
     #END give
     return();
@@ -1808,7 +1808,7 @@ sub ids_to_handles
 							       method_name => 'ids_to_handles');
     }
 
-    my $ctx = $Bio::KBase::AbstractHandle::Service::CallContext;
+    my $ctx = $Bio::KBase::AbstractHandle::AbstractHandleServer::CallContext;
     my($handles);
     #BEGIN ids_to_handles
 	$handles = [];
