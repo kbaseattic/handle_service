@@ -28,7 +28,8 @@ ifeq ($(SELF_URL),)
 endif
 
 SERVICE_PSGI = $(SERVICE_NAME).psgi
-TPAGE_ARGS = --define kb_runtime=$(RUNTIME) --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --define kb_service_name=$(SERVICE_NAME) --define kb_service_config_stanza=$(SERVICE_CONFIG) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI)
+NAMESPACE = KBH
+TPAGE_ARGS = --define kb_runtime=$(RUNTIME) --define kb_runas_user=$(SERVICE_USER) --define kb_top=$(TARGET) --define kb_service_name=$(SERVICE_NAME) --define kb_service_config_stanza=$(SERVICE_CONFIG) --define kb_service_dir=$(SERVICE_DIR) --define kb_service_port=$(SERVICE_PORT) --define kb_psgi=$(SERVICE_PSGI) --define handle_namespace=$(NAMESPACE)
 
 deploy-service:
 	mkdir -p ./$(DESTDIR)/services/$(SERVICE_DIR)
