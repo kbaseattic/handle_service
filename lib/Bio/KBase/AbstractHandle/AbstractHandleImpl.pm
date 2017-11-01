@@ -32,7 +32,7 @@ Log::Log4perl->easy_init($DEBUG);
 use Bio::KBase::HandleServiceConstants 'handleNameSpace';
 
 our $namespace = handleNameSpace;
-INFO "using $namespace as the namespace for handles created by this service";
+INFO "pid $$ using $namespace as the default handle namespace";
 
 our $cfg = {};
 our ($default_shock, $mysql_host, $mysql_port, $mysql_user, $mysql_pass,
@@ -42,16 +42,23 @@ if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $cfg = new Config::Simple($ENV{KB_DEPLOYMENT_CONFIG}) or
         die "could not construct new Config::Simple object";
     $default_shock = $cfg->param('handle_service.default-shock-server');
+    $namespace     = $cfg->param('handle_service.handle-namespace');
     $mysql_host    = $cfg->param('handle_service.mysql-host');
     $mysql_port    = $cfg->param('handle_service.mysql-port');
     $mysql_user    = $cfg->param('handle_service.mysql-user');
     $mysql_pass    = $cfg->param('handle_service.mysql-pass');
     $data_source   = $cfg->param('handle_service.data-source');
-    INFO "$$ reading config from $ENV{KB_DEPLOYMENT_CONFIG}";
-    INFO "$$ using $default_shock as the default shock server";
+    INFO "pid $$ reading config from $ENV{KB_DEPLOYMENT_CONFIG}";
+    INFO "pid $$ using $default_shock as the default shock server";
+    INFO "pid $$ using $namespace as the namespace for handles created by this service";
 }
 else {
-    die "could not find KB_DEPLOYMENT_CONFIG";
+    die "pid $$ CRITICAL: could not find KB_DEPLOYMENT_CONFIG, exiting";
+}
+
+unless ($namespace)
+{
+    die "pid $$ CRITICAL: handle namespace was not set, exiting";
 }
 
 # methods not exposed in the API
