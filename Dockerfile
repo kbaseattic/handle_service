@@ -11,6 +11,7 @@ RUN apt-get update && \
     rm -r /var/lib/apt/lists /var/cache/apt/archives
 
 COPY deployment /kb/deployment
+ENV KB_DEPLOYMENT_CONFIG=/kb/deployment/conf/deployment.cfg
 
 # The BUILD_DATE value seem to bust the docker cache when the timestamp changes, move to
 # the end
@@ -22,4 +23,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       maintainer="Steve Chan sychan@lbl.gov"
 
 EXPOSE 7109
-ENTRYPOINT [ "/kb/deployment/bin/entrypoint.sh" ]
+ENTRYPOINT [ "/kb/deployment/bin/dockerize" ]
+CMD [ "-template", \
+      "/kb/deployment/conf/.templates/deployment.cfg.templ:/kb/deployment/conf/deployment.cfg", \
+      "starman", "--listen", ":7109", "/kb/deployment/lib/Bio/KBase/AbstractHandle/AbstractHandle.psgi" ]

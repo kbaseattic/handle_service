@@ -1,0 +1,13 @@
+[handle_service]
+mysql-host={{ default .Env.mysql_host "ci-mysql" }}
+mysql-user={{ default .Env.mysql_user "hsiadmin" }}
+mlog_log_file={{ default .Env.mlog_log_file "service.log" }}
+service-host={{ default .Env.service_host "localhost" }}
+data-source={{ default .Env.data_source "dbi:mysql:hsi" }}
+mlog_log_level={{ default .Env.mlog_log_level "6" }}
+mysql-pass={{ default .Env.mysql_pass "" }}
+mysql-perm={{ default .Env.mysql_perm "ALL" }}
+default-shock-server={{ default .Env.default_shock_server "https://ci.kbase.us/services/shock-api/" }}
+handle-namespace={{ default .Env.handle_namespace "KBH" }}
+service-port={{ default .Env.service_port "7109" }}
+auth-service-url={{ default .Env.auth_service_url "https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login" }}
