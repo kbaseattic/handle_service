@@ -1,10 +1,27 @@
 version: "3.1"
 services:
   handle_service:
-    image: kbase/handle_service:${TRAVIS_BRANCH:-latest}
-    command: [ "https://gitlab.kbase.lbl.gov:1443/devops/serviceconf/raw/master/handle_service/handle_service-ci.yml"]
+    image: kbase/handle_service:${TRAVIS_BRANCH:-develop}
+    command: 
+      - "-template"
+      - "/kb/deployment/conf/.templates/deployment.cfg.templ:/kb/deployment/conf/deployment.cfg"
+      - "-env"
+      - "https://gitlab.kbase.lbl.gov:1443/devops/serviceconf/raw/master/handle_service/handle_service-ci.yml"
+      - "-env-header"
+      - "/run/secrets/auth_data"
+      - "-validate-cert=false"
+      - "-wait"
+      - "tcp://ci-mysql:3306"
+      - "-timeout"
+      - "150s"
+      - "starman"
+      - "--listen"
+      - ":7109"
+      - "/kb/deployment/lib/Bio/KBase/AbstractHandle/AbstractHandle.psgi"
     ports:
       - "7109:7109"
+    environment:
+      - KB_SERVICE_NAME=handle_service
     secrets:
       - auth_data
     depends_on: ["handle_manager", "ci-mysql"]
@@ -18,7 +35,19 @@ services:
 
   handle_manager:
     image: kbase/handle_mngr:latest
-    command: [ "https://gitlab.kbase.lbl.gov:1443/devops/serviceconf/raw/master/handle_mngr/handle_mngr-ci.yml"]
+    command: 
+      - "-template"
+      - "/kb/deployment/conf/.templates/deployment.cfg.templ:/kb/deployment/conf/deployment.cfg"
+      - "-env"
+      - "https://gitlab.kbase.lbl.gov:1443/devops/serviceconf/raw/master/handle_mngr/handle_mngr-ci.yml"
+      - "-wait"
+      - "tcp://auth2:8080"
+      - "-timeout"
+      - "120s"
+      - "starman"
+      - "--listen"
+      - ":9001"
+      - "/kb/deployment/lib/Bio/KBase/HandleMngr/HandleMngr.psgi"
     ports:
       - "9001:9001"
     secrets:
