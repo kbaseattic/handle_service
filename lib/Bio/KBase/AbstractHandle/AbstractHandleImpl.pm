@@ -32,7 +32,7 @@ Log::Log4perl->easy_init($DEBUG);
 use Bio::KBase::HandleServiceConstants 'handleNameSpace';
 
 our $namespace = handleNameSpace;
-INFO "pid $$ using $namespace as the default handle namespace";
+INFO "pid $$ using '$namespace' as the default handle namespace";
 
 our $cfg = {};
 our ($default_shock, $mysql_host, $mysql_port, $mysql_user, $mysql_pass,
@@ -50,7 +50,7 @@ if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $data_source   = $cfg->param('handle_service.data-source');
     INFO "pid $$ reading config from $ENV{KB_DEPLOYMENT_CONFIG}";
     INFO "pid $$ using $default_shock as the default shock server";
-    INFO "pid $$ using $namespace as the namespace for handles created by this service";
+    INFO "pid $$ using '$namespace' as the namespace for handles created by this service";
 }
 else {
     die "pid $$ CRITICAL: could not find KB_DEPLOYMENT_CONFIG, exiting";
