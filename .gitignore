@@ -2,3 +2,5 @@
 *~
 /deployment/services
 AbstractHandle.conf
+/secrets/
+*.pyc
